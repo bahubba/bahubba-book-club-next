@@ -1,5 +1,6 @@
-import { Schema, model, models } from "mongoose";
+import { Schema, model, models } from 'mongoose';
 
+/** MongoDB User document schema */
 const userSchema = new Schema({
   email: {
     type: String,
@@ -9,7 +10,7 @@ const userSchema = new Schema({
   givenName: String,
   surname: String,
   imageURL: String,
-  memberships: [{
+  memberships: [ {
     clubID: { type: Schema.Types.ObjectId, ref: 'BookClub' },
     joined: {
       type: Date,
@@ -19,9 +20,9 @@ const userSchema = new Schema({
     departed: Date,
     role: {
       type: String,
-      enum: ['OWNER', 'ADMIN', 'READER', 'PARTICIPANT', 'OBSERVER']
+      enum: [ 'OWNER', 'ADMIN', 'READER', 'PARTICIPANT', 'OBSERVER' ]
     }
-  }]
+  } ]
 });
 
 const User = models.User || model('User', userSchema);

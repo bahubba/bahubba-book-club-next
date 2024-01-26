@@ -1,3 +1,4 @@
+// MongoDB User document
 export interface UserDoc {
   email: string;
   givenName: string;
@@ -6,6 +7,7 @@ export interface UserDoc {
   memberships?: BookClubMembership[];
 }
 
+// MongoDB BookClub document
 export interface BookClubDoc {
   name: String;
   description: String;
@@ -13,8 +15,10 @@ export interface BookClubDoc {
   members?: BookClubMember[];
 }
 
+// Book club role enum
 export type Role = 'OWNER' | 'ADMIN' | 'READER' | 'PARTICIPANT' | 'OBSERVER';
 
+// MongoDB BookClubMembership subdocument
 export interface BookClubMembership {
   clubID: string;
   joined: Date;
@@ -22,6 +26,7 @@ export interface BookClubMembership {
   role: Role;
 }
 
+// MongoDB BookClubMember subdocument
 export interface BookClubMember {
   userID: string;
   joined: Date;
