@@ -5,26 +5,35 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
-  givenName: String,
-  surname: String,
-  imageURL: String,
-  memberships: [ {
-    clubID: { type: Schema.Types.ObjectId, ref: 'BookClub' },
-    joined: {
-      type: Date,
-      default: Date.now,
-      required: true
-    },
-    departed: Date,
-    role: {
-      type: String,
-      enum: [ 'OWNER', 'ADMIN', 'READER', 'PARTICIPANT', 'OBSERVER' ]
+  providerProfiles: {
+    type: Map,
+    of: {
+      userId: String,
+      providerAccountId: String,
+      name: String,
+      sub: String,
+      image: String
     }
-  } ]
+  },
+  memberships: [
+    {
+      clubID: { type: Schema.Types.ObjectId, ref: 'BookClub' },
+      joined: {
+        type: Date,
+        default: Date.now,
+        required: true
+      },
+      departed: Date,
+      role: {
+        type: String,
+        enum: [ 'OWNER', 'ADMIN', 'READER', 'PARTICIPANT', 'OBSERVER' ]
+      }
+    }
+  ]
 });
 
-const User = models.User || model('User', userSchema);
+const UserModel = models.User || model('User', userSchema);
 
-export default User;
+export default UserModel;

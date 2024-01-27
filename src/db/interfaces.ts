@@ -1,18 +1,36 @@
-// MongoDB User document
-export interface UserDoc {
+import { Document } from 'mongoose';
+
+// Provider profile info
+export interface ProviderProfile {
+  userId: string | undefined;
+  providerAccountId: string;
+  name: string;
+  sub: string | undefined;
+  image: string | null | undefined;
+}
+
+// User info
+export interface User {
   email: string;
-  givenName: string;
-  surname: string;
-  imageURL: string;
+  preferredName: string;
+  providerProfiles: Map<string, ProviderProfile>;
   memberships?: BookClubMembership[];
 }
 
-// MongoDB BookClub document
-export interface BookClubDoc {
+// MongoDB User document
+export interface UserDoc extends User, Document {
+}
+
+// Book club info
+export interface BookClub {
   name: String;
   description: String;
   image: String;
   members?: BookClubMember[];
+}
+
+// MongoDB BookClub document
+export interface BookClubDoc extends BookClub, Document {
 }
 
 // Book club role enum

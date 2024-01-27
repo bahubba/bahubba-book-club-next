@@ -12,6 +12,7 @@
 }
 
 /* Apply max-width and overflow to html and body */
-html, body {
-  @apply max-w-full overflow-x-hidden;
+html,
+body {
+  @apply max-w-full h-full overflow-hidden;
 }

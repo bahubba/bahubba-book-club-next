@@ -9,7 +9,7 @@ const props: Props = {
     NAME: process.env.BBCM_APP_NAME || 'BAHubba Book Club Manager'
   },
   DB: {
-    ATLAS_URI: `mongodb+srv://${ process.env.BBCM_ATLAS_USER }:${ process.env.BBCM_ATLAS_PW }@${ process.env.BBCM_ATLAS_URI }`
+    ATLAS_URI: `mongodb+srv://${process.env.BBCM_ATLAS_USER}:${process.env.BBCM_ATLAS_PW}@${process.env.BBCM_ATLAS_URI}`
   }
 };
 
