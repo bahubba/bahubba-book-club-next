@@ -1,45 +1,56 @@
+import { Collection } from 'mongodb';
+
+import { UserDoc } from '@/db/models/user.models';
 import connectMongo from '@/db/connect-mongo';
-import UserModel from '@/db/models/user.model';
-import { User } from '@/db/interfaces';
-import { model } from 'mongoose';
+import props from '@/util/properties';
+
+/**
+ * Connect to the user collection in MongoDB
+ *
+ * @return {Promise<Collection<UserDoc>>} The user collection
+ */
+const connectUserCollection = async (): Promise<Collection<UserDoc>> => {
+  const db = await connectMongo();
+  return db.collection<UserDoc>(props.DB.ATLAS_USER_COLLECTION);
+};
 
 /**
  * Adds a user document to MongoDB
  *
- * @param {User} user - The user to add to the database
+ * @param {UserDoc} user The user document to add
  */
-export const addUser = async (user: User) => {
-  try {
-    // Connect to MongoDB Atlas
-    await connectMongo();
+export const addUser = async (user: UserDoc) => {
+  // Connect to the database and collection
+  const collection = await connectUserCollection();
 
-    // Convert the user object to a document (mongoose model)
-    const userDoc = new UserModel(user);
-
-    // Persist a user document to MongoDB
-    await userDoc.save();
-
-    // TODO - Return something... The persisted version of the user?
-  } catch (error) {
-    console.log(error);
-  }
+  // Add the user to the database
+  return collection.insertOne(user);
 };
 
 /**
- * Finds a user document in MongoDB by email
+ * Updates a user document in MongoDB
  *
- * @param {string} email - The email address of the user to find
- * @return {User} The user document found in MongoDB
+ * @param {UserDoc} user The user document to update
  */
-export const findUserByEmail = async (email: string): Promise<User | null | undefined> => {
-  try {
-    // Establish connection to MongoDB Atlas
-    await connectMongo();
+export const updateUser = async (user: UserDoc) => {
+  // Connect to the database and collection
+  const collection = await connectUserCollection();
 
-    // Find the user document in MongoDB
-    return await UserModel.findOne({ email });
-  } catch (error) {
-    console.log(error);
-  }
+  // TODO - Throw error if user._id is undefined
+  // Update the user in the database
+  return collection.updateOne({ _id: user._id }, { $set: user });
 };
 
+/**
+ * Finds a user document by email
+ *
+ * @param {string} email The email address to search for
+ * @return {UserDoc | null} The user document if found, null otherwise
+ */
+export const findUserByEmail = async (email: string): Promise<UserDoc | null> => {
+  // Connect to the database and collection
+  const collection = await connectUserCollection();
+
+  // Find the user in the database
+  return collection.findOne({ email });
+};

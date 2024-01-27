@@ -2,8 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
-import { addUser, findUserByEmail } from '@/db/repositories/user.repository';
-import UserModel from '@/db/models/user.model';
+import { addUser, findUserByEmail, updateUser } from '@/db/repositories/user.repository';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -35,27 +34,28 @@ export const authOptions: NextAuthOptions = {
         await addUser({
           email,
           preferredName: user.name ?? profile.name ?? 'Anonymous User',
-          providerProfiles: new Map([
-            [ account.provider, {
+          providerProfiles: {
+            [account.provider]: {
               userId: account.userId ?? user.id,
               providerAccountId: account.providerAccountId,
               name: user.name ?? profile.name ?? 'Anonymous User',
               sub: profile.sub,
               image: profile.image ?? user.image
-            } ]
-          ])
+            }
+          }
         });
       } else {
         // If the user exists, update their profile with the current provider info
-        userDoc.providerProfiles.set(account.provider, {
+        userDoc.providerProfiles[account.provider] = {
           userId: account.userId ?? user.id,
           providerAccountId: account.providerAccountId,
           name: user.name ?? profile.name ?? 'Anonymous User',
           sub: profile.sub,
           image: profile.image ?? user.image
-        });
+        };
 
-        await UserModel.updateOne({ email }, userDoc);
+        // Update the user in MongoDB
+        await updateUser(userDoc);
       }
 
       return true;
