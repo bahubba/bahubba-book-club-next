@@ -10,6 +10,7 @@ import {
 import AuthButton from '@/components/buttons/auth.button';
 import ProfileLink from '@/components/nav/links/profile.link';
 import props from '@/util/properties';
+import UserAvatar from '@/components/avatars/user.avatar';
 
 /** The navigation bar for the application, sticking to the top of the screen */
 const NavBar = () => {
@@ -35,7 +36,7 @@ const NavBar = () => {
           <AuthButton/>
         </NavbarItem>
         <NavbarItem>
-          <ProfileLink/>
+          <UserAvatar/>
         </NavbarItem>
       </NavbarContent>
     </NUINavBar>

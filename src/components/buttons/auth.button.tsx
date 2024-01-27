@@ -15,13 +15,10 @@ const AuthButton = () => {
 
   return (
     <Button
-      size="lg"
-      variant="light"
-      color="primary"
-      className="text-gray-300"
-      onClick={session ? handleSignOut : handleSignIn}
+      color="secondary"
+      onClick={ session ? handleSignOut : handleSignIn }
     >
-      {`Sign ${session ? 'Out' : 'In'}`}
+      { `Sign ${ session ? 'Out' : 'In' }` }
     </Button>
   );
 };
