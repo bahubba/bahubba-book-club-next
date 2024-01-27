@@ -1,22 +1,14 @@
-import mongoose from 'mongoose';
+import { MongoClient } from 'mongodb';
 
 import props from '@/util/properties';
 
-// MongoDB atlas connection status
-let isConnected: boolean;
+// MongoDB atlas connection
+const client = new MongoClient(props.DB.ATLAS_URI);
 
 /** Connect to MongoDB Atlas if not already connected */
 const connectMongo = async () => {
-  // If already connected, re-use the existing connection
-  if (isConnected) {
-    console.log('Re-using existing MongoDB connection');
-    return;
-  }
-
-  // If not already connected, connect to MongoDB Atlas
-  await mongoose.connect(props.DB.ATLAS_URI);
-  isConnected = true;
-  console.log('Connected to MongoDB Atlas');
+  await client.connect();
+  return client.db(props.DB.ATLAS_DB);
 };
 
 export default connectMongo;
