@@ -10,6 +10,7 @@ const UserAvatar = () => {
   const session = useSession();
 
   return (
+    !session.data ? <></> :
     <Link href="/profile">
       <Avatar
         src={ session.data?.user?.image || undefined }
