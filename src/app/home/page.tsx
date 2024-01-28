@@ -1,8 +1,9 @@
+import { Suspense } from 'react';
+import { Spinner } from '@nextui-org/spinner';
+
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
 import { getBookClubsForUser } from '@/app/api/fetchers/book-club.fetchers';
-import { Suspense } from 'react';
-import { Spinner } from '@nextui-org/spinner';
 
 /** Async component for loading book clubs to display */
 const BookClubs = async () => {
