@@ -42,7 +42,8 @@ export const authOptions: NextAuthOptions = {
               sub: profile.sub,
               image: profile.image ?? user.image
             }
-          }
+          },
+          memberships: []
         });
       } else {
         // If the user exists, update their profile with the current provider info

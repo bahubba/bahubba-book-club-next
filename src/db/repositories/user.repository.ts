@@ -1,18 +1,8 @@
 import { Collection } from 'mongodb';
 
 import { UserDoc } from '@/db/models/user.models';
-import connectMongo from '@/db/connect-mongo';
+import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
-
-/**
- * Connect to the user collection in MongoDB
- *
- * @return {Promise<Collection<UserDoc>>} The user collection
- */
-const connectUserCollection = async (): Promise<Collection<UserDoc>> => {
-  const db = await connectMongo();
-  return db.collection<UserDoc>(props.DB.ATLAS_USER_COLLECTION);
-};
 
 /**
  * Adds a user document to MongoDB
@@ -21,7 +11,7 @@ const connectUserCollection = async (): Promise<Collection<UserDoc>> => {
  */
 export const addUser = async (user: UserDoc) => {
   // Connect to the database and collection
-  const collection = await connectUserCollection();
+  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
 
   // Add the user to the database
   return collection.insertOne(user);
@@ -34,7 +24,7 @@ export const addUser = async (user: UserDoc) => {
  */
 export const updateUser = async (user: UserDoc) => {
   // Connect to the database and collection
-  const collection = await connectUserCollection();
+  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
 
   // TODO - Throw error if user._id is undefined
   // Update the user in the database
@@ -49,7 +39,7 @@ export const updateUser = async (user: UserDoc) => {
  */
 export const findUserByEmail = async (email: string): Promise<UserDoc | null> => {
   // Connect to the database and collection
-  const collection = await connectUserCollection();
+  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
 
   // Find the user in the database
   return collection.findOne({ email });

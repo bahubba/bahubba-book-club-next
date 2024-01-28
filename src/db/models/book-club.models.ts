@@ -1,5 +1,18 @@
 // Book club role enum
-export type Role = 'OWNER' | 'ADMIN' | 'READER' | 'PARTICIPANT' | 'OBSERVER';
+export enum Role {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  READER = 'READER',
+  PARTICIPANT = 'PARTICIPANT',
+  OBSERVER = 'OBSERVER'
+}
+
+// Book club publicity enum
+export enum Publicity {
+  PUBLIC = 'PUBLIC',
+  OBSERVABLE = 'OBSERVABLE',
+  PRIVATE = 'PRIVATE'
+}
 
 // BookClubMember subdocument
 export interface BookClubMember {
@@ -15,5 +28,6 @@ export interface BookClubDoc {
   name: string;
   description: string;
   image: string;
+  publicity: Publicity;
   members?: BookClubMember[];
 }

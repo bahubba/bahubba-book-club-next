@@ -8,9 +8,8 @@ import {
 } from '@nextui-org/navbar';
 
 import AuthButton from '@/components/buttons/auth.button';
-import ProfileLink from '@/components/nav/links/profile.link';
-import props from '@/util/properties';
 import UserAvatar from '@/components/avatars/user.avatar';
+import props from '@/util/properties';
 
 /** The navigation bar for the application, sticking to the top of the screen */
 const NavBar = () => {
@@ -33,7 +32,7 @@ const NavBar = () => {
       </Link>
       <NavbarContent justify="end">
         <NavbarItem className="text-gray-300">
-          <AuthButton/>
+          <AuthButton color="secondary"/>
         </NavbarItem>
         <NavbarItem>
           <UserAvatar/>
