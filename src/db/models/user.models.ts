@@ -26,4 +26,6 @@ export interface UserDoc {
     [key: string]: ProviderProfile
   };
   memberships: BookClubMembership[];
+  joined: Date;
+  departed?: Date;
 }

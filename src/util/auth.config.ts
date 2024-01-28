@@ -43,7 +43,8 @@ export const authOptions: NextAuthOptions = {
               image: profile.image ?? user.image
             }
           },
-          memberships: []
+          memberships: [],
+          joined: new Date()
         });
       } else {
         // If the user exists, update their profile with the current provider info

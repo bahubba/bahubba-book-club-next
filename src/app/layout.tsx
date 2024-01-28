@@ -15,7 +15,7 @@ const inter = Inter({ subsets: [ 'latin' ], display: 'swap' });
 
 // Metadata for the application
 export const metadata: Metadata = {
-  title: props.APP.NAME,
+  title: props.APP.NAME as string,
   description: 'Create, manage, join, and participate in book clubs.'
 };
 

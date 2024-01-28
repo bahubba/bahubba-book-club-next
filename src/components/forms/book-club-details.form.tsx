@@ -3,9 +3,10 @@
 import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 import { Radio, RadioGroup } from '@nextui-org/radio';
-import { handleSubmitNewBookClub } from '@/app/api/form-handlers/book-club-form-handlers.api';
-import { Publicity } from '@/db/models/book-club.models';
 import { Button } from '@nextui-org/button';
+
+import { handleSubmitNewBookClub } from '@/app/api/form-handlers/book-club-form.handlers';
+import { Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/app/api/form-handlers/state-interfaces';
 
 /** Form for creating or updating a book club's details */
