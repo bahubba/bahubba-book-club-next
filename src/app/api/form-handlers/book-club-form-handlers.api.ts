@@ -1,34 +1,38 @@
+'use server';
+
 import { getServerSession } from 'next-auth';
 
 import { BookClubDoc, Publicity, Role } from '@/db/models/book-club.models';
 import { addBookClub, findByName } from '@/db/repositories/book-club.repository';
 import { findUserByEmail, updateUser } from '@/db/repositories/user.repository';
+import { ErrorFormState } from '@/app/api/form-handlers/state-interfaces';
 import props from '@/util/properties';
+import { redirect } from 'next/navigation';
 
 /**
  * Handle submitting a new book club
  *
- * @param {BookClubDoc} _ Unused; The previous form state
+ * @param {ErrorFormState} prevState Unused; The previous form state
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  */
-export const handleSubmitNewBookClub = async (_: BookClubDoc, formData: FormData) => {
+export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const session = await getServerSession();
 
   // TODO - Handle exceptions
-  if(!session?.user?.email) throw new Error('Not authorized');
+  if (!session?.user?.email) throw new Error('Not authorized');
 
   // Pull out the club's name and ensure that it is not a reserved word
-  const name = formData.get('name')?.toString() ?? '';
-  if (props.APP.RESERVED_CLUB_NAMES.includes(name)) throw new Error('Invalid name');
+  const name = formData.get('name')?.toString().trim() ?? '';
+  if (props.APP.RESERVED_CLUB_NAMES.includes(name)) return { error: 'Invalid name' };
 
   // Ensure there isn't an existing book club with the same name
   const existing = await findByName(formData.get('name')?.toString() ?? '');
-  if(existing) throw new Error('Duplicate name');
+  if (existing) return { error: 'Name already in use' };
 
   // Pull the user from MongoDB
   const user = await findUserByEmail(session.user.email);
-  if(!user || !user._id) throw new Error('User not found');
+  if (!user || !user._id) return { error: 'User not found' };
 
   // Ensure publicity is a valid value
   let publicity = formData.get('publicity')?.toString().trim().toUpperCase() || Publicity.PRIVATE;
@@ -40,11 +44,11 @@ export const handleSubmitNewBookClub = async (_: BookClubDoc, formData: FormData
     description: formData.get('description')?.toString() ?? 'A book club for reading books',
     image: formData.get('image')?.toString() ?? '',
     publicity: publicity as Publicity,
-    members: [{
+    members: [ {
       userID: user._id,
       joined: new Date(),
       role: Role.OWNER
-    }]
+    } ]
   });
 
   // Add membership in the club to the user
@@ -59,4 +63,6 @@ export const handleSubmitNewBookClub = async (_: BookClubDoc, formData: FormData
       }
     ]
   });
-}
+
+  redirect('/home');
+};

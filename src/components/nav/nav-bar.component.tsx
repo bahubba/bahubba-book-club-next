@@ -32,7 +32,7 @@ const NavBar = () => {
       </Link>
       <NavbarContent justify="end">
         <NavbarItem className="text-gray-300">
-          <AuthButton/>
+          <AuthButton color="secondary"/>
         </NavbarItem>
         <NavbarItem>
           <UserAvatar/>
