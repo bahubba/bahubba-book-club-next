@@ -15,7 +15,7 @@ export const addBookClub = async (bookClub: BookClubDoc): Promise<InsertOneResul
 
   // Add the book club to the database
   return collection.insertOne(bookClub);
-}
+};
 
 /**
  * Finds a book club by its name
@@ -29,4 +29,17 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
 
   // Find the book club in the database
   return collection.findOne({ name });
-}
+};
+
+/**
+ * Find all book clubs for which a user is a member
+ *
+ * @param {string} userID The ID of the user to search for
+ */
+export const findBookClubsForUser = async (userID: string): Promise<BookClubDoc[]> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+
+  // Find the book clubs in the database
+  return collection.find({ 'members.userID': userID, 'members.departed': { $exists: false } }).toArray();
+};
