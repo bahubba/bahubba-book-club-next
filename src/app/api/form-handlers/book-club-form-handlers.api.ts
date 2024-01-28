@@ -1,19 +1,21 @@
 'use server';
 
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth';
 
-import { BookClubDoc, Publicity, Role } from '@/db/models/book-club.models';
+import { Publicity, Role } from '@/db/models/book-club.models';
 import { addBookClub, findByName } from '@/db/repositories/book-club.repository';
 import { findUserByEmail, updateUser } from '@/db/repositories/user.repository';
 import { ErrorFormState } from '@/app/api/form-handlers/state-interfaces';
 import props from '@/util/properties';
-import { redirect } from 'next/navigation';
 
 /**
  * Handle submitting a new book club
  *
- * @param {ErrorFormState} prevState Unused; The previous form state
+ * @param {ErrorFormState} prevState Form state from the previous render
  * @param {FormData} formData The book club form's data, matching the Book Club interface
+ * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
 export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
@@ -64,5 +66,7 @@ export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formDat
     ]
   });
 
+  // On success, redirect to the home page
+  revalidatePath('/home');
   redirect('/home');
 };
