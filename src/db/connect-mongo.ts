@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { Collection, MongoClient } from 'mongodb';
 
 import props from '@/util/properties';
 
@@ -10,5 +10,16 @@ const connectMongo = async () => {
   await client.connect();
   return client.db(props.DB.ATLAS_DB);
 };
+
+/**
+ * Connect to a collection in MongoDB Atlas
+ *
+ * @param {string} collectionName The name of the collection to connect to
+ * @return {Promise<Collection<any>>} The collection
+ */
+export const connectCollection = async (collectionName: string): Promise<Collection<any>> => {
+  const db = await connectMongo();
+  return db.collection(collectionName);
+}
 
 export default connectMongo;

@@ -18,7 +18,7 @@ const RootPage = async () => {
       <div className="flex flex-col h-full justify-around">
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold">{ `Welcome to ${ props.APP.NAME }` }</h1>
-          <Link href="/api/auth/signin" className="text-blue-800 underline">Please sign in to continue</Link>
+          <Link href="/src/app/api/auth/signin" className="text-blue-800 underline">Please sign in to continue</Link>
         </div>
         <Image
           src="/favicon.ico"

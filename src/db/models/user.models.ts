@@ -25,5 +25,5 @@ export interface UserDoc {
   providerProfiles: {
     [key: string]: ProviderProfile
   };
-  memberships?: BookClubMembership[];
+  memberships: BookClubMembership[];
 }
