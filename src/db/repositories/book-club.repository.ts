@@ -28,7 +28,7 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
   const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
 
   // Find the book club in the database
-  return collection.findOne({ name });
+  return collection.findOne({ name }, { collation: { locale: 'en', strength: 2 } });
 };
 
 /**

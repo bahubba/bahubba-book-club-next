@@ -29,7 +29,7 @@ export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formDat
   if (props.APP.RESERVED_CLUB_NAMES.includes(name)) return { error: 'Invalid name' };
 
   // Ensure there isn't an existing book club with the same name
-  const existing = await findByName(formData.get('name')?.toString() ?? '');
+  const existing = await findByName(name);
   if (existing) return { error: 'Name already in use' };
 
   // Pull the user from MongoDB
