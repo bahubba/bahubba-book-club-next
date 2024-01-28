@@ -2,6 +2,8 @@ import ProtectedRoute from '@/components/nav/protected-route.component';
 
 /**
  * Layout for the create book club page
+ *
+ * @param {React.ReactNode} children The children of the layout
  */
 const CreateBookClubPageLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
