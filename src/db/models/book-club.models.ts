@@ -30,4 +30,5 @@ export interface BookClubDoc {
   image: string;
   publicity: Publicity;
   members?: BookClubMember[];
+  disbanded?: Date;
 }

@@ -1,5 +1,5 @@
 import { Collection, InsertOneResult } from 'mongodb';
-import { BookClubDoc } from '@/db/models/book-club.models';
+import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
 
@@ -35,6 +35,7 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
  * Find all book clubs for which a user is a member
  *
  * @param {string} userID The ID of the user to search for
+ * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
 export const findBookClubsForUser = async (userID: string): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
@@ -42,4 +43,35 @@ export const findBookClubsForUser = async (userID: string): Promise<BookClubDoc[
 
   // Find the book clubs in the database
   return collection.find({ 'members.userID': userID, 'members.departed': { $exists: false } }).toArray();
+};
+
+/**
+ * Find all public or observable book clubs that match a search term
+ *
+ * @param {string} query The search term to match
+ * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
+ */
+export const findBookClubsBySearch = async (query: string): Promise<BookClubDoc[]> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+
+  // Find the book clubs in the database
+  return collection.find({
+    $and: [
+      {
+        disbanded: { $exists: false }
+      }, {
+        $or: [
+          { name: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } }
+        ]
+      }, {
+        $or: [
+          { publicity: Publicity.PUBLIC },
+          { publicity: Publicity.OBSERVABLE },
+          { publicity: Publicity.PRIVATE }
+        ]
+      }
+    ]
+  }).toArray();
 };

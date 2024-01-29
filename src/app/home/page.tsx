@@ -3,7 +3,7 @@ import { Spinner } from '@nextui-org/spinner';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
-import { getBookClubsForUser } from '@/app/api/fetchers/book-club.fetchers';
+import { getBookClubsForUser } from '@/api/fetchers/book-club.fetchers';
 import CreateBookClubButton from '@/components/buttons/create-book-club.button';
 import BookClubSearchButton from '@/components/buttons/book-club-search.button';
 
