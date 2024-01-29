@@ -66,26 +66,3 @@ export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formDat
   revalidatePath('/home');
   redirect('/home');
 };
-
-/**
- * Handle submitting a search for book clubs
- *
- * @param {ErrorFormState} prevState Form state from the previous render
- * @param {FormData} formData The book club form's data, matching the Book Club interface
- * @return {ErrorFormState} The new form state; Used for passing back error messages
- */
-export const handleSubmitBookClubSearch = async (prevState: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
-  // Get the user and ensure that they're authenticated
-  await ensureAuth();
-
-  // Pull out the search query
-  const query = formData.get('query')?.toString().trim() ?? '';
-  if (!query) return { error: 'No search query' };
-
-  // Fetch public or observable book clubs that match the search term
-  findBookClubsBySearch(query);
-
-  // On success, redirect to the search results page
-  revalidatePath('/book-clubs/search/results');
-  redirect('/book-clubs/search/results');
-};
