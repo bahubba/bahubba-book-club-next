@@ -5,12 +5,11 @@ import ProtectedRoute from '@/components/nav/protected-route.component';
  *
  * @param {React.ReactNode} children The children of the layout
  */
-const CreateBookClubPageLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+const BookClubPageLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <ProtectedRoute>
       <div className="flex items-start justify-center w-full">
         <div className="flex flex-col min-w-[50%]">
-          <h1 className="text-2xl font-bold">Create Book Club</h1>
           { children }
         </div>
       </div>
@@ -18,4 +17,4 @@ const CreateBookClubPageLayout = ({ children }: Readonly<{ children: React.React
   );
 };
 
-export default CreateBookClubPageLayout;
+export default BookClubPageLayout;

@@ -7,7 +7,7 @@ interface Props {
 const props: Props = {
   APP: {
     NAME: process.env.BBCM_APP_NAME || 'BAHubba Book Club Manager',
-    RESERVED_CLUB_NAMES: [ 'create' ],
+    RESERVED_CLUB_NAMES: [ 'create', 'search' ],
   },
   DB: {
     ATLAS_URI: `mongodb+srv://${ process.env.BBCM_ATLAS_USER }:${ process.env.BBCM_ATLAS_PW }@${ process.env.BBCM_ATLAS_URI }`,
