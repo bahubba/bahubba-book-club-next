@@ -8,9 +8,8 @@ import { Divider } from '@nextui-org/divider';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
 import { ScrollShadow } from '@nextui-org/scroll-shadow';
 
-/** Async component for loading book clubs to display */
+/** Async function for loading book clubs to display */
 const fetchBookClubs = async (searchQuery: string) => {
-  console.log('fetching...'); // DELETEME
   return !searchQuery ? [] : await searchBookClubs(searchQuery);
 };
 
