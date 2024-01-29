@@ -11,9 +11,12 @@ interface SectionHeaderLayoutProps {
 /**
  * Header for a section of a sectioned page, with action section hidden until hovered over
  */
-const SectionHeaderLayout = ({ title, children }: Readonly<SectionHeaderLayoutProps>) => {
+const SectionHeaderLayout = ({
+  title,
+  children
+}: Readonly<SectionHeaderLayoutProps>) => {
   // State vars
-  const [ hover, setHover ] = useState(false);
+  const [hover, setHover] = useState(false);
 
   // Event handlers
   const handleMouseEnter = () => setHover(true);
@@ -22,13 +25,11 @@ const SectionHeaderLayout = ({ title, children }: Readonly<SectionHeaderLayoutPr
   return (
     <div
       className="flex items-center justify-between p-2 pb-0"
-      onMouseEnter={ handleMouseEnter }
-      onMouseLeave={ handleMouseLeave }
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      <h1 className="flex-shrink text-2xl font-bold mb-0.5">{ title }</h1>
-      <div className="flex flex-1 justify-end">
-        { hover && children }
-      </div>
+      <h1 className="flex-shrink text-2xl font-bold mb-0.5">{title}</h1>
+      <div className="flex flex-1 justify-end">{hover && children}</div>
     </div>
   );
 };

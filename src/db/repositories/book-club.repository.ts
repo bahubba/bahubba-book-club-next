@@ -9,9 +9,13 @@ import props from '@/util/properties';
  * @param {BookClubDoc} bookClub The book club to add
  * @return {Promise<InsertOneResult<BookClubDoc>>} The result of the insert operation
  */
-export const addBookClub = async (bookClub: BookClubDoc): Promise<InsertOneResult<BookClubDoc>> => {
+export const addBookClub = async (
+  bookClub: BookClubDoc
+): Promise<InsertOneResult<BookClubDoc>> => {
   // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
 
   // Add the book club to the database
   return collection.insertOne(bookClub);
@@ -25,10 +29,15 @@ export const addBookClub = async (bookClub: BookClubDoc): Promise<InsertOneResul
  */
 export const findByName = async (name: string): Promise<BookClubDoc | null> => {
   // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
 
   // Find the book club in the database
-  return collection.findOne({ name }, { collation: { locale: 'en', strength: 2 } });
+  return collection.findOne(
+    { name },
+    { collation: { locale: 'en', strength: 2 } }
+  );
 };
 
 /**
@@ -37,12 +46,18 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
  * @param {string} userID The ID of the user to search for
  * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
-export const findBookClubsForUser = async (userID: string): Promise<BookClubDoc[]> => {
+export const findBookClubsForUser = async (
+  userID: string
+): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
 
   // Find the book clubs in the database
-  return collection.find({ 'members.userID': userID, 'members.departed': { $exists: false } }).toArray();
+  return collection
+    .find({ 'members.userID': userID, 'members.departed': { $exists: false } })
+    .toArray();
 };
 
 /**
@@ -51,27 +66,35 @@ export const findBookClubsForUser = async (userID: string): Promise<BookClubDoc[
  * @param {string} query The search term to match
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
-export const findBookClubsBySearch = async (query: string): Promise<BookClubDoc[]> => {
+export const findBookClubsBySearch = async (
+  query: string
+): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(props.DB.ATLAS_BOOK_CLUB_COLLECTION);
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
 
   // Find the book clubs in the database
-  return collection.find({
-    $and: [
-      {
-        disbanded: { $exists: false }
-      }, {
-        $or: [
-          { name: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } }
-        ]
-      }, {
-        $or: [
-          { publicity: Publicity.PUBLIC },
-          { publicity: Publicity.OBSERVABLE },
-          { publicity: Publicity.PRIVATE }
-        ]
-      }
-    ]
-  }).toArray();
+  return collection
+    .find({
+      $and: [
+        {
+          disbanded: { $exists: false }
+        },
+        {
+          $or: [
+            { name: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } }
+          ]
+        },
+        {
+          $or: [
+            { publicity: Publicity.PUBLIC },
+            { publicity: Publicity.OBSERVABLE },
+            { publicity: Publicity.PRIVATE }
+          ]
+        }
+      ]
+    })
+    .toArray();
 };

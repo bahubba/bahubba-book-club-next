@@ -10,8 +10,8 @@ import props from '@/util/properties';
 import ProtectedRoute from '@/components/nav/protected-route.component';
 
 // Load the Roboto Slab font for use throughout the application
-const robotoSlab = Roboto_Slab({ weight: '400', subsets: [ 'latin' ] });
-const inter = Inter({ subsets: [ 'latin' ], display: 'swap' });
+const robotoSlab = Roboto_Slab({ weight: '400', subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 // Metadata for the application
 export const metadata: Metadata = {
@@ -20,24 +20,26 @@ export const metadata: Metadata = {
 };
 
 /** The root layout for the application */
-const RootLayout = async ({ children }: Readonly<{ children: React.ReactNode }>) => {
+const RootLayout = async ({
+  children
+}: Readonly<{ children: React.ReactNode }>) => {
   // Get the server-side session
   const session = await getServerSession();
 
   return (
     <html lang="en">
-    <body className={ robotoSlab.className }>
-    <Providers>
-      <SessionProvider session={ session }>
-        <main className="flex flex-col h-screen">
-          <NavBar/>
-          <div className="pt-2 flex-1 bg-gray-100 max-h-fill-below-header">
-            { children }
-          </div>
-        </main>
-      </SessionProvider>
-    </Providers>
-    </body>
+      <body className={robotoSlab.className}>
+        <Providers>
+          <SessionProvider session={session}>
+            <main className="flex flex-col h-screen">
+              <NavBar />
+              <div className="pt-2 flex-1 bg-gray-100 max-h-fill-below-header">
+                {children}
+              </div>
+            </main>
+          </SessionProvider>
+        </Providers>
+      </body>
     </html>
   );
 };

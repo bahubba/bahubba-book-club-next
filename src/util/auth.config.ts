@@ -2,7 +2,11 @@ import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
-import { addUser, findUserByEmail, updateUser } from '@/db/repositories/user.repository';
+import {
+  addUser,
+  findUserByEmail,
+  updateUser
+} from '@/db/repositories/user.repository';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,

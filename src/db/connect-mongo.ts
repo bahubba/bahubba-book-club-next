@@ -17,9 +17,11 @@ const connectMongo = async () => {
  * @param {string} collectionName The name of the collection to connect to
  * @return {Promise<Collection<any>>} The collection
  */
-export const connectCollection = async (collectionName: string): Promise<Collection<any>> => {
+export const connectCollection = async (
+  collectionName: string
+): Promise<Collection<any>> => {
   const db = await connectMongo();
   return db.collection(collectionName);
-}
+};
 
 export default connectMongo;

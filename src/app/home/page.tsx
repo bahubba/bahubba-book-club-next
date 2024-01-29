@@ -11,27 +11,29 @@ import BookClubSearchButton from '@/components/buttons/book-club-search.button';
 const BookClubs = async () => {
   const bookClubs = await getBookClubsForUser();
 
-  return <BookClubCardGridLayout bookClubs={ bookClubs }/>;
+  return <BookClubCardGridLayout bookClubs={bookClubs} />;
 };
 
 /** The home page for the application, showing a user's clubs, books, and trending info */
-const HomePage = () =>
+const HomePage = () => (
   <div className="flex w-full h-full pb-2">
     <PageSectionLayout
       header="Clubs"
       sectionHeaderChildren={
         <div className="flex gap-0.5">
-          <CreateBookClubButton/>
-          <BookClubSearchButton/>
+          <CreateBookClubButton />
+          <BookClubSearchButton />
         </div>
       }
     >
-      <Suspense fallback={
-        <div className="flex justify-center items-center w-full h-full">
-          <Spinner/>
-        </div>
-      }>
-        <BookClubs/>
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center w-full h-full">
+            <Spinner />
+          </div>
+        }
+      >
+        <BookClubs />
       </Suspense>
     </PageSectionLayout>
     <PageSectionLayout header="Books">
@@ -40,6 +42,7 @@ const HomePage = () =>
     <PageSectionLayout header="Trending">
       <div>Some long text string that will take up some width</div>
     </PageSectionLayout>
-  </div>;
+  </div>
+);
 
 export default HomePage;

@@ -11,7 +11,9 @@ import props from '@/util/properties';
  */
 export const addUser = async (user: UserDoc) => {
   // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
+  const collection: Collection<UserDoc> = await connectCollection(
+    props.DB.ATLAS_USER_COLLECTION
+  );
 
   // Add the user to the database
   return collection.insertOne(user);
@@ -24,7 +26,9 @@ export const addUser = async (user: UserDoc) => {
  */
 export const updateUser = async (user: UserDoc) => {
   // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
+  const collection: Collection<UserDoc> = await connectCollection(
+    props.DB.ATLAS_USER_COLLECTION
+  );
 
   // TODO - Throw error if user._id is undefined
   // Update the user in the database
@@ -37,9 +41,13 @@ export const updateUser = async (user: UserDoc) => {
  * @param {string} email The email address to search for
  * @return {UserDoc | null} The user document if found, null otherwise
  */
-export const findUserByEmail = async (email: string): Promise<UserDoc | null> => {
+export const findUserByEmail = async (
+  email: string
+): Promise<UserDoc | null> => {
   // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
+  const collection: Collection<UserDoc> = await connectCollection(
+    props.DB.ATLAS_USER_COLLECTION
+  );
 
   // Find the user in the database
   return collection.findOne({ email });
