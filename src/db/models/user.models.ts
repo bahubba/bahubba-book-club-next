@@ -29,3 +29,8 @@ export interface UserDoc {
   joined: Date;
   departed?: Date;
 }
+
+// MongoDB User document with _id
+export interface VerifiedUserDoc extends UserDoc {
+  _id: string;
+}

@@ -2,12 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { getServerSession } from 'next-auth';
 
 import { Publicity, Role } from '@/db/models/book-club.models';
-import { addBookClub, findByName } from '@/db/repositories/book-club.repository';
-import { findUserByEmail, updateUser } from '@/db/repositories/user.repository';
-import { ErrorFormState } from '@/app/api/form-handlers/state-interfaces';
+import { addBookClub, findBookClubsBySearch, findByName } from '@/db/repositories/book-club.repository';
+import { updateUser } from '@/db/repositories/user.repository';
+import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import { ensureAuth } from '@/api/auth.api';
 import props from '@/util/properties';
 
 /**
@@ -19,10 +19,10 @@ import props from '@/util/properties';
  */
 export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const session = await getServerSession();
+  await ensureAuth();
 
-  // TODO - Handle exceptions
-  if (!session?.user?.email) throw new Error('Not authorized');
+  // Pull out the user
+  const user = await ensureAuth();
 
   // Pull out the club's name and ensure that it is not a reserved word
   const name = formData.get('name')?.toString().trim() ?? '';
@@ -32,10 +32,6 @@ export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formDat
   const existing = await findByName(name);
   if (existing) return { error: 'Name already in use' };
 
-  // Pull the user from MongoDB
-  const user = await findUserByEmail(session.user.email);
-  if (!user || !user._id) return { error: 'User not found' };
-
   // Ensure publicity is a valid value
   let publicity = formData.get('publicity')?.toString().trim().toUpperCase() || Publicity.PRIVATE;
   if (!(publicity in Publicity)) publicity = Publicity.PRIVATE;
@@ -43,7 +39,7 @@ export const handleSubmitNewBookClub = async (prevState: ErrorFormState, formDat
   // Create the new club
   const newClubResult = await addBookClub({
     name,
-    description: formData.get('description')?.toString() ?? 'A book club for reading books',
+    description: formData.get('description')?.toString().trim() || 'A book club for reading books',
     image: formData.get('image')?.toString() ?? '',
     publicity: publicity as Publicity,
     members: [ {
