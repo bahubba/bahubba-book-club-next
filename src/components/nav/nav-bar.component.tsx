@@ -12,7 +12,7 @@ import UserAvatar from '@/components/avatars/user.avatar';
 import props from '@/util/properties';
 
 /** The navigation bar for the application, sticking to the top of the screen */
-const NavBar = () =>
+const NavBar = () => (
   <NUINavBar
     maxWidth="full"
     isBordered
@@ -26,17 +26,18 @@ const NavBar = () =>
           height="30"
           width="30"
         />
-        <h1 className="ps-2 text-3xl font-bold">{ props.APP.NAME }</h1>
+        <h1 className="ps-2 text-3xl font-bold">{props.APP.NAME}</h1>
       </NavbarBrand>
     </Link>
     <NavbarContent justify="end">
       <NavbarItem className="text-gray-300">
-        <AuthButton color="secondary"/>
+        <AuthButton color="secondary" />
       </NavbarItem>
       <NavbarItem>
-        <UserAvatar/>
+        <UserAvatar />
       </NavbarItem>
     </NavbarContent>
-  </NUINavBar>;
+  </NUINavBar>
+);
 
 export default NavBar;

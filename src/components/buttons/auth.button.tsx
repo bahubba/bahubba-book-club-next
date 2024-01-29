@@ -5,7 +5,13 @@ import { Button } from '@nextui-org/button';
 
 // Component props
 interface AuthButtonProps {
-  color?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  color?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'danger';
 }
 
 /**
@@ -23,10 +29,10 @@ const AuthButton = ({ color = 'default' }: AuthButtonProps) => {
   return (
     <Button
       variant="light"
-      color={ color }
-      onClick={ session ? handleSignOut : handleSignIn }
+      color={color}
+      onClick={session ? handleSignOut : handleSignIn}
     >
-      { `Sign ${ session ? 'Out' : 'In' }` }
+      {`Sign ${session ? 'Out' : 'In'}`}
     </Button>
   );
 };

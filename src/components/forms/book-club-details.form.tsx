@@ -12,15 +12,14 @@ import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 /** Form for creating or updating a book club's details */
 const BookClubDetailsForm = () => {
   // Form state
-  const [ formState, formAction ] = useFormState(
-    handleSubmitNewBookClub,
-    { error: '' } as ErrorFormState
-  );
+  const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
+    error: ''
+  } as ErrorFormState);
 
   return (
-    <form action={ formAction }>
+    <form action={formAction}>
       <div className="space-y-2">
-        { formState.error && <p className="text-red-500">* { formState.error }</p> }
+        {formState.error && <p className="text-red-500">* {formState.error}</p>}
         <Input
           variant="bordered"
           label="Name"
@@ -41,14 +40,19 @@ const BookClubDetailsForm = () => {
         <RadioGroup
           label="Publicity"
           orientation="horizontal"
-          defaultValue={ Publicity.PRIVATE }
+          defaultValue={Publicity.PRIVATE}
           name="publicity"
         >
-          <Radio value={ Publicity.PUBLIC }>Public</Radio>
-          <Radio value={ Publicity.OBSERVABLE }>Observable</Radio>
-          <Radio value={ Publicity.PRIVATE }>Private</Radio>
+          <Radio value={Publicity.PUBLIC}>Public</Radio>
+          <Radio value={Publicity.OBSERVABLE}>Observable</Radio>
+          <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
-        <Button type="submit" color="secondary">Create</Button>
+        <Button
+          type="submit"
+          color="secondary"
+        >
+          Create
+        </Button>
       </div>
     </form>
   );

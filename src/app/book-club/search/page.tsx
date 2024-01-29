@@ -14,10 +14,11 @@ const fetchBookClubs = async (searchQuery: string) =>
 
 /** Search page for finding book clubs */
 const SearchPage = () => {
-  const [ searchQuery, setSearchQuery ] = useState<string>('');
-  const [ bookClubs, setBookClubs ] = useState<BookClubDoc[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [bookClubs, setBookClubs] = useState<BookClubDoc[]>([]);
 
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value);
+  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setSearchQuery(event.target.value);
 
   const handleSubmitSearch = async () => {
     setBookClubs(await fetchBookClubs(searchQuery));
@@ -33,24 +34,31 @@ const SearchPage = () => {
             size="sm"
             variant="bordered"
             placeholder="Search for a book club"
-            value={ searchQuery }
-            onChange={ handleSearchInput }
+            value={searchQuery}
+            onChange={handleSearchInput}
           />
           <Button
             className="flex-shrink"
             size="lg"
-            color={ searchQuery.trim() ? 'secondary' : 'default' }
-            onClick={ handleSubmitSearch }
-            disabled={ !searchQuery.trim() }
+            color={searchQuery.trim() ? 'secondary' : 'default'}
+            onClick={handleSubmitSearch}
+            disabled={!searchQuery.trim()}
           >
             Search
           </Button>
         </div>
-        <Divider/>
-        <ScrollShadow hideScrollBar size={ 100 } className="flex-1 overflow-y-auto max-h-screen">
-          {
-            bookClubs && <BookClubCardGridLayout cols={ 6 } bookClubs={ bookClubs }/>
-          }
+        <Divider />
+        <ScrollShadow
+          hideScrollBar
+          size={100}
+          className="flex-1 overflow-y-auto max-h-screen"
+        >
+          {bookClubs && (
+            <BookClubCardGridLayout
+              cols={6}
+              bookClubs={bookClubs}
+            />
+          )}
         </ScrollShadow>
       </div>
     </div>

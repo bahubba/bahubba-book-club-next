@@ -1,20 +1,20 @@
 import IconProps from '@/components/icons/icon-props';
 
 const PlusIcon = ({
-                    fill = 'currentColor',
-                    size,
-                    height,
-                    width,
-                    label,
-                    ...props
-                  }: IconProps): React.ReactNode => (
+  fill = 'currentColor',
+  size,
+  height,
+  width,
+  label,
+  ...props
+}: IconProps): React.ReactNode => (
   <svg
-    height={ size || height || 24 }
-    width={ size || width || 24 }
+    height={size || height || 24}
+    width={size || width || 24}
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://ww.w3.org/2000/svg"
-    { ...props }
+    {...props}
   >
     <path
       fillRule="evenodd"
@@ -24,7 +24,7 @@ const PlusIcon = ({
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      fill={ fill }
+      fill={fill}
     />
   </svg>
 );

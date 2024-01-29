@@ -9,12 +9,16 @@ const UserAvatar = () => {
   // Get the current user's session
   const session = useSession();
 
-  return (
-    !session.data ? <></> :
+  return !session.data ? (
+    <></>
+  ) : (
     <Link href="/profile">
       <Avatar
-        src={ session.data?.user?.image || undefined }
-        name={ !session.data?.user?.image && session.data?.user?.name || 'Anonymous user' }
+        src={session.data?.user?.image || undefined}
+        name={
+          (!session.data?.user?.image && session.data?.user?.name) ||
+          'Anonymous user'
+        }
       />
     </Link>
   );

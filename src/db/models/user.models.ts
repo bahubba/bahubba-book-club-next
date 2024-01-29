@@ -23,7 +23,7 @@ export interface UserDoc {
   email: string;
   preferredName: string;
   providerProfiles: {
-    [key: string]: ProviderProfile
+    [key: string]: ProviderProfile;
   };
   memberships: BookClubMembership[];
   joined: Date;
