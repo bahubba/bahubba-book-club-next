@@ -5,16 +5,13 @@ import { Button } from '@nextui-org/button';
 import PlusIcon from '@/components/icons/plus.icon';
 
 /** Button linking to the create book club page */
-const CreateBookClubButton = () => {
-  return (
-    <Tooltip className="bg-opacity-75 bg-black text-white" content="Create a book club">
-      <Link href="/book-club/create">
-        <Button isIconOnly size="sm" color="secondary" aria-label="Create book club">
-          <PlusIcon/>
-        </Button>
-      </Link>
-    </Tooltip>
-  );
-};
+const CreateBookClubButton = () =>
+  <Tooltip className="bg-opacity-75 bg-black text-white" content="Create a book club">
+    <Link href="/book-club/create">
+      <Button isIconOnly size="sm" color="secondary" aria-label="Create book club">
+        <PlusIcon/>
+      </Button>
+    </Link>
+  </Tooltip>;
 
 export default CreateBookClubButton;

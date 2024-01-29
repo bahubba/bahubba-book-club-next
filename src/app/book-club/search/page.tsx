@@ -9,9 +9,8 @@ import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layo
 import { ScrollShadow } from '@nextui-org/scroll-shadow';
 
 /** Async function for loading book clubs to display */
-const fetchBookClubs = async (searchQuery: string) => {
-  return !searchQuery ? [] : await searchBookClubs(searchQuery);
-};
+const fetchBookClubs = async (searchQuery: string) =>
+  !searchQuery ? [] : await searchBookClubs(searchQuery);
 
 /** Search page for finding book clubs */
 const SearchPage = () => {

@@ -14,16 +14,13 @@ interface BookClubGridLayoutProps {
  * @param { number } props.cols - Number of columns to display
  * @param { BookClubDoc[] } props.bookClubs - Book clubs to display
  */
-const BookClubCardGridLayout = ({ cols = 3, bookClubs }: Readonly<BookClubGridLayoutProps>) => {
-  return (
-    <div className={ `grid grid-cols-${ cols } gap-1 p-2` }>
-      {
-        bookClubs.map(bookClub => (
-          <BookClubCard key={ bookClub._id } bookClub={ bookClub }/>
-        ))
-      }
-    </div>
-  );
-};
+const BookClubCardGridLayout = ({ cols = 3, bookClubs }: Readonly<BookClubGridLayoutProps>) =>
+  <div className={ `grid grid-cols-${ cols } gap-1 p-2` }>
+    {
+      bookClubs.map(bookClub => (
+        <BookClubCard key={ bookClub._id } bookClub={ bookClub }/>
+      ))
+    }
+  </div>;
 
 export default BookClubCardGridLayout;

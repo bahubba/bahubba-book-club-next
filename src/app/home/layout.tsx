@@ -6,8 +6,7 @@ import ProtectedRoute from '@/components/nav/protected-route.component';
  * @param {Object} props Component props
  * @param {React.ReactNode} props.children The children of the layout
  */
-const HomePageLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
-  return <ProtectedRoute>{ children }</ProtectedRoute>;
-};
+const HomePageLayout = ({ children }: Readonly<{ children: React.ReactNode }>) =>
+  <ProtectedRoute>{ children }</ProtectedRoute>;
 
 export default HomePageLayout;
