@@ -39,8 +39,6 @@ export const getStockBookClubImageNames = async (): Promise<string[]> => {
     })
   );
 
-  console.log('imageList'); // DELETEME
-
   // Return a list of stock book club image names
   return imageList
     ? imageList
