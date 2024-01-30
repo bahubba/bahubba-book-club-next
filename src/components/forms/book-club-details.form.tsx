@@ -12,7 +12,6 @@ import BookClubCard from '@/components/cards/book-club.card';
 import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
 import { Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
-import { ImageProps } from '@/components/interfaces';
 
 // Interface for form values
 interface FormValues {
@@ -45,10 +44,8 @@ const BookClubDetailsForm = () => {
     setFormData({ ...formData, [name]: value });
 
   // Handler for image selection
-  const setSelectedImage = ({ imageName, imageURL }: ImageProps) => {
+  const setSelectedImage = (imageName: string) =>
     setFormData({ ...formData, imageName });
-    setSelectedImageURL(imageURL);
-  };
 
   // Helper function to determine if the form is submittable
   const canSubmit = () =>
@@ -112,7 +109,7 @@ const BookClubDetailsForm = () => {
           bookClub={{
             name: formData.name,
             description: formData.description,
-            image: selectedImageURL,
+            image: formData.imageName,
             publicity: formData.publicity
           }}
         />

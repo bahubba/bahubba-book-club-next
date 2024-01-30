@@ -5,44 +5,43 @@ import { Card } from '@nextui-org/card';
 import { Image } from '@nextui-org/image';
 
 import { getPreSignedBookClubImageURL } from '@/api/fetchers/s3.fetchers';
-import { ImageProps } from '@/components/interfaces';
 
 // Component props
 interface BookClubImagePickerCardProps {
-  fileName: string;
+  imageName: string;
   selected: boolean;
-  setSelectedImage: (imageProps: ImageProps) => void;
+  setSelectedImage: (imageName: string) => void;
 }
 
 /**
  * Selectable image for book clubs
  *
  * @param {Object} props - The component props
- * @param {string} props.fileName - The file name of the image
+ * @param {string} props.imageName - The file name of the image
  * @param {boolean} props.selected - Whether or not the image is selected
  * @param {Function} props.setSelectedImage - Function to set the selected image
  */
 const BookClubImagePickerCard = ({
-  fileName,
+  imageName,
   selected,
   setSelectedImage
 }: Readonly<BookClubImagePickerCardProps>) => {
   const [url, setURL] = useState<string>('');
 
   // Handler for image selection
-  const handleClick = () =>
-    setSelectedImage({ imageName: fileName, imageURL: url });
+  const handleClick = () => setSelectedImage(imageName);
 
   // On load, get the pre-signed URL for the image
   // TODO - It would be nice to find a more best-practice Next.js way to do this
   useEffect(() => {
     const getBookClubImage = async () => {
-      const fetchedURL = await getPreSignedBookClubImageURL(fileName);
+      const fetchedURL = await getPreSignedBookClubImageURL(imageName);
       setURL(fetchedURL);
     };
 
-    fileName && fileName !== 'default' && getBookClubImage();
-  }, [fileName]);
+    if (!imageName || imageName === 'default') setURL('/images/books.jpg');
+    else getBookClubImage();
+  }, [imageName]);
 
   return (
     <Card
@@ -54,8 +53,8 @@ const BookClubImagePickerCard = ({
     >
       {url && (
         <Image
-          src={fileName === 'default' ? '/images/books.jpg' : url}
-          alt={fileName}
+          src={url}
+          alt={imageName}
           className="w-full h-auto"
           width="250"
           height="250"

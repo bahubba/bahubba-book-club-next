@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react';
 import { getStockBookClubImageNames } from '@/api/fetchers/s3.fetchers';
 import BookClubImagePickerCard from '../cards/image-picker.card';
-import { ImageProps } from '@/components/interfaces';
 
 // Component props
 interface BookClubImagePickerProps {
   selectedImage: string;
-  setSelectedImage: (imageProps: ImageProps) => void;
+  setSelectedImage: (imageName: string) => void;
 }
 
 /** Async function for getting a list of selectable images */
@@ -26,14 +25,14 @@ const BookClubImagePicker = ({
   selectedImage,
   setSelectedImage
 }: Readonly<BookClubImagePickerProps>) => {
-  const [imageFileNames, setImageFileNames] = useState<string[]>([]);
+  const [imageNames, setImageNames] = useState<string[]>([]);
 
   // On load, get the list of stock images
   // TODO - It would be nice to find a more best-practice Next.js way to do this
   useEffect(() => {
     const getBookClubImagePickerCards = async () => {
-      const fetchedFileNames = await fetchBookClubImagePickerCards();
-      setImageFileNames(fetchedFileNames);
+      const fetchedImageNames = await fetchBookClubImagePickerCards();
+      setImageNames(fetchedImageNames);
     };
 
     getBookClubImagePickerCards();
@@ -43,15 +42,15 @@ const BookClubImagePicker = ({
     <div className="grid grid-cols-3 gap-2">
       <BookClubImagePickerCard
         key="default"
-        fileName="default"
+        imageName="default"
         selected={selectedImage === 'default'}
         setSelectedImage={setSelectedImage}
       />
-      {imageFileNames.map((fileName, index) => (
+      {imageNames.map((imageName, index) => (
         <BookClubImagePickerCard
           key={index}
-          fileName={fileName}
-          selected={selectedImage === fileName}
+          imageName={imageName}
+          selected={selectedImage === imageName}
           setSelectedImage={setSelectedImage}
         />
       ))}

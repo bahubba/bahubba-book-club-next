@@ -12,12 +12,11 @@ import {
 } from '@nextui-org/modal';
 
 import BookClubImagePicker from '@/components/pickers/book-club-image.picker';
-import { ImageProps } from '@/components/interfaces';
 
 // Component props
 interface BookClubImagePickerModalProps {
   selectedImage: string;
-  setSelectedImage: (imageProps: ImageProps) => void;
+  setSelectedImage: (imageName: string) => void;
 }
 
 /**
