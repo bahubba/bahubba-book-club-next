@@ -2,6 +2,7 @@
 
 import { useFormStatus } from 'react-dom';
 import { Button } from '@nextui-org/button';
+import { Spinner } from '@nextui-org/spinner';
 
 // Component props
 interface SubmitButtonProps {
@@ -26,7 +27,7 @@ const SubmitButton = ({
       color={disabled ? 'default' : 'secondary'}
       disabled={disabled || pending}
     >
-      {pending ? 'Submitting...' : buttonText}
+      {pending ? <Spinner /> : buttonText}
     </Button>
   );
 };

@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       maxHeight: {
-        'fill-below-header': 'calc(100% - 64px)'
+        'fill-below-header': 'calc(100vh - 64px)'
       }
     }
   },

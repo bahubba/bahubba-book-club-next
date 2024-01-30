@@ -26,7 +26,7 @@ const SearchPage = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col gap-y-2 max-w-[75%] max-h-fill-below-header">
+      <div className="flex flex-col gap-y-2 min-w-[50vw] max-w-[75vw] max-h-fill-below-header">
         <h1 className="flex-shrink text-2xl font-bold">Book Club Search</h1>
         <div className="flex-shrink flex items-center gap-x-1">
           <Input
@@ -51,7 +51,7 @@ const SearchPage = () => {
         <ScrollShadow
           hideScrollBar
           size={100}
-          className="flex-1 overflow-y-auto max-h-screen"
+          className="flex-1 pb-2 overflow-y-auto max-h-fill-below-header"
         >
           {bookClubs && (
             <BookClubCardGridLayout
