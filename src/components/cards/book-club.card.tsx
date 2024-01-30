@@ -11,6 +11,7 @@ import Link from 'next/link';
  * @param {BookClubDoc} bookClub - Book club
  */
 const BookClubCard = ({ bookClub }: { bookClub: BookClubDoc }) => (
+  // TODO - Get the image from S3
   <Link href={`/book-club/${bookClub.name.toLowerCase()}`}>
     <Tooltip
       className="bg-opacity-75 bg-black text-white"

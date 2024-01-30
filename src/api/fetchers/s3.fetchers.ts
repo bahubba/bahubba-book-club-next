@@ -5,7 +5,6 @@ import { ensureAuth } from '../auth.api';
 import { s3Client } from '@/util/s3.config';
 import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import props from '@/util/properties';
-import { revalidatePath } from 'next/cache';
 
 /** Retrieve a pre-signed URL for a given image name */
 export const getPreSignedBookClubImageURL = async (
@@ -48,22 +47,4 @@ export const getStockBookClubImageNames = async (): Promise<string[]> => {
         .filter(image => image.Size && image.Size > 0)
         .map(image => image.Key?.split('/').pop() as string)
     : [];
-};
-
-/** Retrieves a list of stock book club image URLs */
-export const getStockBookClubImageURLs = async (): Promise<string[]> => {
-  // Ensure that the user is authenticated
-  await ensureAuth();
-
-  // Retrieve a list of stock book club image names
-  const imageNames = await getStockBookClubImageNames();
-
-  // Generate a pre-signed URL for each image name
-  const imageURLs = await Promise.all(
-    imageNames.map(async imageName => {
-      return await getPreSignedBookClubImageURL(imageName);
-    })
-  );
-
-  return imageURLs;
 };
