@@ -4,7 +4,8 @@ import { BookClubDoc } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
   findBookClubsForUser,
-  findBookClubByName
+  findBookClubByName,
+  findBookClubBySlug
 } from '@/db/repositories/book-club.repository';
 import { ensureAuth } from '@/api/auth.api';
 
@@ -45,4 +46,19 @@ export const getBookClubByName = async (
 
   // Fetch the book club
   return await findBookClubByName(name, user._id);
+};
+
+/**
+ * Gets a book club by slug
+ *
+ * @param {string} slug The slug of the book club to find
+ */
+export const getBookClubBySlug = async (
+  slug: string
+): Promise<BookClubDoc | null> => {
+  // Ensure that the user is authenticated
+  const user = await ensureAuth();
+
+  // Fetch the book club
+  return await findBookClubBySlug(slug, user._id);
 };

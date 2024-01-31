@@ -125,3 +125,30 @@ export const findBookClubByName = async (
     'members.departed': { $exists: false }
   });
 };
+
+/**
+ * Find a book club by its slug
+ *
+ * @param {string} slug The slug of the book club to find
+ * @param {string} userID The ID of the user to search for
+ * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
+ */
+export const findBookClubBySlug = async (
+  slug: string,
+  userID: string
+): Promise<BookClubDoc | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  console.log('name, userID', slug, userID);
+
+  // Find the book club in the database
+  return await collection.findOne({
+    departed: { $exists: false },
+    slug,
+    'members.userID': userID,
+    'members.departed': { $exists: false }
+  });
+};

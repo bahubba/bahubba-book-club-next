@@ -12,6 +12,7 @@ import { updateUser } from '@/db/repositories/user.repository';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 import { ensureAuth } from '@/api/auth.api';
 import props from '@/util/properties';
+import slugify from 'slugify';
 
 /**
  * Handle submitting a new book club
@@ -48,6 +49,7 @@ export const handleSubmitNewBookClub = async (
   // Create the new club
   const newClubResult = await addBookClub({
     name,
+    slug: slugify(name, { lower: true }),
     description:
       formData.get('description')?.toString().trim() ||
       'A book club for reading books',

@@ -12,7 +12,7 @@ import BookClubCard from '@/components/cards/book-club.card';
 import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
 import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
-import { getBookClubByName } from '@/api/fetchers/book-club.fetchers';
+import { getBookClubBySlug } from '@/api/fetchers/book-club.fetchers';
 
 // Interface for form values
 interface FormValues {
@@ -24,14 +24,14 @@ interface FormValues {
 
 /** Async function for getting the book club */
 const fetchBookClub = async (
-  bookClubName: string
-): Promise<BookClubDoc | null> => await getBookClubByName(bookClubName);
+  bookClubSlug: string
+): Promise<BookClubDoc | null> => await getBookClubBySlug(bookClubSlug);
 
 /** Form for creating or updating a book club's details */
 const BookClubDetailsForm = ({
-  bookClubName
-}: Readonly<{ bookClubName?: string }>) => {
-  console.log('inner bookClubName:', bookClubName); // DELETEME
+  bookClubSlug
+}: Readonly<{ bookClubSlug?: string }>) => {
+  console.log('inner bookClubSlug:', bookClubSlug); // DELETEME
 
   // Form state
   const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
@@ -48,8 +48,8 @@ const BookClubDetailsForm = ({
 
   // Fetch book club if editing
   useEffect(() => {
-    const fetchEditBookClub = async (bookClubName: string) => {
-      const bookClub = await fetchBookClub(bookClubName);
+    const fetchEditBookClub = async (bookClubSlug: string) => {
+      const bookClub = await fetchBookClub(bookClubSlug);
       console.log('fetching', bookClub); // DELETEME
       if (!!bookClub)
         setFormData({
@@ -60,8 +60,8 @@ const BookClubDetailsForm = ({
         });
     };
 
-    if (!!bookClubName && bookClubName.length) fetchEditBookClub(bookClubName);
-  }, [bookClubName]);
+    if (!!bookClubSlug && bookClubSlug.length) fetchEditBookClub(bookClubSlug);
+  }, [bookClubSlug]);
 
   // Handler for form data changes
   const handleInputChange = ({
@@ -124,7 +124,7 @@ const BookClubDetailsForm = ({
           <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
         <SubmitButton
-          buttonText="Create"
+          buttonText={bookClubSlug ? 'Update' : 'Create'}
           disabled={!canSubmit()}
         />
       </div>

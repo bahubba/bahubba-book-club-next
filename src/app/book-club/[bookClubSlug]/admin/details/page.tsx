@@ -3,16 +3,16 @@ import BookClubDetailsForm from '@/components/forms/book-club-details.form';
 // Page props
 interface BookClubAdminDetailsPageProps {
   params: {
-    bookClubNameSlug: string;
+    bookClubSlug: string;
   };
 }
 
 /** Book club details admin page */
 const BookClubAdminDetailsPage = ({
-  params: { bookClubNameSlug }
+  params: { bookClubSlug }
 }: Readonly<BookClubAdminDetailsPageProps>) => {
-  console.log('bookClubNameSlug:', bookClubNameSlug); // DELETEME
-  return <BookClubDetailsForm bookClubName={bookClubNameSlug} />;
+  console.log('bookClubSlug:', bookClubSlug); // DELETEME
+  return <BookClubDetailsForm bookClubSlug={bookClubSlug} />;
 };
 
 export default BookClubAdminDetailsPage;
