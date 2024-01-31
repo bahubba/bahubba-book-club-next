@@ -1,9 +1,10 @@
 'use server';
 
-import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
+import { BookClubDoc } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
-  findBookClubsForUser
+  findBookClubsForUser,
+  findBookClubByName
 } from '@/db/repositories/book-club.repository';
 import { ensureAuth } from '@/api/auth.api';
 
@@ -16,7 +17,11 @@ export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   return await findBookClubsForUser(user._id);
 };
 
-/** Searches for book clubs by name or description */
+/**
+ * Searches for book clubs by name or description
+ *
+ * @param {string} search The search term to find book clubs by
+ */
 export const searchBookClubs = async (
   search: string
 ): Promise<BookClubDoc[]> => {
@@ -25,4 +30,19 @@ export const searchBookClubs = async (
 
   // Fetch the user's book clubs
   return await findBookClubsBySearch(search);
+};
+
+/**
+ * Gets a book club by name
+ *
+ * @param {string} name The name of the book club to find
+ */
+export const getBookClubByName = async (
+  name: string
+): Promise<BookClubDoc | null> => {
+  // Ensure that the user is authenticated
+  const user = await ensureAuth();
+
+  // Fetch the book club
+  return await findBookClubByName(name, user._id);
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 import { Divider } from '@nextui-org/divider';
@@ -10,8 +10,9 @@ import BookClubImagePickerModal from '@/components/modals/book-club-image-picker
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
 import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
-import { Publicity } from '@/db/models/book-club.models';
+import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import { getBookClubByName } from '@/api/fetchers/book-club.fetchers';
 
 // Interface for form values
 interface FormValues {
@@ -21,8 +22,17 @@ interface FormValues {
   publicity: Publicity;
 }
 
+/** Async function for getting the book club */
+const fetchBookClub = async (
+  bookClubName: string
+): Promise<BookClubDoc | null> => await getBookClubByName(bookClubName);
+
 /** Form for creating or updating a book club's details */
-const BookClubDetailsForm = () => {
+const BookClubDetailsForm = ({
+  bookClubName
+}: Readonly<{ bookClubName?: string }>) => {
+  console.log('inner bookClubName:', bookClubName); // DELETEME
+
   // Form state
   const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
     error: ''
@@ -35,7 +45,23 @@ const BookClubDetailsForm = () => {
     imageName: 'default',
     publicity: Publicity.PRIVATE
   });
-  const [selectedImageURL, setSelectedImageURL] = useState<string>('');
+
+  // Fetch book club if editing
+  useEffect(() => {
+    const fetchEditBookClub = async (bookClubName: string) => {
+      const bookClub = await fetchBookClub(bookClubName);
+      console.log('fetching', bookClub); // DELETEME
+      if (!!bookClub)
+        setFormData({
+          name: bookClub.name,
+          description: bookClub.description,
+          imageName: bookClub.image,
+          publicity: bookClub.publicity
+        });
+    };
+
+    if (!!bookClubName && bookClubName.length) fetchEditBookClub(bookClubName);
+  }, [bookClubName]);
 
   // Handler for form data changes
   const handleInputChange = ({
