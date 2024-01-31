@@ -6,7 +6,6 @@ import { revalidatePath } from 'next/cache';
 import { Publicity, Role } from '@/db/models/book-club.models';
 import {
   addBookClub,
-  findBookClubsBySearch,
   findByName
 } from '@/db/repositories/book-club.repository';
 import { updateUser } from '@/db/repositories/user.repository';

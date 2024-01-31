@@ -12,7 +12,7 @@ import UserAvatar from '@/components/avatars/user.avatar';
 import props from '@/util/properties';
 
 /** The navigation bar for the application, sticking to the top of the screen */
-const NavBar = () => (
+const AppBar = () => (
   <NUINavBar
     maxWidth="full"
     isBordered
@@ -40,4 +40,4 @@ const NavBar = () => (
   </NUINavBar>
 );
 
-export default NavBar;
+export default AppBar;
