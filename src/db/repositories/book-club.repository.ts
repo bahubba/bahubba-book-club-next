@@ -1,5 +1,10 @@
 import { Collection, InsertOneResult } from 'mongodb';
-import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
+import {
+  BookClubDoc,
+  BookClubMemberProjection,
+  Publicity,
+  Role
+} from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
 
@@ -151,4 +156,110 @@ export const findBookClubBySlug = async (
     'members.userID': userID,
     'members.departed': { $exists: false }
   });
+};
+
+/**
+ * Find a user's membership in a book club by slug
+ *
+ * @param {string} slug The slug of the book club
+ * @param {string} userID The ID of the user to search for
+ * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
+ */
+export const findMemberRoleBySlug = async (
+  slug: string,
+  userID: string
+): Promise<Role | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Create an aggregation pipeline to find the user's role in the book club
+  const aggregation = [
+    {
+      $unwind: {
+        path: '$members'
+      }
+    },
+    {
+      $match: {
+        slug,
+        'members.userID': userID,
+        'members.departed': {
+          $exists: false
+        }
+      }
+    },
+    {
+      $project: {
+        role: '$members.role'
+      }
+    }
+  ];
+
+  // Find the user's role in the book club
+  const result = await collection.aggregate(aggregation).toArray();
+  return result.length > 0 ? result[0].role : null;
+};
+
+/**
+ * Find a book club's members by its slug
+ *
+ * @param {string} slug The slug of the book club to find
+ * @return {Promise<BookClubMemberProjection[]>} The members of the book club
+ */
+export const findMembersBySlug = async (slug: string) => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Generate the aggregation pipeline
+  const aggregation = [
+    {
+      $match: {
+        slug,
+        disbanded: {
+          $exists: false
+        }
+      }
+    },
+    {
+      $unwind: {
+        path: '$members'
+      }
+    },
+    {
+      $match: {
+        'members.departed': {
+          $exists: false
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'members.userID',
+        foreignField: '_id',
+        as: 'memberDetails'
+      }
+    },
+    {
+      $project: {
+        preferredName: {
+          $arrayElemAt: ['$memberDetails.preferredName', 0]
+        },
+        email: {
+          $arrayElemAt: ['$memberDetails.email', 0]
+        },
+        role: '$members.role',
+        joined: {
+          $arrayElemAt: ['$memberDetails.joined', 0]
+        }
+      }
+    }
+  ];
+
+  // Run the aggregation to get the members and return
+  return await collection.aggregate(aggregation).toArray();
 };

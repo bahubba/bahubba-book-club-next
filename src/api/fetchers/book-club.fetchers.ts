@@ -1,11 +1,12 @@
 'use server';
 
-import { BookClubDoc } from '@/db/models/book-club.models';
+import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
   findBookClubsForUser,
   findBookClubByName,
-  findBookClubBySlug
+  findBookClubBySlug,
+  findMemberRoleBySlug
 } from '@/db/repositories/book-club.repository';
 import { ensureAuth } from '@/api/auth.api';
 
@@ -64,4 +65,32 @@ export const getBookClubBySlug = async (
 
   // Fetch the book club
   return await findBookClubBySlug(slug, user._id);
+};
+
+/**
+ * Gets a user's membership in a book club by slug
+ *
+ * @param {string} slug The slug of the book club
+ * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
+ */
+export const getBookClubMembership = async (
+  slug: string
+): Promise<Role | null> => {
+  // Ensure that the user is authenticated
+  const user = await ensureAuth();
+
+  // Fetch the user's role in the book club and return
+  return await findMemberRoleBySlug(slug, user._id);
+};
+
+/**
+ * Gets a book club's members by slug
+ * @param {string} slug The slug of the book club
+ * @return {Promise<BookClubMemberProjection[]>} The members of the book club
+ */
+export const getBookClubMembers = async (slug: string) => {
+  // Ensure that the user is authenticated
+  const user = await ensureAuth();
+
+  // TODO - fill in
 };
