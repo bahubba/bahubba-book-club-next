@@ -22,17 +22,24 @@ interface FormValues {
   publicity: Publicity;
 }
 
-/** Async function for getting the book club */
+/**
+ * Async function for getting the book club by slug
+ *
+ * @param {string} bookClubSlug - The book club slug
+ */
 const fetchBookClub = async (
   bookClubSlug: string
 ): Promise<BookClubDoc | null> => await getBookClubBySlug(bookClubSlug);
 
-/** Form for creating or updating a book club's details */
+/**
+ * Form for creating or updating a book club's details
+ *
+ * @prop {Object} props - The component props
+ * @prop {string} props.bookClubSlug - The book club slug
+ */
 const BookClubDetailsForm = ({
   bookClubSlug
 }: Readonly<{ bookClubSlug?: string }>) => {
-  console.log('inner bookClubSlug:', bookClubSlug); // DELETEME
-
   // Form state
   const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
     error: ''
@@ -50,7 +57,6 @@ const BookClubDetailsForm = ({
   useEffect(() => {
     const fetchEditBookClub = async (bookClubSlug: string) => {
       const bookClub = await fetchBookClub(bookClubSlug);
-      console.log('fetching', bookClub); // DELETEME
       if (!!bookClub)
         setFormData({
           name: bookClub.name,
