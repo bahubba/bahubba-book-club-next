@@ -7,7 +7,13 @@ interface BookClubAdminDetailsPageProps {
   };
 }
 
-/** Book club details admin page */
+/**
+ * Book club details admin page
+ *
+ * @prop {Object} props - The page props
+ * @prop {BookClubAdminDetailsPageProps} props.params - The page params
+ * @prop {string} props.params.bookClubSlug - The book club slug from the URL path
+ */
 const BookClubAdminDetailsPage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubAdminDetailsPageProps>) => {
