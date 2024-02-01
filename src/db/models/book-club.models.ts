@@ -26,6 +26,7 @@ export interface BookClubMember {
 export interface BookClubDoc {
   _id?: string;
   name: string;
+  slug?: string;
   description: string;
   image: string;
   publicity: Publicity;

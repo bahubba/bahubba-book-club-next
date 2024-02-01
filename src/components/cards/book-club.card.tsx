@@ -8,6 +8,7 @@ import { Card, CardBody, CardHeader } from '@nextui-org/card';
 
 import { getPreSignedBookClubImageURL } from '@/api/fetchers/s3.fetchers';
 import { BookClubDoc } from '@/db/models/book-club.models';
+import slugify from 'slugify';
 
 /**
  * Card display component for book clubs
@@ -33,13 +34,13 @@ const BookClubCard = ({ bookClub }: { bookClub: BookClubDoc }) => {
 
   return (
     // TODO - Get the image from S3
-    <Link href={`/book-club/${bookClub.name.toLowerCase()}`}>
+    <Link href={`/book-club/${slugify(bookClub.name, { lower: true })}`}>
       <Tooltip
         className="bg-opacity-75 bg-black text-white"
         showArrow
         content={bookClub.description}
       >
-        <Card>
+        <Card className="max-w-[200px]">
           <CardHeader className="pb-0 flex-col items-start">
             <h1>{bookClub.name}</h1>
             <small className="overflow-hidden line-clamp-1">
@@ -47,13 +48,17 @@ const BookClubCard = ({ bookClub }: { bookClub: BookClubDoc }) => {
             </small>
           </CardHeader>
           <CardBody className="overflow-visible">
-            <Image
-              className="object-cover rounded-xl"
-              src={url}
-              alt="Books"
-              height={200}
-              width={200}
-            />
+            <div className="flex justify-center">
+              {url && (
+                <Image
+                  className="object-cover rounded-xl"
+                  src={url}
+                  alt="Books"
+                  height={200}
+                  width={200}
+                />
+              )}
+            </div>
           </CardBody>
         </Card>
       </Tooltip>

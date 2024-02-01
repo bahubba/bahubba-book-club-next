@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 import { Divider } from '@nextui-org/divider';
@@ -10,8 +10,9 @@ import BookClubImagePickerModal from '@/components/modals/book-club-image-picker
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
 import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
-import { Publicity } from '@/db/models/book-club.models';
+import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import { getBookClubBySlug } from '@/api/fetchers/book-club.fetchers';
 
 // Interface for form values
 interface FormValues {
@@ -21,8 +22,24 @@ interface FormValues {
   publicity: Publicity;
 }
 
-/** Form for creating or updating a book club's details */
-const BookClubDetailsForm = () => {
+/**
+ * Async function for getting the book club by slug
+ *
+ * @param {string} bookClubSlug - The book club slug
+ */
+const fetchBookClub = async (
+  bookClubSlug: string
+): Promise<BookClubDoc | null> => await getBookClubBySlug(bookClubSlug);
+
+/**
+ * Form for creating or updating a book club's details
+ *
+ * @prop {Object} props - The component props
+ * @prop {string} props.bookClubSlug - The book club slug
+ */
+const BookClubDetailsForm = ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug?: string }>) => {
   // Form state
   const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
     error: ''
@@ -35,7 +52,22 @@ const BookClubDetailsForm = () => {
     imageName: 'default',
     publicity: Publicity.PRIVATE
   });
-  const [selectedImageURL, setSelectedImageURL] = useState<string>('');
+
+  // Fetch book club if editing
+  useEffect(() => {
+    const fetchEditBookClub = async (bookClubSlug: string) => {
+      const bookClub = await fetchBookClub(bookClubSlug);
+      if (!!bookClub)
+        setFormData({
+          name: bookClub.name,
+          description: bookClub.description,
+          imageName: bookClub.image,
+          publicity: bookClub.publicity
+        });
+    };
+
+    if (!!bookClubSlug && bookClubSlug.length) fetchEditBookClub(bookClubSlug);
+  }, [bookClubSlug]);
 
   // Handler for form data changes
   const handleInputChange = ({
@@ -98,7 +130,7 @@ const BookClubDetailsForm = () => {
           <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
         <SubmitButton
-          buttonText="Create"
+          buttonText={bookClubSlug ? 'Update' : 'Create'}
           disabled={!canSubmit()}
         />
       </div>

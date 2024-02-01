@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import slugify from 'slugify';
 
 import { Publicity, Role } from '@/db/models/book-club.models';
 import {
@@ -48,6 +49,7 @@ export const handleSubmitNewBookClub = async (
   // Create the new club
   const newClubResult = await addBookClub({
     name,
+    slug: slugify(name, { lower: true }),
     description:
       formData.get('description')?.toString().trim() ||
       'A book club for reading books',

@@ -1,5 +1,11 @@
 import BookClubAdminTabs from '@/components/nav/tabs/book-club-admin.tabs';
 
+/**
+ * Book club admin layout
+ *
+ * @prop {Object} props - The component props
+ * @prop {React.ReactNode} props.children - The children components
+ */
 const BookClubAdminLayout = ({
   children
 }: Readonly<{ children: React.ReactNode }>) => {

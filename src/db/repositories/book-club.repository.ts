@@ -55,7 +55,7 @@ export const findBookClubsForUser = async (
   );
 
   // Find the book clubs in the database
-  return collection
+  return await collection
     .find({ 'members.userID': userID, 'members.departed': { $exists: false } })
     .toArray();
 };
@@ -75,7 +75,7 @@ export const findBookClubsBySearch = async (
   );
 
   // Find the book clubs in the database
-  return collection
+  return await collection
     .find({
       $and: [
         {
@@ -97,4 +97,58 @@ export const findBookClubsBySearch = async (
       ]
     })
     .toArray();
+};
+
+/**
+ * Find a book club by its name
+ *
+ * @param {string} name The name of the book club to find
+ * @param {string} userID The ID of the user to search for
+ * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
+ */
+export const findBookClubByName = async (
+  name: string,
+  userID: string
+): Promise<BookClubDoc | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  console.log('name, userID', name, userID);
+
+  // Find the book club in the database
+  return await collection.findOne({
+    departed: { $exists: false },
+    name,
+    'members.userID': userID,
+    'members.departed': { $exists: false }
+  });
+};
+
+/**
+ * Find a book club by its slug
+ *
+ * @param {string} slug The slug of the book club to find
+ * @param {string} userID The ID of the user to search for
+ * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
+ */
+export const findBookClubBySlug = async (
+  slug: string,
+  userID: string
+): Promise<BookClubDoc | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  console.log('name, userID', slug, userID);
+
+  // Find the book club in the database
+  return await collection.findOne({
+    departed: { $exists: false },
+    slug,
+    'members.userID': userID,
+    'members.departed': { $exists: false }
+  });
 };
