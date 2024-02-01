@@ -11,7 +11,6 @@ interface BookClubAdminDetailsPageProps {
 const BookClubAdminDetailsPage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubAdminDetailsPageProps>) => {
-  console.log('bookClubSlug:', bookClubSlug); // DELETEME
   return <BookClubDetailsForm bookClubSlug={bookClubSlug} />;
 };
 

@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import slugify from 'slugify';
 
 import { Publicity, Role } from '@/db/models/book-club.models';
 import {
@@ -12,7 +13,6 @@ import { updateUser } from '@/db/repositories/user.repository';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 import { ensureAuth } from '@/api/auth.api';
 import props from '@/util/properties';
-import slugify from 'slugify';
 
 /**
  * Handle submitting a new book club
