@@ -22,7 +22,7 @@ export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
  * Searches for book clubs by name or description
  *
  * @param {string} search The search term to find book clubs by
- * @returns {Promise<BookClubDoc[]>} The book clubs that match the search term
+ * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
 export const searchBookClubs = async (
   search: string
