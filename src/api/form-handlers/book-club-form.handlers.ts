@@ -46,10 +46,13 @@ export const handleSubmitNewBookClub = async (
     Publicity.PRIVATE;
   if (!(publicity in Publicity)) publicity = Publicity.PRIVATE;
 
+  // Create a slug for the book club from the name
+  const slug = slugify(name, { lower: true });
+
   // Create the new club
-  const newClubResult = await addBookClub({
+  await addBookClub({
     name,
-    slug: slugify(name, { lower: true }),
+    slug,
     description:
       formData.get('description')?.toString().trim() ||
       'A book club for reading books',
@@ -57,7 +60,7 @@ export const handleSubmitNewBookClub = async (
     publicity: publicity as Publicity,
     members: [
       {
-        userID: user._id,
+        userEmail: user.email,
         joined: new Date(),
         role: Role.OWNER
       }
@@ -70,7 +73,7 @@ export const handleSubmitNewBookClub = async (
     memberships: [
       ...user.memberships,
       {
-        clubID: newClubResult.insertedId,
+        clubSlug: slug,
         joined: new Date(),
         role: Role.OWNER
       }
