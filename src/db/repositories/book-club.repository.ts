@@ -262,15 +262,6 @@ export const findMembersBySlug = async (
     }
   ];
 
-  return [
-    {
-      preferredName: 'test',
-      email: 'test',
-      role: Role.ADMIN,
-      joined: new Date()
-    }
-  ];
-
   // Run the aggregation to get the members and return
   return await collection
     .aggregate<BookClubMemberProjection>(aggregation)
