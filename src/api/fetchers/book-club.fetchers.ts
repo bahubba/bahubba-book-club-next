@@ -60,7 +60,7 @@ export const getBookClubByName = async (
   const bookClub = await findBookClubByName(name, user.email);
 
   // Return the book club
-  return bookClub ? toJSON(bookClub) : null;
+  return !!bookClub ? toJSON(bookClub) : null;
 };
 
 /**
@@ -79,7 +79,7 @@ export const getBookClubBySlug = async (
   const bookClub = await findBookClubBySlug(slug, user.email);
 
   // Return the book club
-  return bookClub ? toJSON(bookClub) : null;
+  return !!bookClub ? toJSON(bookClub) : null;
 };
 
 /**
