@@ -11,6 +11,7 @@ import {
   findMembersBySlug
 } from '@/db/repositories/book-club.repository';
 import { BookClubMemberProjection } from '@/db/models/book-club.models';
+import { toJSON } from '@/util/helpers';
 
 /** Retrieves all book clubs for the logged-in user */
 export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
@@ -18,7 +19,10 @@ export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   const user = await ensureAuth();
 
   // Fetch the user's book clubs
-  return await findBookClubsForUser(user.email);
+  const bookClubs = await findBookClubsForUser(user.email);
+
+  // Return the book clubs
+  return toJSON(bookClubs);
 };
 
 /**
@@ -34,7 +38,10 @@ export const searchBookClubs = async (
   await ensureAuth();
 
   // Fetch the user's book clubs
-  return await findBookClubsBySearch(search);
+  const bookClubs = await findBookClubsBySearch(search);
+
+  // Return the book clubs
+  return toJSON(bookClubs);
 };
 
 /**
@@ -50,7 +57,10 @@ export const getBookClubByName = async (
   const user = await ensureAuth();
 
   // Fetch the book club
-  return await findBookClubByName(name, user.email);
+  const bookClub = await findBookClubByName(name, user.email);
+
+  // Return the book club
+  return bookClub ? toJSON(bookClub) : null;
 };
 
 /**
@@ -66,7 +76,10 @@ export const getBookClubBySlug = async (
   const user = await ensureAuth();
 
   // Fetch the book club
-  return await findBookClubBySlug(slug, user.email);
+  const bookClub = await findBookClubBySlug(slug, user.email);
+
+  // Return the book club
+  return bookClub ? toJSON(bookClub) : null;
 };
 
 /**
