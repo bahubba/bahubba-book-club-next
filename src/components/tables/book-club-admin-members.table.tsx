@@ -1,32 +1,50 @@
+'use client';
+
+import { getMembersBySlug } from '@/api/fetchers/book-club.fetchers';
+import { BookClubMemberProjection } from '@/db/models/book-club.models';
 import {
   Table,
   TableBody,
   TableCell,
   TableColumn,
-  TableHeader
+  TableHeader,
+  TableRow
 } from '@nextui-org/table';
 
 /**
  * Table displaying members in rows as editable forms
+ *
+ * @prop {Object} props Component props
+ * @prop {BookClubMemberProjection[]} props.members The members of the book club
  */
-const BookClubAdminMembersTable = () => {
+const BookClubAdminMembersTable = ({
+  members
+}: Readonly<{ members: BookClubMemberProjection[] }>) => {
   return (
-    <></>
-    // <Table
-    //   isStriped
-    //   isHeaderSticky
-    // >
-    //   <TableHeader>
-    //     <TableColumn key="name">Name</TableColumn>
-    //     <TableColumn key="email">Email</TableColumn>
-    //     <TableColumn key="role">Role</TableColumn>
-    //     <TableColumn key="remove">Remove</TableColumn>
-    //     <TableColumn key="joined">Joined</TableColumn>
-    //   </TableHeader>
-    //   <TableBody>
-
-    //   </TableBody>
-    // </Table>
+    <Table
+      aria-label="Table of members in the book club"
+      isStriped
+      isHeaderSticky
+    >
+      <TableHeader>
+        <TableColumn key="name">Name</TableColumn>
+        <TableColumn key="email">Email</TableColumn>
+        <TableColumn key="role">Role</TableColumn>
+        <TableColumn key="remove">Remove</TableColumn>
+        <TableColumn key="joined">Joined</TableColumn>
+      </TableHeader>
+      <TableBody>
+        {members.map(member => (
+          <TableRow key={member.email}>
+            <TableCell>{member.preferredName}</TableCell>
+            <TableCell>{member.email}</TableCell>
+            <TableCell>{member.role}</TableCell>
+            <TableCell>Remove</TableCell>
+            <TableCell>{member.joined.toUTCString()}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

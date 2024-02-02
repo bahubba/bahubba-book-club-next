@@ -208,7 +208,9 @@ export const findMemberRoleBySlug = async (
  * @param {string} slug The slug of the book club to find
  * @return {Promise<BookClubMemberProjection[]>} The members of the book club
  */
-export const findMembersBySlug = async (slug: string) => {
+export const findMembersBySlug = async (
+  slug: string
+): Promise<BookClubMemberProjection[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -260,6 +262,17 @@ export const findMembersBySlug = async (slug: string) => {
     }
   ];
 
+  return [
+    {
+      preferredName: 'test',
+      email: 'test',
+      role: Role.ADMIN,
+      joined: new Date()
+    }
+  ];
+
   // Run the aggregation to get the members and return
-  return await collection.aggregate(aggregation).toArray();
+  return await collection
+    .aggregate<BookClubMemberProjection>(aggregation)
+    .toArray();
 };

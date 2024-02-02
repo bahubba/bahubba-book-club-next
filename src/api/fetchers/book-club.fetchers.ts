@@ -1,19 +1,23 @@
 'use server';
 
+import { ensureAuth } from '@/api/auth.api';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
   findBookClubsForUser,
   findBookClubByName,
   findBookClubBySlug,
-  findMemberRoleBySlug
+  findMemberRoleBySlug,
+  findMembersBySlug
 } from '@/db/repositories/book-club.repository';
-import { ensureAuth } from '@/api/auth.api';
+import { BookClubMemberProjection } from '@/db/models/book-club.models';
 
 /** Retrieves all book clubs for the logged-in user */
 export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
   const user = await ensureAuth();
+
+  console.log('Fetching book clubs for user');
 
   // Fetch the user's book clubs
   return await findBookClubsForUser(user._id);
@@ -88,9 +92,19 @@ export const getBookClubMembership = async (
  * @param {string} slug The slug of the book club
  * @return {Promise<BookClubMemberProjection[]>} The members of the book club
  */
-export const getBookClubMembers = async (slug: string) => {
+export const getMembersBySlug = async (
+  slug: string
+): Promise<BookClubMemberProjection[]> => {
   // Ensure that the user is authenticated
   const user = await ensureAuth();
 
-  // TODO - fill in
+  // Ensure the user is an admin or owner of the book club
+  const role = await findMemberRoleBySlug(slug, user._id);
+  if (!role || ![Role.ADMIN, Role.OWNER].includes(role)) {
+    // TODO - Handle this error more gracefully
+    throw new Error('You are not authorized to perform this action');
+  }
+
+  // Fetch the book club and return its members
+  return await findMembersBySlug(slug);
 };
