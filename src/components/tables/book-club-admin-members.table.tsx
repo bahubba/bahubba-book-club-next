@@ -1,7 +1,5 @@
 'use client';
 
-import { getMembersBySlug } from '@/api/fetchers/book-club.fetchers';
-import { BookClubMemberProjection } from '@/db/models/book-club.models';
 import {
   Table,
   TableBody,
@@ -10,6 +8,8 @@ import {
   TableHeader,
   TableRow
 } from '@nextui-org/table';
+
+import { BookClubMemberProjection } from '@/db/models/book-club.models';
 
 /**
  * Table displaying members in rows as editable forms
