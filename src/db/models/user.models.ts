@@ -11,7 +11,7 @@ export interface ProviderProfile {
 
 // BookClubMembership subdocument
 export interface BookClubMembership {
-  clubID: string;
+  clubSlug: string;
   joined: Date;
   departed?: Date;
   role: Role;
@@ -19,7 +19,6 @@ export interface BookClubMembership {
 
 // MongoDB User document
 export interface UserDoc {
-  _id?: string;
   email: string;
   preferredName: string;
   providerProfiles: {
@@ -28,9 +27,4 @@ export interface UserDoc {
   memberships: BookClubMembership[];
   joined: Date;
   departed?: Date;
-}
-
-// MongoDB User document with _id
-export interface VerifiedUserDoc extends UserDoc {
-  _id: string;
 }

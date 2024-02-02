@@ -48,11 +48,11 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
 /**
  * Find all book clubs for which a user is a member
  *
- * @param {string} userID The ID of the user to search for
+ * @param {string} userEmail The ID of the user to search for
  * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
 export const findBookClubsForUser = async (
-  userID: string
+  userEmail: string
 ): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -61,12 +61,15 @@ export const findBookClubsForUser = async (
 
   // Find the book clubs in the database
   return await collection
-    .find({ 'members.userID': userID, 'members.departed': { $exists: false } })
+    .find({
+      'members.userEmail': userEmail,
+      'members.departed': { $exists: false }
+    })
     .toArray();
 };
 
 /**
- * Find all public  book clubs that match a search term
+ * Find all public book clubs that match a search term
  *
  * @param {string} query The search term to match
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
@@ -107,25 +110,23 @@ export const findBookClubsBySearch = async (
  * Find a book club by its name
  *
  * @param {string} name The name of the book club to find
- * @param {string} userID The ID of the user to search for
+ * @param {string} userEmail The email of the user to search for
  * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
  */
 export const findBookClubByName = async (
   name: string,
-  userID: string
+  userEmail: string
 ): Promise<BookClubDoc | null> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
   );
 
-  console.log('name, userID', name, userID);
-
   // Find the book club in the database
   return await collection.findOne({
     departed: { $exists: false },
     name,
-    'members.userID': userID,
+    'members.userEmail': userEmail,
     'members.departed': { $exists: false }
   });
 };
@@ -134,25 +135,23 @@ export const findBookClubByName = async (
  * Find a book club by its slug
  *
  * @param {string} slug The slug of the book club to find
- * @param {string} userID The ID of the user to search for
+ * @param {string} userEmail The email of the user to search for
  * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
  */
 export const findBookClubBySlug = async (
   slug: string,
-  userID: string
+  userEmail: string
 ): Promise<BookClubDoc | null> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
   );
 
-  console.log('name, userID', slug, userID);
-
   // Find the book club in the database
   return await collection.findOne({
     departed: { $exists: false },
     slug,
-    'members.userID': userID,
+    'members.userEmail': userEmail,
     'members.departed': { $exists: false }
   });
 };
@@ -161,12 +160,12 @@ export const findBookClubBySlug = async (
  * Find a user's membership in a book club by slug
  *
  * @param {string} slug The slug of the book club
- * @param {string} userID The ID of the user to search for
+ * @param {string} userEmail The email of the user to search for
  * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
  */
 export const findMemberRoleBySlug = async (
   slug: string,
-  userID: string
+  userEmail: string
 ): Promise<Role | null> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -183,7 +182,7 @@ export const findMemberRoleBySlug = async (
     {
       $match: {
         slug,
-        'members.userID': userID,
+        'members.userEmail': userEmail,
         'members.departed': {
           $exists: false
         }
@@ -240,8 +239,8 @@ export const findMembersBySlug = async (
     {
       $lookup: {
         from: 'users',
-        localField: 'members.userID',
-        foreignField: '_id',
+        localField: 'members.userEmail',
+        foreignField: 'email',
         as: 'memberDetails'
       }
     },

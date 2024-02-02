@@ -18,7 +18,7 @@ export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   const user = await ensureAuth();
 
   // Fetch the user's book clubs
-  return await findBookClubsForUser(user._id);
+  return await findBookClubsForUser(user.email);
 };
 
 /**
@@ -50,7 +50,7 @@ export const getBookClubByName = async (
   const user = await ensureAuth();
 
   // Fetch the book club
-  return await findBookClubByName(name, user._id);
+  return await findBookClubByName(name, user.email);
 };
 
 /**
@@ -66,7 +66,7 @@ export const getBookClubBySlug = async (
   const user = await ensureAuth();
 
   // Fetch the book club
-  return await findBookClubBySlug(slug, user._id);
+  return await findBookClubBySlug(slug, user.email);
 };
 
 /**
@@ -82,7 +82,7 @@ export const getBookClubMembership = async (
   const user = await ensureAuth();
 
   // Fetch the user's role in the book club and return
-  return await findMemberRoleBySlug(slug, user._id);
+  return await findMemberRoleBySlug(slug, user.email);
 };
 
 /**
@@ -97,7 +97,7 @@ export const getMembersBySlug = async (
   const user = await ensureAuth();
 
   // Ensure the user is an admin or owner of the book club
-  const role = await findMemberRoleBySlug(slug, user._id);
+  const role = await findMemberRoleBySlug(slug, user.email);
   if (!role || ![Role.ADMIN, Role.OWNER].includes(role)) {
     // TODO - Handle this error more gracefully
     throw new Error('You are not authorized to perform this action');

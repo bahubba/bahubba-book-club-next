@@ -17,7 +17,7 @@ export enum Publicity {
 
 // BookClubMember subdocument
 export interface BookClubMember {
-  userID: string;
+  userEmail: string;
   joined: Date;
   departed?: Date;
   role: Role;
@@ -27,7 +27,6 @@ export interface BookClubMember {
 
 // MongoDB BookClub document
 export interface BookClubDoc {
-  _id?: string;
   name: string;
   slug?: string;
   description: string;
