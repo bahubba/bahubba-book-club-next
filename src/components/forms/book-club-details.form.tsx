@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 import { Divider } from '@nextui-org/divider';
@@ -23,51 +23,35 @@ interface FormValues {
 }
 
 /**
- * Async function for getting the book club by slug
- *
- * @param {string} bookClubSlug - The book club slug
- */
-const fetchBookClub = async (
-  bookClubSlug: string
-): Promise<BookClubDoc | null> => await getBookClubBySlug(bookClubSlug);
-
-/**
  * Form for creating or updating a book club's details
  *
  * @prop {Object} props - The component props
- * @prop {string} props.bookClubSlug - The book club slug
+ * @prop {BookClubDoc} props.bookClub - The book club to edit
  */
 const BookClubDetailsForm = ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug?: string }>) => {
+  bookClub
+}: Readonly<{ bookClub?: BookClubDoc }>) => {
   // Form state
   const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
     error: ''
   } as ErrorFormState);
 
   // State for selected image
-  const [formData, setFormData] = useState<FormValues>({
-    name: '',
-    description: '',
-    imageName: 'default',
-    publicity: Publicity.PRIVATE
-  });
-
-  // Fetch book club if editing
-  useEffect(() => {
-    const fetchEditBookClub = async (bookClubSlug: string) => {
-      const bookClub = await fetchBookClub(bookClubSlug);
-      if (!!bookClub)
-        setFormData({
+  const [formData, setFormData] = useState<FormValues>(
+    bookClub
+      ? {
           name: bookClub.name,
           description: bookClub.description,
           imageName: bookClub.image,
           publicity: bookClub.publicity
-        });
-    };
-
-    if (!!bookClubSlug && bookClubSlug.length) fetchEditBookClub(bookClubSlug);
-  }, [bookClubSlug]);
+        }
+      : {
+          name: '',
+          description: '',
+          imageName: 'default',
+          publicity: Publicity.PRIVATE
+        }
+  );
 
   // Handler for form data changes
   const handleInputChange = ({
@@ -130,7 +114,7 @@ const BookClubDetailsForm = ({
           <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
         <SubmitButton
-          buttonText={bookClubSlug ? 'Update' : 'Create'}
+          buttonText={bookClub ? 'Update' : 'Create'}
           disabled={!canSubmit()}
         />
       </div>

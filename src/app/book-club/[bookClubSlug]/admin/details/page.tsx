@@ -1,4 +1,8 @@
+import { Suspense } from 'react';
+import { Spinner } from '@nextui-org/spinner';
+
 import BookClubDetailsForm from '@/components/forms/book-club-details.form';
+import { getBookClubBySlug } from '@/api/fetchers/book-club.fetchers';
 
 // Page props
 interface BookClubAdminDetailsPageProps {
@@ -6,6 +10,25 @@ interface BookClubAdminDetailsPageProps {
     bookClubSlug: string;
   };
 }
+
+/**
+ * Async component for rendering the admin details form after fetching data
+ *
+ * @prop {Object} props - The component props
+ * @prop {string} props.bookClubSlug The slug of the book club
+ */
+const BookClubDetailsFormWrapper = async ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  const bookClub = await getBookClubBySlug(bookClubSlug);
+
+  return bookClub ? (
+    <BookClubDetailsForm bookClub={bookClub} />
+  ) : (
+    // TODO - Add a 404 page
+    <span>No book club found</span>
+  );
+};
 
 /**
  * Book club details admin page
@@ -17,7 +40,17 @@ interface BookClubAdminDetailsPageProps {
 const BookClubAdminDetailsPage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubAdminDetailsPageProps>) => {
-  return <BookClubDetailsForm bookClubSlug={bookClubSlug} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center w-full h-96">
+          <Spinner />
+        </div>
+      }
+    >
+      <BookClubDetailsFormWrapper bookClubSlug={bookClubSlug} />
+    </Suspense>
+  );
 };
 
 export default BookClubAdminDetailsPage;

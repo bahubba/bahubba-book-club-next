@@ -1,3 +1,5 @@
+/** ENUMS */
+
 // Book club role enum
 export enum Role {
   OWNER = 'OWNER',
@@ -14,6 +16,8 @@ export enum Publicity {
   PRIVATE = 'PRIVATE'
 }
 
+/** SUBDOCUMENTS */
+
 // BookClubMember subdocument
 export interface BookClubMember {
   userID: string;
@@ -21,6 +25,8 @@ export interface BookClubMember {
   departed?: Date;
   role: Role;
 }
+
+/** DOCUMENTS */
 
 // MongoDB BookClub document
 export interface BookClubDoc {
@@ -32,4 +38,14 @@ export interface BookClubDoc {
   publicity: Publicity;
   members?: BookClubMember[];
   disbanded?: Date;
+}
+
+/** PROJECTIONS */
+
+// MongoDB projection for Book Club Members
+export interface BookClubMemberProjection {
+  preferredName: string;
+  email: string;
+  role: Role;
+  joined: Date;
 }
