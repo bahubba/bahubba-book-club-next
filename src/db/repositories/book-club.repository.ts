@@ -48,7 +48,7 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
 /**
  * Find all book clubs for which a user is a member
  *
- * @param {string} userEmail The ID of the user to search for
+ * @param {string} userEmail The email of the user to search for
  * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
 export const findBookClubsForUser = async (
