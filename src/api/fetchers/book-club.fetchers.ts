@@ -17,8 +17,6 @@ export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
   const user = await ensureAuth();
 
-  console.log('Fetching book clubs for user');
-
   // Fetch the user's book clubs
   return await findBookClubsForUser(user._id);
 };
