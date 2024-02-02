@@ -66,7 +66,7 @@ export const findBookClubsForUser = async (
 };
 
 /**
- * Find all public or observable book clubs that match a search term
+ * Find all public  book clubs that match a search term
  *
  * @param {string} query The search term to match
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
@@ -95,7 +95,6 @@ export const findBookClubsBySearch = async (
         {
           $or: [
             { publicity: Publicity.PUBLIC },
-            { publicity: Publicity.OBSERVABLE },
             { publicity: Publicity.PRIVATE }
           ]
         }

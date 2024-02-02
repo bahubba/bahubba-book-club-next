@@ -12,7 +12,6 @@ import BookClubCard from '@/components/cards/book-club.card';
 import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
 import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
-import { getBookClubBySlug } from '@/api/fetchers/book-club.fetchers';
 
 // Interface for form values
 interface FormValues {
@@ -67,7 +66,12 @@ const BookClubDetailsForm = ({
   const canSubmit = () =>
     formData.name.length &&
     formData.description.length &&
-    formData.imageName.length;
+    formData.imageName.length &&
+    (!bookClub ||
+      formData.name !== bookClub.name ||
+      formData.description !== bookClub.description ||
+      formData.imageName !== bookClub.image ||
+      formData.publicity !== bookClub.publicity);
 
   return (
     <form action={formAction}>
@@ -110,7 +114,6 @@ const BookClubDetailsForm = ({
           onChange={handleInputChange}
         >
           <Radio value={Publicity.PUBLIC}>Public</Radio>
-          <Radio value={Publicity.OBSERVABLE}>Observable</Radio>
           <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
         <SubmitButton
