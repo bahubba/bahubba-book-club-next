@@ -4,15 +4,12 @@
 export enum Role {
   OWNER = 'OWNER',
   ADMIN = 'ADMIN',
-  READER = 'READER',
-  PARTICIPANT = 'PARTICIPANT',
-  OBSERVER = 'OBSERVER'
+  READER = 'READER'
 }
 
 // Book club publicity enum
 export enum Publicity {
   PUBLIC = 'PUBLIC',
-  OBSERVABLE = 'OBSERVABLE',
   PRIVATE = 'PRIVATE'
 }
 
