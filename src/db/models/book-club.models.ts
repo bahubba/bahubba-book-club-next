@@ -27,7 +27,6 @@ export interface BookClubMember {
 
 // MongoDB BookClub document
 export interface BookClubDoc {
-  _id?: string;
   name: string;
   slug?: string;
   description: string;
