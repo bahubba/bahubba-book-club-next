@@ -9,7 +9,10 @@ import { Radio, RadioGroup } from '@nextui-org/radio';
 import BookClubImagePickerModal from '@/components/modals/book-club-image-picker.modal';
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
-import { handleSubmitNewBookClub } from '@/api/form-handlers/book-club-form.handlers';
+import {
+  handleSubmitNewBookClub,
+  handleUpdateBookClub
+} from '@/api/form-handlers/book-club-form.handlers';
 import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 
@@ -31,9 +34,12 @@ const BookClubDetailsForm = ({
   bookClub
 }: Readonly<{ bookClub?: BookClubDoc }>) => {
   // Form state
-  const [formState, formAction] = useFormState(handleSubmitNewBookClub, {
-    error: ''
-  } as ErrorFormState);
+  const [formState, formAction] = useFormState(
+    !!bookClub ? handleUpdateBookClub : handleSubmitNewBookClub,
+    {
+      error: ''
+    } as ErrorFormState
+  );
 
   // State for selected image
   const [formData, setFormData] = useState<FormValues>(
@@ -67,6 +73,8 @@ const BookClubDetailsForm = ({
     formData.name.length &&
     formData.description.length &&
     formData.imageName.length &&
+    !formData.name.includes('/') &&
+    formData.name !== '-' &&
     (!bookClub ||
       formData.name !== bookClub.name ||
       formData.description !== bookClub.description ||
@@ -77,6 +85,14 @@ const BookClubDetailsForm = ({
     <form action={formAction}>
       <div className="space-y-2">
         {formState.error && <p className="text-red-500">* {formState.error}</p>}
+        {formData.name.includes('/') && (
+          <p className="text-red-500">* Name cannot include a slash</p>
+        )}
+        <Input
+          className="hidden"
+          name="previousSlug"
+          value={bookClub?.slug}
+        />
         <Input
           variant="bordered"
           label="Name"

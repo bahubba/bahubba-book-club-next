@@ -16,7 +16,7 @@ export const addUser = async (user: UserDoc) => {
   );
 
   // Add the user to the database
-  return collection.insertOne(user);
+  return await collection.insertOne(user);
 };
 
 /**
@@ -32,7 +32,7 @@ export const updateUser = async (user: UserDoc) => {
 
   // TODO - Throw error if user._id is undefined
   // Update the user in the database
-  return collection.updateOne({ _id: user._id }, { $set: user });
+  return await collection.updateOne({ email: user.email }, { $set: user });
 };
 
 /**
@@ -50,5 +50,5 @@ export const findUserByEmail = async (
   );
 
   // Find the user in the database
-  return collection.findOne({ email });
+  return await collection.findOne({ email });
 };
