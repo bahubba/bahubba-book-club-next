@@ -1,3 +1,5 @@
+import PageSectionLayout from '@/components/layout/page-section.layout';
+
 // Component props
 interface BookClubHomePageProps {
   params: {
@@ -17,9 +19,20 @@ const BookClubHomePage = ({
 }: Readonly<BookClubHomePageProps>) => {
   // TODO - Fetch book club and get name for title from there, not slug
   return (
-    <>
-      <h1 className="text-2xl font-bold">{bookClubSlug}</h1>
-    </>
+    <div className="flex w-full h-full pb-2">
+      <PageSectionLayout
+        header="Members"
+        sectionHeaderChildren={<div className="flex gap-0.5"></div>}
+      >
+        <span>Members go here</span>
+      </PageSectionLayout>
+      <PageSectionLayout header="Books">
+        <div>Some long text string that will take up some width</div>
+      </PageSectionLayout>
+      <PageSectionLayout header="Discussions">
+        <div>Some long text string that will take up some width</div>
+      </PageSectionLayout>
+    </div>
   );
 };
 
