@@ -137,3 +137,20 @@ export const getMembersBySlug = async (
   // Fetch the book club and return its members
   return await findMembersBySlug(slug);
 };
+
+/**
+ * Checks whether a user is a member of a book club
+ *
+ * @param {string} slug The slug of the book club
+ * @return {Promise<boolean>} Whether the user is a member of the book club
+ */
+export const isBookClubMember = async (slug: string): Promise<boolean> => {
+  // Ensure that the user is authenticated
+  const { email } = await ensureAuth();
+
+  // Fetch the user's role in the book club
+  const role = await findMemberRoleBySlug(slug, email);
+
+  // Return whether the user is a member
+  return !!role;
+};
