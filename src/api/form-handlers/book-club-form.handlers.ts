@@ -19,12 +19,12 @@ import props from '@/util/properties';
 /**
  * Handle submitting a new book club
  *
- * @param {ErrorFormState} prevState Form state from the previous render
+ * @param {ErrorFormState} _ Form state from the previous render; Unused
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
 export const handleSubmitNewBookClub = async (
-  prevState: ErrorFormState,
+  _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
