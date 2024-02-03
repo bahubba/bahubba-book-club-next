@@ -19,6 +19,7 @@ export interface BookClubMembership {
 
 // MongoDB User document
 export interface UserDoc {
+  _id?: string;
   email: string;
   preferredName: string;
   providerProfiles: {

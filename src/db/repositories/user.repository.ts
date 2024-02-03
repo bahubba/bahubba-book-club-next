@@ -32,7 +32,7 @@ export const updateUser = async (user: UserDoc) => {
 
   // TODO - Throw error if user._id is undefined
   // Update the user in the database
-  return collection.updateOne({ _id: user._id }, { $set: user });
+  return collection.updateOne({ email: user.email }, { $set: user });
 };
 
 /**

@@ -27,6 +27,22 @@ export const addBookClub = async (
 };
 
 /**
+ * Updates a book club
+ *
+ * @param {string} slug The slug of the book club to update
+ * @param {BookClubDoc} bookClub The book club to update
+ */
+export const updateBookClub = async (slug: string, bookClub: BookClubDoc) => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Update the book club in the database
+  return collection.updateOne({ slug }, { $set: bookClub });
+};
+
+/**
  * Finds a book club by its name
  *
  * @param {string} name The name of the book club to find
@@ -62,8 +78,12 @@ export const findBookClubsForUser = async (
   // Find the book clubs in the database
   return await collection
     .find({
-      'members.userEmail': userEmail,
-      'members.departed': { $exists: false }
+      members: {
+        $elemMatch: {
+          userEmail: userEmail,
+          departed: { $exists: false }
+        }
+      }
     })
     .toArray();
 };
@@ -72,10 +92,12 @@ export const findBookClubsForUser = async (
  * Find all public book clubs that match a search term
  *
  * @param {string} query The search term to match
+ * @param {string} userEmail The email of the searching user
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
 export const findBookClubsBySearch = async (
-  query: string
+  query: string,
+  userEmail: string
 ): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -98,7 +120,19 @@ export const findBookClubsBySearch = async (
         {
           $or: [
             { publicity: Publicity.PUBLIC },
-            { publicity: Publicity.PRIVATE }
+            {
+              $and: [
+                { publicity: Publicity.PRIVATE },
+                {
+                  members: {
+                    $elemMatch: {
+                      userEmail: userEmail,
+                      departed: { $exists: false }
+                    }
+                  }
+                }
+              ]
+            }
           ]
         }
       ]
@@ -126,8 +160,17 @@ export const findBookClubByName = async (
   return await collection.findOne({
     departed: { $exists: false },
     name,
-    'members.userEmail': userEmail,
-    'members.departed': { $exists: false }
+    $or: [
+      { publicity: Publicity.PUBLIC },
+      {
+        members: {
+          $elemMatch: {
+            userEmail: userEmail,
+            departed: { $exists: false }
+          }
+        }
+      }
+    ]
   });
 };
 
@@ -151,8 +194,17 @@ export const findBookClubBySlug = async (
   return await collection.findOne({
     departed: { $exists: false },
     slug,
-    'members.userEmail': userEmail,
-    'members.departed': { $exists: false }
+    $or: [
+      { publicity: Publicity.PUBLIC },
+      {
+        members: {
+          $elemMatch: {
+            userEmail: userEmail,
+            departed: { $exists: false }
+          }
+        }
+      }
+    ]
   });
 };
 
@@ -264,4 +316,32 @@ export const findMembersBySlug = async (
   return await collection
     .aggregate<BookClubMemberProjection>(aggregation)
     .toArray();
+};
+
+/**
+ * Finds a book club by its slug where the requesting user is an admin (or owner)
+ *
+ * @param {string} slug The slug of the book club to find
+ * @param {string} userEmail The email of the requesting user
+ */
+export const findBookClubBySlugForAdmin = async (
+  slug: string,
+  userEmail: string
+): Promise<BookClubDoc | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Find the book club in the database
+  return await collection.findOne({
+    slug,
+    members: {
+      $elemMatch: {
+        userEmail: userEmail,
+        role: { $in: [Role.OWNER, Role.ADMIN] },
+        departed: { $exists: false }
+      }
+    }
+  });
 };
