@@ -3,6 +3,7 @@ import {
   BookClubDoc,
   BookClubMemberProjection,
   Publicity,
+  PublicityProjection,
   Role
 } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
@@ -250,6 +251,29 @@ export const findMemberRoleBySlug = async (
   // Find the user's role in the book club
   const result = await collection.aggregate(aggregation).toArray();
   return result.length > 0 ? result[0].role : null;
+};
+
+/**
+ * Find a book club's publicity by its slug
+ *
+ * @param {string} slug The slug of the book club
+ */
+export const findPublicityBySlug = async (
+  slug: string
+): Promise<Publicity | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Find the book club in the database
+  const publicityProjection: PublicityProjection | null =
+    await collection.findOne(
+      { slug, disbanded: { $exists: false } },
+      { projection: { publicity: 1 } }
+    );
+
+  return publicityProjection?.publicity || null;
 };
 
 /**

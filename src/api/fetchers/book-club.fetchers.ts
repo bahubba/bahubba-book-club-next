@@ -8,9 +8,13 @@ import {
   findBookClubByName,
   findBookClubBySlug,
   findMemberRoleBySlug,
-  findMembersBySlug
+  findMembersBySlug,
+  findPublicityBySlug
 } from '@/db/repositories/book-club.repository';
-import { BookClubMemberProjection } from '@/db/models/book-club.models';
+import {
+  BookClubMemberProjection,
+  Publicity
+} from '@/db/models/book-club.models';
 import { toJSON } from '@/util/helpers';
 
 /** Retrieves all book clubs for the logged-in user */
@@ -35,10 +39,10 @@ export const searchBookClubs = async (
   search: string
 ): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
-  await ensureAuth();
+  const { email } = await ensureAuth();
 
   // Fetch the user's book clubs
-  const bookClubs = await findBookClubsBySearch(search);
+  const bookClubs = await findBookClubsBySearch(search, email);
 
   // Return the book clubs
   return toJSON(bookClubs);
@@ -88,14 +92,28 @@ export const getBookClubBySlug = async (
  * @param {string} slug The slug of the book club
  * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
  */
-export const getBookClubMembership = async (
-  slug: string
-): Promise<Role | null> => {
+export const getBookClubRole = async (slug: string): Promise<Role | null> => {
   // Ensure that the user is authenticated
   const user = await ensureAuth();
 
   // Fetch the user's role in the book club and return
   return await findMemberRoleBySlug(slug, user.email);
+};
+
+/**
+ * Gets a book club's publicity
+ *
+ * @param {string} slug The slug of the book club
+ * @return {Promise<Publicity | null>} The publicity of the book club
+ */
+export const getBookClubPublicity = async (
+  slug: string
+): Promise<Publicity | null> => {
+  // Ensure that the user is authenticated
+  await ensureAuth();
+
+  // Fetch and return the book club's publicity
+  return await findPublicityBySlug(slug);
 };
 
 /**

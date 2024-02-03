@@ -58,3 +58,8 @@ export interface BookClubMemberProjection {
   role: Role;
   joined: Date;
 }
+
+// MongoDB projection for only publicity
+export interface PublicityProjection {
+  publicity: Publicity;
+}
