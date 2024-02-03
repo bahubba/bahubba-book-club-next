@@ -1,3 +1,5 @@
+import { BookClubMembershipRequest } from './membership-request.models';
+
 /** ENUMS */
 
 // Book club role enum
@@ -13,12 +15,6 @@ export enum Publicity {
   PRIVATE = 'PRIVATE'
 }
 
-export enum BookClubMembershipRequestStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED'
-}
-
 /** SUBDOCUMENTS */
 
 // BookClubMember subdocument
@@ -27,12 +23,6 @@ export interface BookClubMember {
   joined: Date;
   departed?: Date;
   role: Role;
-}
-
-export interface BookClubMembershipRequest {
-  userEmail: string;
-  requested: Date;
-  status: BookClubMembershipRequestStatus;
 }
 
 /** DOCUMENTS */
@@ -57,4 +47,9 @@ export interface BookClubMemberProjection {
   email: string;
   role: Role;
   joined: Date;
+}
+
+// MongoDB projection for only publicity
+export interface PublicityProjection {
+  publicity: Publicity;
 }

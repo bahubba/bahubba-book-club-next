@@ -17,15 +17,19 @@ export const handleSubmitMembershipRequest = async (
   _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
-  // Get the user and ensure that they're authenticated
-  const user = await ensureAuth();
+  // Ensure the user is authenticated and pull out their email
+  const { email } = await ensureAuth();
 
   // Pull out the slug and ensure it exists
   const slug = formData.get('slug')?.toString().trim();
   if (!slug) return { error: 'Invalid book club' };
 
   // Request membership in the book club
-  await requestMembership(slug, user.email);
+  await requestMembership(
+    slug,
+    email,
+    formData.get('message')?.toString().trim() ?? ''
+  );
 
   // Redirect to the book club page
   // TODO - toast
