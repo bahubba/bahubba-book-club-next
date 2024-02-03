@@ -10,9 +10,7 @@ const BookClubPageLayout = ({
   children
 }: Readonly<{ children: React.ReactNode }>) => (
   <ProtectedRoute>
-    <div className="flex items-start justify-center w-full">
-      <div className="flex flex-col min-w-[50%]">{children}</div>
-    </div>
+    <div className="flex items-start justify-center w-full">{children}</div>
   </ProtectedRoute>
 );
 
