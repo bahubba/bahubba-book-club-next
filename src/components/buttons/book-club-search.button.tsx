@@ -5,7 +5,7 @@ import { Button } from '@nextui-org/button';
 import SearchIcon from '@/components/icons/search.icon';
 
 /** Button linking to the create book club page */
-const CreateBookClubButton = () => (
+const BookClubSearchButton = () => (
   <Tooltip
     className="bg-opacity-75 bg-black text-white"
     content="Search for book clubs"
@@ -23,4 +23,4 @@ const CreateBookClubButton = () => (
   </Tooltip>
 );
 
-export default CreateBookClubButton;
+export default BookClubSearchButton;

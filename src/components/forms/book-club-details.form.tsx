@@ -41,7 +41,7 @@ const BookClubDetailsForm = ({
     } as ErrorFormState
   );
 
-  // State for selected image
+  // State for input fields
   const [formData, setFormData] = useState<FormValues>(
     bookClub
       ? {
