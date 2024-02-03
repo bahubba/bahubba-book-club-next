@@ -13,6 +13,12 @@ export enum Publicity {
   PRIVATE = 'PRIVATE'
 }
 
+export enum BookClubMembershipRequestStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED'
+}
+
 /** SUBDOCUMENTS */
 
 // BookClubMember subdocument
@@ -21,6 +27,12 @@ export interface BookClubMember {
   joined: Date;
   departed?: Date;
   role: Role;
+}
+
+export interface BookClubMembershipRequest {
+  userEmail: string;
+  requested: Date;
+  status: BookClubMembershipRequestStatus;
 }
 
 /** DOCUMENTS */
@@ -33,6 +45,7 @@ export interface BookClubDoc {
   image: string;
   publicity: Publicity;
   members?: BookClubMember[];
+  membershipRequests?: BookClubMembershipRequest[];
   disbanded?: Date;
 }
 
