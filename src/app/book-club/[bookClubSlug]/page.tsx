@@ -1,3 +1,4 @@
+import RequestMembershipButton from '@/components/buttons/request-membership.button';
 import PageSectionLayout from '@/components/layout/page-section.layout';
 
 // Component props
@@ -22,7 +23,11 @@ const BookClubHomePage = ({
     <div className="flex w-full h-full pb-2">
       <PageSectionLayout
         header="Members"
-        sectionHeaderChildren={<div className="flex gap-0.5"></div>}
+        sectionHeaderChildren={
+          <div className="flex gap-0.5">
+            <RequestMembershipButton bookClubSlug={bookClubSlug} />
+          </div>
+        }
       >
         <span>Members go here</span>
       </PageSectionLayout>

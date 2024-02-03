@@ -7,7 +7,7 @@ import { Spinner } from '@nextui-org/spinner';
 // Component props
 interface SubmitButtonProps {
   buttonText: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 /**
@@ -18,7 +18,7 @@ interface SubmitButtonProps {
  */
 const SubmitButton = ({
   buttonText,
-  disabled
+  disabled = false
 }: Readonly<SubmitButtonProps>) => {
   const { pending } = useFormStatus();
   return (
