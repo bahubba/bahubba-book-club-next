@@ -24,7 +24,9 @@ const PageSectionLayout = ({
   children
 }: Readonly<PageSectionLayoutProps>) => (
   <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white">
-    <SectionHeaderLayout title={header}>
+    <SectionHeaderLayout
+      title={<h1 className="text-2xl font-bold">{header}</h1>}
+    >
       {sectionHeaderChildren}
     </SectionHeaderLayout>
     <ScrollShadow

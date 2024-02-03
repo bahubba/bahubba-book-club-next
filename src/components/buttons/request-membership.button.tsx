@@ -1,11 +1,9 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { Button } from '@nextui-org/button';
-import { Spinner } from '@nextui-org/spinner';
 import { Tooltip } from '@nextui-org/tooltip';
 
 import AddMemberIcon from '../icons/add-member.icon';
-import { isBookClubMember } from '@/api/fetchers/book-club.fetchers';
 import { hasOpenRequest } from '@/api/fetchers/membership-request.fetchers';
 
 /**
@@ -16,12 +14,6 @@ import { hasOpenRequest } from '@/api/fetchers/membership-request.fetchers';
 const FilteredRequestMembershipButton = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
-  // Check if the user is already a member of the book club
-  const isMember = await isBookClubMember(bookClubSlug);
-
-  // If the user is a member, don't show the button
-  if (isMember) return <></>;
-
   // Check if the user has an open request
   const hasRequest = await hasOpenRequest(bookClubSlug);
 
@@ -38,7 +30,7 @@ const FilteredRequestMembershipButton = async ({
           aria-label={`Request membership to ${bookClubSlug}`}
           disabled={hasRequest}
         >
-          <AddMemberIcon />
+          <AddMemberIcon color={hasRequest ? 'secondary' : 'primary'} />
         </Button>
       </Link>
     </Tooltip>
@@ -50,13 +42,18 @@ const FilteredRequestMembershipButton = async ({
  *
  * @prop {Object} props - The component's props
  * @prop {string} props.bookClubSlug - The slug of the book club
+ * @prop {boolean} props.isMember - Whether the user is a member of the book club
  */
 const RequestMembershipButton = ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => (
-  <Suspense fallback={<Spinner />}>
-    <FilteredRequestMembershipButton bookClubSlug={bookClubSlug} />
-  </Suspense>
-);
+  bookClubSlug,
+  isMember = false
+}: Readonly<{ bookClubSlug: string; isMember?: boolean }>) =>
+  isMember ? (
+    <></>
+  ) : (
+    <Suspense fallback={<></>}>
+      <FilteredRequestMembershipButton bookClubSlug={bookClubSlug} />
+    </Suspense>
+  );
 
 export default RequestMembershipButton;

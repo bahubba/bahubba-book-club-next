@@ -16,32 +16,35 @@ const BookClubs = async () => {
 
 /** The home page for the application, showing a user's clubs, books, and trending info */
 const HomePage = () => (
-  <div className="flex w-full h-full pb-2">
-    <PageSectionLayout
-      header="Clubs"
-      sectionHeaderChildren={
-        <div className="flex gap-0.5">
-          <CreateBookClubButton />
-          <BookClubSearchButton />
-        </div>
-      }
-    >
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center w-full h-full">
-            <Spinner />
+  <div className="flex-1 flex flex-col h-full pb-2">
+    <h1 className="flex-shrink ms-2 mb-2 text-3xl font-bold">Home</h1>
+    <div className="flex-1 flex w-full pb-2">
+      <PageSectionLayout
+        header="Clubs"
+        sectionHeaderChildren={
+          <div className="flex gap-0.5">
+            <CreateBookClubButton />
+            <BookClubSearchButton />
           </div>
         }
       >
-        <BookClubs />
-      </Suspense>
-    </PageSectionLayout>
-    <PageSectionLayout header="Books">
-      <div>Some long text string that will take up some width</div>
-    </PageSectionLayout>
-    <PageSectionLayout header="Trending">
-      <div>Some long text string that will take up some width</div>
-    </PageSectionLayout>
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center w-full h-full">
+              <Spinner />
+            </div>
+          }
+        >
+          <BookClubs />
+        </Suspense>
+      </PageSectionLayout>
+      <PageSectionLayout header="Books">
+        <div>Some long text string that will take up some width</div>
+      </PageSectionLayout>
+      <PageSectionLayout header="Trending">
+        <div>Some long text string that will take up some width</div>
+      </PageSectionLayout>
+    </div>
   </div>
 );
 

@@ -9,7 +9,8 @@ import {
   findBookClubBySlug,
   findMemberRoleBySlug,
   findMembersBySlug,
-  findPublicityBySlug
+  findPublicityBySlug,
+  findNameBySlug
 } from '@/db/repositories/book-club.repository';
 import {
   BookClubMemberProjection,
@@ -153,4 +154,18 @@ export const isBookClubMember = async (slug: string): Promise<boolean> => {
 
   // Return whether the user is a member
   return !!role;
+};
+
+/**
+ * Gets a book club's name
+ *
+ * @param {string} slug The slug of the book club
+ * @return {Promise<string | null>} The name of the book club
+ */
+export const getBookClubName = async (slug: string): Promise<string | null> => {
+  // Ensure that the user is authenticated and pull the user's email
+  const { email } = await ensureAuth();
+
+  // Fetch the book club and return its name
+  return await findNameBySlug(slug, email);
 };
