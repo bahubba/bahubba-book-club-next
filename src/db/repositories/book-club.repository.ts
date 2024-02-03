@@ -23,7 +23,7 @@ export const addBookClub = async (
   );
 
   // Add the book club to the database
-  return collection.insertOne(bookClub);
+  return await collection.insertOne(bookClub);
 };
 
 /**
@@ -39,7 +39,7 @@ export const updateBookClub = async (slug: string, bookClub: BookClubDoc) => {
   );
 
   // Update the book club in the database
-  return collection.updateOne({ slug }, { $set: bookClub });
+  return await collection.updateOne({ slug }, { $set: bookClub });
 };
 
 /**
@@ -55,7 +55,7 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
   );
 
   // Find the book club in the database
-  return collection.findOne(
+  return await collection.findOne(
     { name },
     { collation: { locale: 'en', strength: 2 } }
   );
