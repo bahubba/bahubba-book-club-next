@@ -28,3 +28,22 @@ export interface UserDoc {
   joined: Date;
   departed?: Date;
 }
+
+// MongoDB projection for the User document withuot memberships
+export const noMembershipsUserProjection = {
+  _id: 0,
+  email: 1,
+  preferredName: 1,
+  providerProfiles: 1,
+  joined: 1,
+  departed: 1
+};
+
+// MongoDB projection for User document without memberships or provider profiles
+export const rawUserProjection = {
+  _id: 0,
+  email: 1,
+  preferredName: 1,
+  joined: 1,
+  departed: 1
+};

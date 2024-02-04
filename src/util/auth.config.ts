@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 
 import {
   addUser,
-  findUserByEmail,
+  findFullUserByEmail,
   updateUser
 } from '@/db/repositories/user.repository';
 
@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
       const { email } = profile;
 
       // Check if the user exists in the database
-      const userDoc = await findUserByEmail(email);
+      const userDoc = await findFullUserByEmail(email);
 
       // If the user doesn't exist, add them to the database
       if (!userDoc) {
