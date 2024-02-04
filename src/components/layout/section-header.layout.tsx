@@ -35,7 +35,7 @@ const SectionHeaderLayout = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className={`flex-shrink mb-0.5`}>{title}</div>
+      <div className="flex-shrink mb-0.5">{title}</div>
       <div className={`flex flex-1 justify-${hiddenContentJustify}`}>
         {hover && children}
       </div>
