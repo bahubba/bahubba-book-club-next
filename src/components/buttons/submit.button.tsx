@@ -6,7 +6,15 @@ import { Spinner } from '@nextui-org/spinner';
 
 // Component props
 interface SubmitButtonProps {
-  buttonText: string;
+  buttonText?: string;
+  color?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'danger';
+  buttonIcon?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -14,20 +22,25 @@ interface SubmitButtonProps {
  * Submit button for forms
  *
  * @param {Object} props - Component props
- * @param {string} props.buttonText - Text to display on the button
+ * @param {string} props.buttonText - Text to display on the button if there is no icon
+ * @param {string} props.color - The color of the button
+ * @param {React.ReactNode} props.buttonIcon - The icon to display on the button
  */
 const SubmitButton = ({
-  buttonText,
+  buttonText = 'Submit',
+  color = 'secondary',
+  buttonIcon,
   disabled = false
 }: Readonly<SubmitButtonProps>) => {
   const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
-      color={disabled ? 'default' : 'secondary'}
+      color={disabled ? 'default' : color}
+      isIconOnly={!!buttonIcon}
       disabled={disabled || pending}
     >
-      {pending ? <Spinner /> : buttonText}
+      {pending ? <Spinner /> : buttonIcon ?? buttonText}
     </Button>
   );
 };

@@ -1,15 +1,25 @@
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient } from 'mongodb';
 
 import props from '@/util/properties';
 
 // MongoDB atlas connection
-const client = new MongoClient(props.DB.ATLAS_URI);
-let connection: MongoClient;
+let client: MongoClient,
+  db: Db | undefined,
+  collectionMap: Map<string, Collection> = new Map();
 
 /** Connect to MongoDB Atlas if not already connected */
 const connectMongo = async () => {
-  if (!connection) connection = await client.connect();
-  return client.db(props.DB.ATLAS_DB);
+  // Connect to the database if not already connected
+  if (!client) {
+    client = await new MongoClient(props.DB.ATLAS_URI);
+    db = undefined;
+  }
+  if (!db) {
+    await client.connect();
+    return client.db(props.DB.ATLAS_DB);
+  }
+
+  return db;
 };
 
 /**
@@ -21,7 +31,13 @@ const connectMongo = async () => {
 export const connectCollection = async (
   collectionName: string
 ): Promise<Collection<any>> => {
+  if (collectionMap.has(collectionName)) {
+    const collection = collectionMap.get(collectionName);
+    if (collection) return collection;
+  }
+
   const db = await connectMongo();
+  collectionMap.set(collectionName, db.collection(collectionName));
   return db.collection(collectionName);
 };
 

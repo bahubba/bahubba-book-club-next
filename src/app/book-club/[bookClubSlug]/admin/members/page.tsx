@@ -2,7 +2,11 @@ import { Suspense } from 'react';
 import { Spinner } from '@nextui-org/spinner';
 
 import BookClubAdminMembersTable from '@/components/tables/book-club-admin-members.table';
-import { getMembersBySlug } from '@/api/fetchers/book-club.fetchers';
+import {
+  getBookClubRole,
+  getMembersBySlug
+} from '@/api/fetchers/book-club.fetchers';
+import { Role } from '@/db/models/book-club.models';
 
 // Page props
 interface BookClubAdminMembersPageProps {
@@ -20,9 +24,17 @@ interface BookClubAdminMembersPageProps {
 const BookClubAdminMembersTableWrapper = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
+  // Fetch the members and the current user's role
+  const adminRole = await getBookClubRole(bookClubSlug);
   const members = await getMembersBySlug(bookClubSlug);
 
-  return <BookClubAdminMembersTable members={members} />;
+  return (
+    <BookClubAdminMembersTable
+      bookClubSlug={bookClubSlug}
+      adminRole={adminRole as Role}
+      members={members}
+    />
+  );
 };
 
 /**

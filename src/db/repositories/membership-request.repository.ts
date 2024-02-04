@@ -76,7 +76,12 @@ export const reviewMembershipRequest = async (
     {
       slug,
       disbanded: { $exists: false },
-      'membershipRequests.userEmail': userEmail
+      membershipRequests: {
+        $elemMatch: {
+          userEmail,
+          status: BookClubMembershipRequestStatus.PENDING
+        }
+      }
     },
     {
       $set: {

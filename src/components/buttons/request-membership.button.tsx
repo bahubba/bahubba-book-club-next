@@ -45,15 +45,11 @@ const FilteredRequestMembershipButton = async ({
  * @prop {boolean} props.isMember - Whether the user is a member of the book club
  */
 const RequestMembershipButton = ({
-  bookClubSlug,
-  isMember = false
-}: Readonly<{ bookClubSlug: string; isMember?: boolean }>) =>
-  isMember ? (
-    <></>
-  ) : (
-    <Suspense fallback={<></>}>
-      <FilteredRequestMembershipButton bookClubSlug={bookClubSlug} />
-    </Suspense>
-  );
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => (
+  <Suspense fallback={<></>}>
+    <FilteredRequestMembershipButton bookClubSlug={bookClubSlug} />
+  </Suspense>
+);
 
 export default RequestMembershipButton;

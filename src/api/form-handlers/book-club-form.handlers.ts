@@ -9,12 +9,14 @@ import {
   addBookClub,
   findBookClubBySlugForAdmin,
   findByName,
+  findMemberRoleBySlug,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
 import { updateUser } from '@/db/repositories/user.repository';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 import { ensureAuth } from '@/api/auth.api';
 import props from '@/util/properties';
+import { updateMemberRole } from '@/db/repositories/membership.repository';
 
 /**
  * Handle submitting a new book club
@@ -87,12 +89,12 @@ export const handleSubmitNewBookClub = async (
 /**
  * Handle updating a book club
  *
- * @param {ErrorFormState} prevState Form state from the previous render
+ * @param {ErrorFormState} _ Form state from the previous render
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
 export const handleUpdateBookClub = async (
-  prevState: ErrorFormState,
+  _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
@@ -155,4 +157,53 @@ export const handleUpdateBookClub = async (
   // On success, redirect to the home page
   revalidatePath('/home');
   redirect(`/book-club/${slug}/admin/details`);
+};
+
+/**
+ * Handle updating a member's role in a book club
+ *
+ * @param {ErrorFormState} _ Form state from the previous render
+ * @param {FormData} formData The form data, containing the club slug, the member's email, and the new role
+ * @return {ErrorFormState} The new form state; Used for passing back error messages
+ */
+export const handleUpdateMemberRole = async (
+  _: ErrorFormState,
+  formData: FormData
+): Promise<ErrorFormState> => {
+  // Ensure the user is authenticated and pull out their email
+  const { email: adminEmail } = await ensureAuth();
+
+  // Pull out the form data
+  const slug = formData.get('slug')?.toString().trim() || '';
+  const memberEmail = formData.get('email')?.toString().trim() || '';
+  const newRole = formData.get('role')?.toString().trim().toUpperCase() || '';
+
+  // Ensure all form fields are present and valid
+  if (slug === '' || memberEmail === '' || newRole === '' || !(newRole in Role))
+    return { error: 'Incomplete form data' };
+
+  // Ensure the user is not trying to change their own role
+  if (formData.get('email')?.toString() === adminEmail)
+    return { error: 'Cannot change own role' };
+
+  // Ensure the requesting user is an admin (or owner) of the club
+  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
+  if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
+    return { error: 'Unauthorized' };
+
+  // Ensure the member exists in the club and they are getting a new role
+  const existingRole = await findMemberRoleBySlug(slug, memberEmail);
+  if (
+    !existingRole ||
+    existingRole === newRole ||
+    (adminRole === Role.ADMIN && existingRole === Role.OWNER)
+  )
+    return { error: 'Invalid role change' };
+
+  // Update the member's role
+  await updateMemberRole(slug, memberEmail, newRole as Role);
+
+  // On success, revalidate the admin page
+  revalidatePath(`/book-club/${slug}/admin`);
+  return { error: '' };
 };

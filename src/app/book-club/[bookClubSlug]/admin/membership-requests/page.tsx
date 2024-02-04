@@ -23,7 +23,12 @@ const BookClubAdminMembershipRequestsTableWrapper = async ({
   // Fetch the membership requests
   const membershipRequests = await getMembershipRequests(bookClubSlug);
 
-  return <MembershipRequestsTable membershipRequests={membershipRequests} />;
+  return (
+    <MembershipRequestsTable
+      bookClubSlug={bookClubSlug}
+      membershipRequests={membershipRequests}
+    />
+  );
 };
 
 /**

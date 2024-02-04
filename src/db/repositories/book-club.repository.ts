@@ -245,23 +245,32 @@ export const findMemberRoleBySlug = async (
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
   );
 
-  // Find the user's role in the book club
-  const result = await collection.findOne(
+  // Create an aggregation pipeline to find the user's role in the book club
+  const aggregation = [
     {
-      slug,
-      members: {
-        $elemMatch: {
-          userEmail,
-          departed: { $exists: false }
+      $unwind: {
+        path: '$members'
+      }
+    },
+    {
+      $match: {
+        slug,
+        'members.userEmail': userEmail,
+        'members.departed': {
+          $exists: false
         }
       }
     },
-    { projection: { _id: 0, role: '$members.role' } }
-  );
+    {
+      $project: {
+        role: '$members.role'
+      }
+    }
+  ];
 
-  return isMemberRoleProjection(result) && result.role.length === 1
-    ? result.role[0]
-    : null;
+  // Find the user's role in the book club
+  const result = await collection.aggregate(aggregation).toArray();
+  return result.length > 0 ? result[0].role : null;
 };
 
 /**
