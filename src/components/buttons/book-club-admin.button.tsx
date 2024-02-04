@@ -17,7 +17,7 @@ const BookClubAdminButton = ({
     className="bg-opacity-75 bg-black text-white"
     content="Book Club Admin"
   >
-    <Link href={`/book-club/${bookClubSlug}/admin`}>
+    <Link href={`/book-club/${bookClubSlug}/admin/details`}>
       <Button
         isIconOnly
         size="sm"
