@@ -5,7 +5,7 @@ import {
   noMembershipsUserProjection,
   rawUserProjection
 } from '@/db/models/user.models';
-import { connectCollection } from '@/db/connect-mongo';
+import { connectCollection } from '@/db/connect-neo4j';
 import props from '@/util/properties';
 
 /**

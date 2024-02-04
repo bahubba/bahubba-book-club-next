@@ -16,7 +16,10 @@ const props: Props = {
     ATLAS_DB: process.env.BBCM_ATLAS_DB || 'bbcm',
     ATLAS_USER_COLLECTION: process.env.BBCM_ATLAS_USER_COLLECTION || 'users',
     ATLAS_BOOK_CLUB_COLLECTION:
-      process.env.BBCM_ATLAS_BOOK_CLUB_COLLECTION || 'book-clubs'
+      process.env.BBCM_ATLAS_BOOK_CLUB_COLLECTION || 'book-clubs',
+    AURA_URI: process.env.BBCM_AURA_URI || 'bolt://localhost:7687',
+    AURA_USERNAME: process.env.BBCM_AURA_USERNAME || 'neo4j',
+    AURA_PW: process.env.BBCM_AURA_PW || ''
   },
   AWS: {
     S3_PRE_SIGNED_URL_EXPIRATION:

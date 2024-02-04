@@ -1,6 +1,6 @@
 import { UpdateResult } from 'mongodb';
 
-import { connectCollection } from '@/db/connect-mongo';
+import { connectCollection } from '@/db/connect-neo4j';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
   BookClubMembershipRequest,

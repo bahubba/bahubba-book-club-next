@@ -13,7 +13,7 @@
     "@aws-sdk/s3-request-presigner": "^3.501.0",
     "@nextui-org/react": "^2.2.9",
     "framer-motion": "^11.0.3",
-    "mongodb": "^6.3.0",
+    "neo4j-driver": "^5.17.0",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
     "react": "^18",

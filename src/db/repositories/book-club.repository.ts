@@ -8,7 +8,7 @@ import {
   isMemberRoleProjection,
   rawBookClubProjection
 } from '@/db/models/book-club.models';
-import { connectCollection } from '@/db/connect-mongo';
+import { connectCollection } from '@/db/connect-neo4j';
 import props from '@/util/properties';
 
 /**
