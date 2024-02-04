@@ -369,3 +369,42 @@ export const findBookClubBySlugForAdmin = async (
     }
   });
 };
+
+/**
+ * Find a book club's name by its slug
+ *
+ * @param {string} slug The slug of the book club
+ * @param {string} userEmail The email of the requesting user
+ * @return {Promise<string | null>} The name of the book club, or null if not found
+ */
+export const findNameBySlug = async (
+  slug: string,
+  userEmail: string
+): Promise<string | null> => {
+  // Connect to the database and collection
+  const collection: Collection<BookClubDoc> = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Find the book club in the database
+  const nameProjection = await collection.findOne(
+    {
+      slug,
+      disbanded: { $exists: false },
+      $or: [
+        { publicity: Publicity.PUBLIC },
+        {
+          members: {
+            $elemMatch: {
+              userEmail: userEmail,
+              departed: { $exists: false }
+            }
+          }
+        }
+      ]
+    },
+    { projection: { name: 1 } }
+  );
+
+  return nameProjection?.name ?? null;
+};

@@ -4,7 +4,7 @@ import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 
 import SubmitButton from '../buttons/submit.button';
-import { handleSubmitMembershipRequest } from '@/api/form-handlers/membership-request.handlers';
+import { handleSubmitMembershipRequest } from '@/api/form-handlers/request-membership-form.handlers';
 
 /**
  * Form for requesting membership in a book club
