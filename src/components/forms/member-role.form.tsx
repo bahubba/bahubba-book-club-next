@@ -1,0 +1,91 @@
+'use client';
+
+import { useState } from 'react';
+import { useFormState } from 'react-dom';
+import { Input } from '@nextui-org/input';
+import { Select, SelectItem } from '@nextui-org/select';
+
+import SubmitButton from '@/components/buttons/submit.button';
+import { handleUpdateMemberRole } from '@/api/form-handlers/book-club-form.handlers';
+import { Role } from '@/db/models/book-club.models';
+import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+
+// Component props
+interface MemberRoleFormProps {
+  bookClubSlug: string;
+  email: string;
+  memberEmail: string;
+  adminRole: Role;
+  role: Role;
+}
+
+/**
+ * Form for updating a member's role in a book club
+ *
+ * @prop {Object} props Component props
+ * @prop {string} props.bookClubSlug The slug of the book club
+ * @prop {string} props.userEmail The email of the user
+ * @prop {string} props.role The current role of the user
+ */
+const MemberRoleForm = ({
+  bookClubSlug,
+  email,
+  memberEmail,
+  adminRole,
+  role
+}: Readonly<MemberRoleFormProps>) => {
+  // Form state
+  const [formState, formAction] = useFormState(handleUpdateMemberRole, {
+    error: ''
+  } as ErrorFormState);
+
+  // Role state
+  const [selectedRole, setSelectedRole] = useState(role);
+
+  // Handle selecting a new role
+  const handleSelectRole = ({
+    target: { value }
+  }: React.ChangeEvent<HTMLSelectElement>) => setSelectedRole(value as Role);
+
+  return (
+    <form action={formAction}>
+      <div className="flex flex-col gap-y-1">
+        {formState.error && <p className="text-red-500">* {formState.error}</p>}
+        <div className="flex justify-between gap-x-1">
+          <Input
+            className="hidden"
+            name="slug"
+            value={bookClubSlug}
+          />
+          <Input
+            className="hidden"
+            name="email"
+            value={memberEmail}
+          />
+          <Select
+            label="Role"
+            name="role"
+            selectedKeys={[selectedRole]}
+            onChange={handleSelectRole}
+            isDisabled={
+              email === memberEmail ||
+              (adminRole === Role.ADMIN && role === Role.OWNER)
+            }
+          >
+            {Object.values(Role).map(roleVal => (
+              <SelectItem
+                key={roleVal}
+                value={roleVal}
+              >
+                {roleVal}
+              </SelectItem>
+            ))}
+          </Select>
+          {role !== selectedRole && <SubmitButton buttonText="Update" />}
+        </div>
+      </div>
+    </form>
+  );
+};
+
+export default MemberRoleForm;
