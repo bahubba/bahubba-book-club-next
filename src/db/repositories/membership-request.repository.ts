@@ -1,3 +1,5 @@
+import { UpdateResult } from 'mongodb';
+
 import { connectCollection } from '@/db/connect-mongo';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
@@ -5,7 +7,6 @@ import {
   BookClubMembershipRequestStatus
 } from '@/db/models/membership-request.models';
 import props from '@/util/properties';
-import { UpdateResult } from 'mongodb';
 
 /**
  * Request membership in a book club
