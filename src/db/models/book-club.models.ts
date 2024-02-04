@@ -64,3 +64,15 @@ export const rawBookClubProjection = {
   publicity: 1,
   disbanded: 1
 };
+
+// MongoDB projection for only members.role; Used for pulling a single member's role
+export interface MemberRoleProjection {
+  role: Role[];
+}
+
+// Typeguard for MemberRoleProjection
+export const isMemberRoleProjection = (
+  obj: any
+): obj is MemberRoleProjection => {
+  return 'role' in obj;
+};

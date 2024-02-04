@@ -5,6 +5,7 @@ import {
   Publicity,
   PublicityProjection,
   Role,
+  isMemberRoleProjection,
   rawBookClubProjection
 } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
@@ -89,7 +90,7 @@ export const findBookClubsForUser = async (
       {
         members: {
           $elemMatch: {
-            userEmail: userEmail,
+            userEmail,
             departed: { $exists: false }
           }
         }
@@ -138,7 +139,7 @@ export const findBookClubsBySearch = async (
                   {
                     members: {
                       $elemMatch: {
-                        userEmail: userEmail,
+                        userEmail,
                         departed: { $exists: false }
                       }
                     }
@@ -180,7 +181,7 @@ export const findBookClubByName = async (
         {
           members: {
             $elemMatch: {
-              userEmail: userEmail,
+              userEmail,
               departed: { $exists: false }
             }
           }
@@ -217,7 +218,7 @@ export const findBookClubBySlug = async (
         {
           members: {
             $elemMatch: {
-              userEmail: userEmail,
+              userEmail,
               departed: { $exists: false }
             }
           }
@@ -244,33 +245,23 @@ export const findMemberRoleBySlug = async (
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
   );
 
-  // Create an aggregation pipeline to find the user's role in the book club
-  // TODO - See if this can be done without unwinding the members array
-  const aggregation = [
+  // Find the user's role in the book club
+  const result = await collection.findOne(
     {
-      $unwind: {
-        path: '$members'
-      }
-    },
-    {
-      $match: {
-        slug,
-        'members.userEmail': userEmail,
-        'members.departed': {
-          $exists: false
+      slug,
+      members: {
+        $elemMatch: {
+          userEmail,
+          departed: { $exists: false }
         }
       }
     },
-    {
-      $project: {
-        role: '$members.role'
-      }
-    }
-  ];
+    { projection: { _id: 0, role: '$members.role' } }
+  );
 
-  // Find the user's role in the book club
-  const result = await collection.aggregate(aggregation).toArray();
-  return result.length > 0 ? result[0].role : null;
+  return isMemberRoleProjection(result) && result.role.length === 1
+    ? result.role[0]
+    : null;
 };
 
 /**
@@ -386,7 +377,7 @@ export const findBookClubBySlugForAdmin = async (
       slug,
       members: {
         $elemMatch: {
-          userEmail: userEmail,
+          userEmail,
           role: { $in: [Role.OWNER, Role.ADMIN] },
           departed: { $exists: false }
         }
@@ -422,7 +413,7 @@ export const findNameBySlug = async (
         {
           members: {
             $elemMatch: {
-              userEmail: userEmail,
+              userEmail,
               departed: { $exists: false }
             }
           }
