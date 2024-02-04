@@ -1,19 +1,25 @@
 import { connectCollection } from '@/db/connect-mongo';
-import { Role } from '@/db/models/book-club.models';
-import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
+import { BookClubDoc, Role } from '@/db/models/book-club.models';
+import {
+  BookClubMembershipRequest,
+  BookClubMembershipRequestStatus
+} from '@/db/models/membership-request.models';
 import props from '@/util/properties';
+import { UpdateResult } from 'mongodb';
 
 /**
  * Request membership in a book club
  *
  * @param {string} slug The slug of the book club to request membership in
  * @param {string} userEmail The email of the user requesting membership
+ * @param {string} message The message to send with the request
+ * @return {Promise<UpdateResult<BookClubDoc>>}
  */
 export const requestMembership = async (
   slug: string,
   userEmail: string,
   message: string
-) => {
+): Promise<UpdateResult<BookClubDoc>> => {
   // Connect to the database and collection
   const collection = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -52,12 +58,13 @@ export const requestMembership = async (
  * @param {string} slug The slug of the book club to approve or reject the request for
  * @param {string} userEmail The email of the user requesting membership
  * @param {BookClubMembershipRequestStatus} status The status to set the request to
+ * @return {Promise<UpdateResult<BookClubDoc>>}
  */
 export const reviewMembershipRequest = async (
   slug: string,
   userEmail: string,
   status: BookClubMembershipRequestStatus
-) => {
+): Promise<UpdateResult<BookClubDoc>> => {
   // Connect to the database and collection
   const collection = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -85,7 +92,10 @@ export const reviewMembershipRequest = async (
  * @param {string} userEmail The email of the user
  * @return {Promise<boolean>} Whether the user has an open membership request
  */
-export const hasOpenRequest = async (slug: string, userEmail: string) => {
+export const hasOpenRequest = async (
+  slug: string,
+  userEmail: string
+): Promise<boolean> => {
   // Connect to the database and collection
   const collection = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -118,7 +128,7 @@ export const hasOpenRequest = async (slug: string, userEmail: string) => {
 export const findMembershipRequests = async (
   slug: string,
   userEmail: string
-) => {
+): Promise<BookClubMembershipRequest[]> => {
   // Connect to the database and collection
   const collection = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -144,5 +154,5 @@ export const findMembershipRequests = async (
   );
 
   // Return the membership requests
-  return result.membershipRequests;
+  return result.membershipRequests ?? [];
 };

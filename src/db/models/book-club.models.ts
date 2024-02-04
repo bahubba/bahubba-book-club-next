@@ -53,3 +53,14 @@ export interface BookClubMemberProjection {
 export interface PublicityProjection {
   publicity: Publicity;
 }
+
+// MongoDB projection for leaving out members and membership requests
+export const rawBookClubProjection = {
+  _id: 0,
+  name: 1,
+  slug: 1,
+  description: 1,
+  image: 1,
+  publicity: 1,
+  disbanded: 1
+};

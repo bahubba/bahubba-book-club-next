@@ -1,10 +1,11 @@
-import { Collection, InsertOneResult } from 'mongodb';
+import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
 import {
   BookClubDoc,
   BookClubMemberProjection,
   Publicity,
   PublicityProjection,
-  Role
+  Role,
+  rawBookClubProjection
 } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
@@ -31,9 +32,12 @@ export const addBookClub = async (
  * Updates a book club
  *
  * @param {string} slug The slug of the book club to update
- * @param {BookClubDoc} bookClub The book club to update
+ * @param {Promise<UpdateResult<BookClubDoc>>} bookClub The book club to update
  */
-export const updateBookClub = async (slug: string, bookClub: BookClubDoc) => {
+export const updateBookClub = async (
+  slug: string,
+  bookClub: BookClubDoc
+): Promise<UpdateResult<BookClubDoc>> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
     props.DB.ATLAS_BOOK_CLUB_COLLECTION
@@ -58,7 +62,10 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
   // Find the book club in the database
   return await collection.findOne(
     { name },
-    { collation: { locale: 'en', strength: 2 } }
+    {
+      collation: { locale: 'en', strength: 2 },
+      projection: rawBookClubProjection
+    }
   );
 };
 
@@ -78,14 +85,17 @@ export const findBookClubsForUser = async (
 
   // Find the book clubs in the database
   return await collection
-    .find({
-      members: {
-        $elemMatch: {
-          userEmail: userEmail,
-          departed: { $exists: false }
+    .find(
+      {
+        members: {
+          $elemMatch: {
+            userEmail: userEmail,
+            departed: { $exists: false }
+          }
         }
-      }
-    })
+      },
+      { projection: rawBookClubProjection }
+    )
     .toArray();
 };
 
@@ -107,37 +117,40 @@ export const findBookClubsBySearch = async (
 
   // Find the book clubs in the database
   return await collection
-    .find({
-      $and: [
-        {
-          disbanded: { $exists: false }
-        },
-        {
-          $or: [
-            { name: { $regex: query, $options: 'i' } },
-            { description: { $regex: query, $options: 'i' } }
-          ]
-        },
-        {
-          $or: [
-            { publicity: Publicity.PUBLIC },
-            {
-              $and: [
-                { publicity: Publicity.PRIVATE },
-                {
-                  members: {
-                    $elemMatch: {
-                      userEmail: userEmail,
-                      departed: { $exists: false }
+    .find(
+      {
+        $and: [
+          {
+            disbanded: { $exists: false }
+          },
+          {
+            $or: [
+              { name: { $regex: query, $options: 'i' } },
+              { description: { $regex: query, $options: 'i' } }
+            ]
+          },
+          {
+            $or: [
+              { publicity: Publicity.PUBLIC },
+              {
+                $and: [
+                  { publicity: Publicity.PRIVATE },
+                  {
+                    members: {
+                      $elemMatch: {
+                        userEmail: userEmail,
+                        departed: { $exists: false }
+                      }
                     }
                   }
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    })
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      { projection: rawBookClubProjection }
+    )
     .toArray();
 };
 
@@ -158,21 +171,24 @@ export const findBookClubByName = async (
   );
 
   // Find the book club in the database
-  return await collection.findOne({
-    departed: { $exists: false },
-    name,
-    $or: [
-      { publicity: Publicity.PUBLIC },
-      {
-        members: {
-          $elemMatch: {
-            userEmail: userEmail,
-            departed: { $exists: false }
+  return await collection.findOne(
+    {
+      departed: { $exists: false },
+      name,
+      $or: [
+        { publicity: Publicity.PUBLIC },
+        {
+          members: {
+            $elemMatch: {
+              userEmail: userEmail,
+              departed: { $exists: false }
+            }
           }
         }
-      }
-    ]
-  });
+      ]
+    },
+    { projection: rawBookClubProjection }
+  );
 };
 
 /**
@@ -192,21 +208,24 @@ export const findBookClubBySlug = async (
   );
 
   // Find the book club in the database
-  return await collection.findOne({
-    departed: { $exists: false },
-    slug,
-    $or: [
-      { publicity: Publicity.PUBLIC },
-      {
-        members: {
-          $elemMatch: {
-            userEmail: userEmail,
-            departed: { $exists: false }
+  return await collection.findOne(
+    {
+      departed: { $exists: false },
+      slug,
+      $or: [
+        { publicity: Publicity.PUBLIC },
+        {
+          members: {
+            $elemMatch: {
+              userEmail: userEmail,
+              departed: { $exists: false }
+            }
           }
         }
-      }
-    ]
-  });
+      ]
+    },
+    { projection: rawBookClubProjection }
+  );
 };
 
 /**
@@ -226,6 +245,7 @@ export const findMemberRoleBySlug = async (
   );
 
   // Create an aggregation pipeline to find the user's role in the book club
+  // TODO - See if this can be done without unwinding the members array
   const aggregation = [
     {
       $unwind: {
@@ -257,6 +277,7 @@ export const findMemberRoleBySlug = async (
  * Find a book club's publicity by its slug
  *
  * @param {string} slug The slug of the book club
+ * @return {Promise<Publicity | null>} The publicity of the book club, or null if not found
  */
 export const findPublicityBySlug = async (
   slug: string
@@ -322,6 +343,7 @@ export const findMembersBySlug = async (
     },
     {
       $project: {
+        _id: 0,
         preferredName: {
           $arrayElemAt: ['$memberDetails.preferredName', 0]
         },
@@ -347,6 +369,7 @@ export const findMembersBySlug = async (
  *
  * @param {string} slug The slug of the book club to find
  * @param {string} userEmail The email of the requesting user
+ * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
  */
 export const findBookClubBySlugForAdmin = async (
   slug: string,
@@ -358,16 +381,19 @@ export const findBookClubBySlugForAdmin = async (
   );
 
   // Find the book club in the database
-  return await collection.findOne({
-    slug,
-    members: {
-      $elemMatch: {
-        userEmail: userEmail,
-        role: { $in: [Role.OWNER, Role.ADMIN] },
-        departed: { $exists: false }
+  return await collection.findOne(
+    {
+      slug,
+      members: {
+        $elemMatch: {
+          userEmail: userEmail,
+          role: { $in: [Role.OWNER, Role.ADMIN] },
+          departed: { $exists: false }
+        }
       }
-    }
-  });
+    },
+    { projection: rawBookClubProjection }
+  );
 };
 
 /**
