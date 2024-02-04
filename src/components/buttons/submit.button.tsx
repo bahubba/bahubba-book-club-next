@@ -22,7 +22,9 @@ interface SubmitButtonProps {
  * Submit button for forms
  *
  * @param {Object} props - Component props
- * @param {string} props.buttonText - Text to display on the button
+ * @param {string} props.buttonText - Text to display on the button if there is no icon
+ * @param {string} props.color - The color of the button
+ * @param {React.ReactNode} props.buttonIcon - The icon to display on the button
  */
 const SubmitButton = ({
   buttonText = 'Submit',

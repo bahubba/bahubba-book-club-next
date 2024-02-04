@@ -24,8 +24,10 @@ interface MemberRoleFormProps {
  *
  * @prop {Object} props Component props
  * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {string} props.userEmail The email of the user
- * @prop {string} props.role The current role of the user
+ * @prop {string} props.email The email of the current user
+ * @prop {string} props.memberEmail The email of the member whose role is being updated
+ * @prop {Role} props.adminRole The role of the current user
+ * @prop {Role} props.role The current role of the user being updated
  */
 const MemberRoleForm = ({
   bookClubSlug,

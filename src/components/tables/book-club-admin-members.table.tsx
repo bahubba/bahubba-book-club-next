@@ -24,6 +24,8 @@ interface BookClubAdminMembersTableProps {
  * Table displaying members in rows as editable forms
  *
  * @prop {Object} props Component props
+ * @prop {string} props.bookClubSlug The slug of the book club
+ * @prop {Role} props.adminRole The role of the current user
  * @prop {BookClubMemberProjection[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({

@@ -28,7 +28,6 @@ const BookClubButtons = async ({
 }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the user's role
   const role = await getBookClubRole(bookClubSlug);
-  console.log('role', role); // DELETEME
 
   // If the user is an admin, show the admin button
   return (

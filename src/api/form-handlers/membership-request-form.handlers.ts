@@ -16,6 +16,7 @@ import {
   checkMembership,
   reinstateMembership
 } from '@/db/repositories/membership.repository';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Handle submitting a membership request
@@ -101,5 +102,6 @@ export const handleReviewMembershipRequest = async (
   }
 
   // Return no error
+  revalidatePath(`/book-club/${slug}/admin`);
   return { error: '' };
 };
