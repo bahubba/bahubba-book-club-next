@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { getServerSession } from 'next-auth';
 import { Spinner } from '@nextui-org/spinner';
 
 import BookClubAdminMembersTable from '@/components/tables/book-club-admin-members.table';
@@ -24,6 +25,9 @@ interface BookClubAdminMembersPageProps {
 const BookClubAdminMembersTableWrapper = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
+  // Get the session and the admin's email
+  const session = await getServerSession();
+
   // Fetch the members and the current user's role
   const adminRole = await getBookClubRole(bookClubSlug);
   const members = await getMembersBySlug(bookClubSlug);
@@ -31,6 +35,7 @@ const BookClubAdminMembersTableWrapper = async ({
   return (
     <BookClubAdminMembersTable
       bookClubSlug={bookClubSlug}
+      adminEmail={session?.user?.email ?? ''}
       adminRole={adminRole as Role}
       members={members}
     />

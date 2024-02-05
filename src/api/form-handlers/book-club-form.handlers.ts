@@ -25,7 +25,7 @@ import { updateMemberRole } from '@/db/repositories/membership.repository';
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleSubmitNewBookClub = async (
+export const handleCreateBookClub = async (
   _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
@@ -186,22 +186,26 @@ export const handleUpdateMemberRole = async (
   if (formData.get('email')?.toString() === adminEmail)
     return { error: 'Cannot change own role' };
 
-  // Ensure the requesting user is an admin (or owner) of the club
+  // Ensure the requesting user is an admin (or owner) of the club and they aren't an admin trying to change ownership of the club
   const adminRole = await findMemberRoleBySlug(slug, adminEmail);
-  if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
+  if (
+    !adminRole ||
+    ![Role.ADMIN, Role.OWNER].includes(adminRole) ||
+    (adminRole !== Role.OWNER && newRole === Role.OWNER)
+  )
     return { error: 'Unauthorized' };
 
   // Ensure the member exists in the club and they are getting a new role
   const existingRole = await findMemberRoleBySlug(slug, memberEmail);
-  if (
-    !existingRole ||
-    existingRole === newRole ||
-    (adminRole === Role.ADMIN && existingRole === Role.OWNER)
-  )
+  if (!existingRole || existingRole === newRole || existingRole === Role.OWNER)
     return { error: 'Invalid role change' };
 
   // Update the member's role
   await updateMemberRole(slug, memberEmail, newRole as Role);
+
+  // If the new role is OWNER, demote the requesting user to admin
+  if (newRole === Role.OWNER)
+    await updateMemberRole(slug, adminEmail, Role.ADMIN);
 
   // On success, revalidate the admin page
   revalidatePath(`/book-club/${slug}/admin`);

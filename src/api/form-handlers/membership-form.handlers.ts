@@ -35,9 +35,13 @@ export const handleRemoveMember = async (
   if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
     return { error: 'Unauthorized' };
 
-  // Ensure the member exists in the club and they're either not an owner or they're removing themsleves
+  // Ensure the member exists in the club and they're not an owner and they're not an admin removing another admin
   const memberRole = await findMemberRoleBySlug(slug, memberEmail);
-  if (!memberRole || (memberRole === Role.OWNER && memberEmail !== adminEmail))
+  if (
+    !memberRole ||
+    memberRole === Role.OWNER ||
+    (memberRole === Role.ADMIN && adminEmail !== memberEmail)
+  )
     return { error: 'Invalid member' };
 
   // Remove the member
