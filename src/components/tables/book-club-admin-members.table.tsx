@@ -12,6 +12,7 @@ import {
 
 import { BookClubMemberProjection, Role } from '@/db/models/book-club.models';
 import MemberRoleForm from '../forms/member-role.form';
+import RemoveMemberButton from '../buttons/remove-member.button';
 
 // Component props
 interface BookClubAdminMembersTableProps {
@@ -46,8 +47,13 @@ const BookClubAdminMembersTable = ({
         <TableColumn key="name">Name</TableColumn>
         <TableColumn key="email">Email</TableColumn>
         <TableColumn key="role">Role</TableColumn>
-        <TableColumn key="remove">Remove</TableColumn>
         <TableColumn key="joined">Joined</TableColumn>
+        <TableColumn
+          key="remove"
+          align="center"
+        >
+          Remove
+        </TableColumn>
       </TableHeader>
       <TableBody>
         {members.map(member => (
@@ -63,13 +69,18 @@ const BookClubAdminMembersTable = ({
                 role={member.role}
               />
             </TableCell>
-            <TableCell>Remove</TableCell>
             <TableCell>
               {new Intl.DateTimeFormat('en-GB', {
                 day: '2-digit',
                 month: 'short',
                 year: 'numeric'
               }).format(member.joined)}
+            </TableCell>
+            <TableCell>
+              <RemoveMemberButton
+                bookClubSlug={bookClubSlug}
+                userEmail={member.email}
+              />
             </TableCell>
           </TableRow>
         ))}
