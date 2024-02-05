@@ -69,10 +69,7 @@ const MemberRoleForm = ({
             name="role"
             selectedKeys={[selectedRole]}
             onChange={handleSelectRole}
-            isDisabled={
-              email === memberEmail ||
-              (adminRole === Role.ADMIN && role === Role.OWNER)
-            }
+            isDisabled={email === memberEmail || role === Role.OWNER}
           >
             {Object.values(Role).map(roleVal => (
               <SelectItem

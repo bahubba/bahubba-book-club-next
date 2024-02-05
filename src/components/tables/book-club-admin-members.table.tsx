@@ -17,6 +17,7 @@ import RemoveMemberButton from '../buttons/remove-member.button';
 // Component props
 interface BookClubAdminMembersTableProps {
   bookClubSlug: string;
+  adminEmail: string;
   adminRole: Role;
   members: BookClubMemberProjection[];
 }
@@ -31,6 +32,7 @@ interface BookClubAdminMembersTableProps {
  */
 const BookClubAdminMembersTable = ({
   bookClubSlug,
+  adminEmail,
   adminRole,
   members
 }: Readonly<BookClubAdminMembersTableProps>) => {
@@ -79,7 +81,10 @@ const BookClubAdminMembersTable = ({
             <TableCell>
               <RemoveMemberButton
                 bookClubSlug={bookClubSlug}
+                adminEmail={adminEmail}
+                adminRole={adminRole}
                 userEmail={member.email}
+                memberRole={member.role}
               />
             </TableCell>
           </TableRow>

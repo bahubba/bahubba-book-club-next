@@ -5,11 +5,15 @@ import { Tooltip } from '@nextui-org/tooltip';
 import SubmitButton from './submit.button';
 import { handleRemoveMember } from '@/api/form-handlers/membership-form.handlers';
 import RejectIcon from '../icons/reject.icon';
+import { Role } from '@/db/models/book-club.models';
 
 // Component props
 interface RemoveMemberButtonProps {
   bookClubSlug: string;
+  adminEmail: string;
+  adminRole: Role;
   userEmail: string;
+  memberRole: Role;
 }
 
 /**
@@ -21,12 +25,22 @@ interface RemoveMemberButtonProps {
  */
 const RemoveMemberButton = ({
   bookClubSlug,
-  userEmail
+  adminEmail,
+  adminRole,
+  userEmail,
+  memberRole
 }: Readonly<RemoveMemberButtonProps>) => {
   // Form state
   const [formState, formAction] = useFormState(handleRemoveMember, {
     error: ''
   });
+
+  // Logic for when the button should be disabled
+  const isDisabled =
+    memberRole === Role.OWNER ||
+    (memberRole === Role.ADMIN &&
+      adminEmail !== userEmail &&
+      adminRole !== Role.OWNER);
 
   return (
     <Tooltip
@@ -45,8 +59,9 @@ const RemoveMemberButton = ({
           value={userEmail}
         />
         <SubmitButton
-          color="danger"
-          buttonIcon={<RejectIcon />}
+          color={isDisabled ? 'default' : 'danger'}
+          buttonIcon={<RejectIcon color={isDisabled ? 'black' : 'secondary'} />}
+          disabled={isDisabled}
         />
       </form>
     </Tooltip>
