@@ -9,7 +9,10 @@ import {
   TableRow
 } from '@nextui-org/table';
 
-import { BookClubMembershipRequest } from '@/db/models/membership-request.models';
+import {
+  BookClubMembershipRequest,
+  BookClubMembershipRequestStatus
+} from '@/db/models/membership-request.models';
 import ReviewMembershipRequestButton from '../buttons/review-membership-request.button';
 
 /**
@@ -28,7 +31,6 @@ const MembershipRequestsTable = ({
 }>) => (
   <Table
     aria-label="Table of membership requests"
-    isStriped
     isHeaderSticky
   >
     <TableHeader>
@@ -52,6 +54,15 @@ const MembershipRequestsTable = ({
       {membershipRequests.map(membershipRequest => (
         <TableRow
           key={`${membershipRequest.userEmail}-${membershipRequest.requested}`}
+          className={
+            membershipRequest.status ===
+            BookClubMembershipRequestStatus.ACCEPTED
+              ? 'bg-green-200'
+              : membershipRequest.status ===
+                BookClubMembershipRequestStatus.REJECTED
+              ? 'bg-red-200'
+              : ''
+          }
         >
           <TableCell>{membershipRequest.userEmail}</TableCell>
           <TableCell>{membershipRequest.message}</TableCell>
@@ -63,17 +74,23 @@ const MembershipRequestsTable = ({
             }).format(membershipRequest.requested)}
           </TableCell>
           <TableCell>
-            <ReviewMembershipRequestButton
-              bookClubSlug={bookClubSlug}
-              userEmail={membershipRequest.userEmail}
-            />
+            {membershipRequest.status ===
+              BookClubMembershipRequestStatus.PENDING && (
+              <ReviewMembershipRequestButton
+                bookClubSlug={bookClubSlug}
+                userEmail={membershipRequest.userEmail}
+              />
+            )}
           </TableCell>
           <TableCell>
-            <ReviewMembershipRequestButton
-              bookClubSlug={bookClubSlug}
-              userEmail={membershipRequest.userEmail}
-              isRejecting
-            />
+            {membershipRequest.status ===
+              BookClubMembershipRequestStatus.PENDING && (
+              <ReviewMembershipRequestButton
+                bookClubSlug={bookClubSlug}
+                userEmail={membershipRequest.userEmail}
+                isRejecting
+              />
+            )}
           </TableCell>
         </TableRow>
       ))}
