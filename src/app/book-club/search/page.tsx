@@ -55,7 +55,7 @@ const SearchPage = () => {
         >
           {bookClubs && (
             <BookClubCardGridLayout
-              cols={6}
+              cols="6"
               bookClubs={bookClubs}
             />
           )}
