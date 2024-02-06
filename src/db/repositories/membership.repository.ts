@@ -244,3 +244,64 @@ export const reinstateMembership = async (
 
   return { bcUpdate, uUpdate };
 };
+
+/**
+ * Remove a member from a book club
+ * ADMIN/OWNER REPO FUNCTION (or self)
+ *
+ * @param {string} slug The club's slug
+ * @param {string} userEmail The member's email
+ * @return {Promise<MembershipUpdate>}
+ */
+export const removeMember = async (
+  slug: string,
+  userEmail: string
+): Promise<MembershipUpdate> => {
+  // Connect to the book club collection
+  const bcCollection = await connectCollection(
+    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  );
+
+  // Remove the member from the book club
+  const bcUpdate = await bcCollection.updateOne(
+    {
+      slug,
+      disbanded: { $exists: false },
+      members: {
+        $elemMatch: {
+          userEmail,
+          departed: { $exists: false }
+        }
+      }
+    },
+    {
+      $set: {
+        'members.$.departed': new Date()
+      }
+    }
+  );
+
+  // Connect to the user collection
+  const uCollection = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
+
+  // Remove the club from the user's memberships
+  const uUpdate = await uCollection.updateOne(
+    {
+      email: userEmail,
+      departed: { $exists: false },
+      memberships: {
+        $elemMatch: {
+          clubSlug: slug,
+          departed: { $exists: false }
+        }
+      }
+    },
+    {
+      $set: {
+        'memberships.$.departed': new Date()
+      }
+    }
+  );
+
+  return { bcUpdate, uUpdate };
+};

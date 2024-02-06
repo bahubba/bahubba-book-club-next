@@ -19,6 +19,7 @@ export const hasOpenRequest = async (slug: string): Promise<boolean> => {
   return await fetchHasOpenRequest(slug, email);
 };
 
+// TODO - Restrict to admins and owners? Maybe only for private clubs?
 /**
  * Finds membership requests for a book club
  *

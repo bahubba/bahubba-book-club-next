@@ -10,7 +10,7 @@ import BookClubImagePickerModal from '@/components/modals/book-club-image-picker
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
 import {
-  handleSubmitNewBookClub,
+  handleCreateBookClub,
   handleUpdateBookClub
 } from '@/api/form-handlers/book-club-form.handlers';
 import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
@@ -35,7 +35,7 @@ const BookClubDetailsForm = ({
 }: Readonly<{ bookClub?: BookClubDoc }>) => {
   // Form state
   const [formState, formAction] = useFormState(
-    !!bookClub ? handleUpdateBookClub : handleSubmitNewBookClub,
+    !!bookClub ? handleUpdateBookClub : handleCreateBookClub,
     {
       error: ''
     } as ErrorFormState

@@ -129,11 +129,15 @@ export const hasOpenRequest = async (
  *
  * @param {string} slug The slug of the book club
  * @param {string} userEmail The email of the requesting user
+ * @param {number} page The page of membership requests to get
+ * @param {number} pageSize The number of membership requests to get
  * @return {Promise<BookClubMembershipRequest[]>} The membership requests
  */
 export const findMembershipRequests = async (
   slug: string,
-  userEmail: string
+  userEmail: string,
+  page: number = 0,
+  pageSize: number = 24
 ): Promise<BookClubMembershipRequest[]> => {
   // Connect to the database and collection
   const collection = await connectCollection(
@@ -155,7 +159,9 @@ export const findMembershipRequests = async (
     {
       projection: {
         membershipRequests: 1
-      }
+      },
+      skip: page * pageSize,
+      limit: pageSize
     }
   );
 

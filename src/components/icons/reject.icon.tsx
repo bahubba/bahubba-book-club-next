@@ -1,6 +1,7 @@
 import IconProps from '@/components/icons/icon-props';
 
 const RejectIcon = ({
+  color = 'secondary',
   fill = 'currentColor',
   size,
   height,
@@ -20,12 +21,12 @@ const RejectIcon = ({
       cx="12"
       cy="12"
       r="9"
-      stroke="#FFBA00"
+      stroke={color === 'black' ? '#000' : '#FFBA00'}
       strokeWidth="2"
     />
     <path
       d="M18 18L6 6"
-      stroke="#FFBA00"
+      stroke={color === 'black' ? '#000' : '#FFBA00'}
       strokeWidth="2"
     />
   </svg>

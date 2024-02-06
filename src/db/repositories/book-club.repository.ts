@@ -74,10 +74,14 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
  * Find all book clubs for which a user is a member
  *
  * @param {string} userEmail The email of the user to search for
+ * @param {number} pageNum The page number to retrieve
+ * @param {number} pageSize The number of results per page
  * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
 export const findBookClubsForUser = async (
-  userEmail: string
+  userEmail: string,
+  pageNum: number = 0,
+  pageSize: number = 24
 ): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -95,7 +99,11 @@ export const findBookClubsForUser = async (
           }
         }
       },
-      { projection: rawBookClubProjection }
+      {
+        projection: rawBookClubProjection,
+        skip: pageNum * pageSize,
+        limit: pageSize
+      }
     )
     .toArray();
 };
@@ -105,11 +113,15 @@ export const findBookClubsForUser = async (
  *
  * @param {string} query The search term to match
  * @param {string} userEmail The email of the searching user
+ * @param {number} pageNum The page number to retrieve
+ * @param {number} pageSize The number of results per page
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
 export const findBookClubsBySearch = async (
   query: string,
-  userEmail: string
+  userEmail: string,
+  pageNum: number = 0,
+  pageSize: number = 24
 ): Promise<BookClubDoc[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -150,7 +162,11 @@ export const findBookClubsBySearch = async (
           }
         ]
       },
-      { projection: rawBookClubProjection }
+      {
+        projection: rawBookClubProjection,
+        skip: pageNum * pageSize,
+        limit: pageSize
+      }
     )
     .toArray();
 };
@@ -301,10 +317,14 @@ export const findPublicityBySlug = async (
  * Find a book club's members by its slug
  *
  * @param {string} slug The slug of the book club to find
+ * @param {number} pageNum The page number to retrieve
+ * @param {number} pageSize The number of results per page
  * @return {Promise<BookClubMemberProjection[]>} The members of the book club
  */
 export const findMembersBySlug = async (
-  slug: string
+  slug: string,
+  pageNum: number = 0,
+  pageSize: number = 24
 ): Promise<BookClubMemberProjection[]> => {
   // Connect to the database and collection
   const collection: Collection<BookClubDoc> = await connectCollection(
@@ -355,7 +375,9 @@ export const findMembersBySlug = async (
           $arrayElemAt: ['$memberDetails.joined', 0]
         }
       }
-    }
+    },
+    { $skip: pageNum * pageSize },
+    { $limit: pageSize }
   ];
 
   // Run the aggregation to get the members and return
