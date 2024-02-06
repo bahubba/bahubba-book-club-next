@@ -50,7 +50,9 @@ const MembershipRequestsTable = ({
     </TableHeader>
     <TableBody>
       {membershipRequests.map(membershipRequest => (
-        <TableRow key={membershipRequest.userEmail}>
+        <TableRow
+          key={`${membershipRequest.userEmail}-${membershipRequest.requested}`}
+        >
           <TableCell>{membershipRequest.userEmail}</TableCell>
           <TableCell>{membershipRequest.message}</TableCell>
           <TableCell>
