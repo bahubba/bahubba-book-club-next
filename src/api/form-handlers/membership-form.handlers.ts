@@ -7,6 +7,7 @@ import { findMemberRoleBySlug } from '@/db/repositories/book-club.repository';
 import { removeMember } from '@/db/repositories/membership.repository';
 import { Role } from '@/db/models/book-club.models';
 import { ErrorFormState } from './state-interfaces';
+import { redirect } from 'next/navigation';
 
 /**
  * Handle removing a member from a book club
@@ -40,12 +41,20 @@ export const handleRemoveMember = async (
   if (
     !memberRole ||
     memberRole === Role.OWNER ||
-    (memberRole === Role.ADMIN && adminEmail !== memberEmail)
+    (memberRole === Role.ADMIN &&
+      adminRole !== Role.OWNER &&
+      adminEmail !== memberEmail)
   )
     return { error: 'Invalid member' };
 
   // Remove the member
   await removeMember(slug, memberEmail);
+
+  // If the user removed themselves, redirect to the home page
+  if (adminEmail === memberEmail) {
+    revalidatePath('/home');
+    redirect('/home');
+  }
 
   // On success, revalidate the admin page
   revalidatePath(`/book-club/${slug}/admin`);
