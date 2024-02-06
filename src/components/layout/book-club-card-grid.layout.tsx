@@ -3,7 +3,19 @@ import { BookClubDoc } from '@/db/models/book-club.models';
 
 // Component props
 interface BookClubGridLayoutProps {
-  cols?: number;
+  cols?:
+    | '1'
+    | '2'
+    | '3'
+    | '4'
+    | '5'
+    | '6'
+    | '7'
+    | '8'
+    | '9'
+    | '10'
+    | '11'
+    | '12';
   bookClubs: BookClubDoc[];
 }
 
@@ -15,13 +27,13 @@ interface BookClubGridLayoutProps {
  * @param { BookClubDoc[] } props.bookClubs - Book clubs to display
  */
 const BookClubCardGridLayout = ({
-  cols = 3,
+  cols = '3',
   bookClubs
 }: Readonly<BookClubGridLayoutProps>) => (
   <div className={`grid grid-cols-${cols} gap-1 p-2`}>
     {bookClubs.map(bookClub => (
       <BookClubCard
-        key={bookClub._id}
+        key={bookClub.slug}
         bookClub={bookClub}
       />
     ))}
