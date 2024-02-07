@@ -1,21 +1,25 @@
 'use client';
 import { useState } from 'react';
 import { Input } from '@nextui-org/input';
-import { searchBookClubs } from '@/api/fetchers/book-club.fetchers';
+import {
+  searchForBookClubs,
+  searchMongoBookClubs
+} from '@/api/fetchers/book-club.fetchers';
 import { BookClubDoc } from '@/db/models/book-club.models';
 import { Button } from '@nextui-org/button';
 import { Divider } from '@nextui-org/divider';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
 import { ScrollShadow } from '@nextui-org/scroll-shadow';
+import { BookClubProperties } from '@/db/models/nodes';
 
 /** Async function for loading book clubs to display */
 const fetchBookClubs = async (searchQuery: string) =>
-  !searchQuery ? [] : await searchBookClubs(searchQuery);
+  !searchQuery ? [] : await searchForBookClubs(searchQuery); // searchMongoBookClubs(searchQuery);
 
 /** Search page for finding book clubs */
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [bookClubs, setBookClubs] = useState<BookClubDoc[]>([]);
+  const [bookClubs, setBookClubs] = useState<BookClubProperties[]>([]);
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) =>
     setSearchQuery(event.target.value);
@@ -56,7 +60,7 @@ const SearchPage = () => {
           {bookClubs && (
             <BookClubCardGridLayout
               cols="6"
-              bookClubs={bookClubs}
+              bookClubs={bookClubs as BookClubDoc[]}
             />
           )}
         </ScrollShadow>

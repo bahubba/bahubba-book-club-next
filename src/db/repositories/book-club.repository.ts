@@ -33,17 +33,19 @@ export const addBookClub = async (
   // Create a book club node and a membership relationship for the user as an owner
   await session.run(
     `
-      MATCH (u:User { email: $email })
+      MATCH (u:User { email: $email, isActive: TRUE })
       MERGE (c:BookClub {
         name: $bookClub.name,
         slug: $bookClub.slug,
         description: $bookClub.description,
         image: $bookClub.image,
-        publicity: $bookClub.publicity
+        publicity: $bookClub.publicity,
+        isActive: TRUE
       })
       MERGE (u)-[:IS_MEMBER_OF {
+        role: $membershipProps.role,
         joined: $membershipProps.joined,
-        role: $membershipProps.role
+        isActive: TRUE
       }]->(c)
       RETURN c
       `,
@@ -67,8 +69,7 @@ export const bookClubExists = async (slug: string): Promise<boolean> => {
   // Query for the existence of the book club
   const result = await session.run(
     `
-      MATCH (b:BookClub { slug: $slug })
-      WHERE b.disbanded IS NULL
+      MATCH (b:BookClub { slug: $slug, isActive: TRUE })
       RETURN COUNT(b) > 0 AS bookClubExists
       `,
     { slug }
@@ -94,11 +95,47 @@ export const findBookClubs = async (
   // Find the book clubs for the user
   const result = await session.run(
     `
-      MATCH (u:User { email: $email })-[:IS_MEMBER_OF]->(b:BookClub)
-      WHERE b.disbanded IS NULL
+      MATCH (u:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b:BookClub { isActive: TRUE })
       RETURN b
       `,
     { email }
+  );
+
+  // Close the session and return the book clubs
+  session.close();
+  return result.records.map(
+    record => record.get('b').properties
+  ) as BookClubProperties[];
+};
+
+/**
+ * Search for book clubs by name or description
+ *
+ * @param {string} email The email of the searching user
+ * @param {string} search The search term to find book clubs by
+ */
+export const findBookClubsBySearch = async (
+  email: string,
+  search: string
+): Promise<BookClubProperties[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Search for book clubs that are public or private and of which the user is a member
+  const result = await session.run(
+    `
+    MATCH (b:BookClub { isActive: TRUE })
+    WHERE (
+      toLower(b.name) CONTAINS toLower($search) OR
+      toLower(b.description) CONTAINS toLower($search)
+    ) AND (
+      b.publicity = 'PUBLIC' OR (
+        EXISTS((:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b))
+      )
+    )
+    RETURN b
+    `,
+    { email, search }
   );
 
   // Close the session and return the book clubs
@@ -214,7 +251,7 @@ export const findMongoBookClubsForUser = async (
  * @param {number} pageSize The number of results per page
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
-export const findBookClubsBySearch = async (
+export const findMongoBookClubsBySearch = async (
   query: string,
   userEmail: string,
   pageNum: number = 0,

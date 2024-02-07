@@ -23,8 +23,9 @@ export interface ProviderProfileProperties {
 export interface UserProperties {
   email: string;
   preferredName: string;
-  joined: Date;
-  departed?: Date;
+  joined: Date | string;
+  isActive: boolean;
+  departed?: Date | string;
 }
 
 // Book club node properties
@@ -34,7 +35,15 @@ export interface BookClubProperties {
   description: string;
   image: string;
   publicity: Publicity;
-  disbanded?: Date;
+  isActive: boolean;
+  created: Date | string;
+  disbanded?: Date | string;
+}
+
+// Combined user and provider profile properties
+export interface UserAndProviderProfile {
+  user: UserProperties | null;
+  profile: ProviderProfileProperties | null;
 }
 
 /** NODES */

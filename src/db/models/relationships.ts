@@ -13,9 +13,10 @@ export enum Role {
 
 // Book club membership properties
 export interface IsMemberOfProperties {
-  joined: string;
-  departed?: string;
   role: Role;
+  joined: Date | string;
+  isActive: boolean;
+  departed?: Date | string;
 }
 
 /** RELATIONSHIPS */

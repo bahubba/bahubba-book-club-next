@@ -12,12 +12,12 @@ import BookClubSearchButton from '@/components/buttons/book-club-search.button';
 
 /** Async component for loading book clubs to display */
 const BookClubs = async () => {
-  const bookClubs = await getMongoBookClubsForUser();
-  const n4jBC = await getBookClubs();
-  console.log('n4jBC', n4jBC); // DELETEME
+  const mongoBookClubs = await getMongoBookClubsForUser();
+  const bookClubs = await getBookClubs();
+  console.log('n4jBC', bookClubs); // DELETEME
 
   // TODO - add key
-  return <BookClubCardGridLayout bookClubs={bookClubs} />;
+  return <BookClubCardGridLayout bookClubs={mongoBookClubs} />;
 };
 
 /** The home page for the application, showing a user's clubs, books, and trending info */

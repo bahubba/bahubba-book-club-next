@@ -3,7 +3,7 @@
 import { ensureAuth, ensureMongoAuth } from '@/api/auth.api';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
-  findBookClubsBySearch,
+  findMongoBookClubsBySearch,
   findMongoBookClubsForUser,
   findBookClubByName,
   findBookClubBySlug,
@@ -11,7 +11,8 @@ import {
   findMembersBySlug,
   findPublicityBySlug,
   findNameBySlug,
-  findBookClubs
+  findBookClubs,
+  findBookClubsBySearch
 } from '@/db/repositories/book-club.repository';
 import {
   BookClubMemberProjection,
@@ -19,17 +20,34 @@ import {
 } from '@/db/models/book-club.models';
 import { BookClubNode, BookClubProperties } from '@/db/models/nodes';
 
-/** Retrieves all book clubs for the logged-in user */
+/**
+ * Retrieve all book clubs for the logged-in user
+ *
+ * @return {Promise<BookClubProperties[]>} The user's book clubs
+ */
 export const getBookClubs = async (): Promise<BookClubProperties[]> => {
   // Ensure that the user is authenticated
-  const {
-    properties: { email }
-  } = await ensureAuth();
+  const { email } = await ensureAuth();
+  console.log('email', email); // DELETEME
 
   // Fetch and return the user's book clubs
-  // const bookClubs: BookClubProperties[] = await findBookClubs(email);
-  // return bookClubs;
   return await findBookClubs(email);
+};
+
+/**
+ * Search for book clubs by name or description
+ *
+ * @param {string} search The search term to find book clubs by
+ * @return {Promise<BookClubProperties[]>}
+ */
+export const searchForBookClubs = async (
+  search: string
+): Promise<BookClubProperties[]> => {
+  // Ensure that the user is authenticated
+  const { email } = await ensureAuth();
+
+  // Fetch and return the user's book clubs
+  return await findBookClubsBySearch(email, search);
 };
 
 /** Retrieves all book clubs for the logged-in user */
@@ -47,14 +65,14 @@ export const getMongoBookClubsForUser = async (): Promise<BookClubDoc[]> => {
  * @param {string} search The search term to find book clubs by
  * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
  */
-export const searchBookClubs = async (
+export const searchMongoBookClubs = async (
   search: string
 ): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
   const { email } = await ensureMongoAuth();
 
   // Fetch and return the user's book clubs
-  return await findBookClubsBySearch(search, email);
+  return await findMongoBookClubsBySearch(search, email);
 };
 
 /**

@@ -7,16 +7,18 @@ import {
   findUser
 } from '@/db/repositories/user.repository';
 import { UserDoc } from '@/db/models/user.models';
-import { UserNode } from '@/db/nodes/user.nodes';
+import { UserProperties } from '@/db/models/nodes';
 
 /** Ensure authentication */
-export const ensureAuth = async (): Promise<UserNode> => {
+export const ensureAuth = async (): Promise<UserProperties> => {
   const session = await getServerSession();
+  console.log('session', session); // DELETEME
   if (!session?.user?.email) throw new Error('Not authorized');
 
   // Pull the user from Neo4j
   const user = await findUser(session.user.email);
-  if (!user || !user.properties.email) throw new Error('Not authorized');
+  console.log('user', user); // DELETEME
+  if (!user || !user.email) throw new Error('Not authorized');
 
   return user;
 };

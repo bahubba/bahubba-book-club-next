@@ -13,9 +13,9 @@ import {
   updateUser
 } from '@/db/repositories/user.repository';
 import {
-  ProviderProfileNodeProps,
-  UserNodeWithProviderProfile
-} from '@/db/nodes/user.nodes';
+  ProviderProfileProperties,
+  UserAndProviderProfile
+} from '@/db/models/nodes';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
           : _.startCase(account.provider);
 
       // Collect the provider profile properties
-      const providerProfile: ProviderProfileNodeProps = {
+      const providerProfile: ProviderProfileProperties = {
         userId: account.userId ?? user.id,
         providerAccountId: account.providerAccountId,
         name: user.name ?? profile.name ?? 'Anonymous User',
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
 
       // TODO - Catch error
       // Check if the user exists in Neo4j
-      const neo4jUser: UserNodeWithProviderProfile =
+      const neo4jUser: UserAndProviderProfile =
         await findUserAndProviderProfile(email, provider);
 
       // Update user info in Neo4j if necessary
@@ -71,7 +71,8 @@ export const authOptions: NextAuthOptions = {
           {
             email,
             preferredName: user.name ?? profile.name ?? 'Anonymous User',
-            joined: new Date().toISOString()
+            joined: new Date().toISOString(),
+            isActive: true
           },
           providerProfile
         );

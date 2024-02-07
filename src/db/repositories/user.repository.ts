@@ -1,5 +1,4 @@
 import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
-import { Session } from 'neo4j-driver';
 
 import { connectCollection } from '@/db/connect-mongo';
 import { driver } from '@/db/connect-neo4j';
@@ -8,26 +7,25 @@ import {
   noMembershipsUserProjection,
   rawUserProjection
 } from '@/db/models/user.models';
-import {
-  ProviderProfileNodeProps,
-  UserNodeProps,
-  UserNodeWithProviderProfile,
-  UserWithProviderProfile
-} from '@/db/nodes/user.nodes';
 import props from '@/util/properties';
+import {
+  ProviderProfileProperties,
+  UserAndProviderProfile,
+  UserProperties
+} from '../models/nodes';
 
 /**
  * Add a new user to Neo4j, including User and ProviderProfile nodes and a relationship between them
  *
- * @param {UserNodeProps} user The properties for the User node
+ * @param {UserProperties} user The properties for the User node
  * @param {string} provider The provider name
  * @param {ProviderProfileNodeProps} providerProfile The properties for the ProviderProfile node
  * @return {Promise<void>} A promise that resolves when the user is added
  */
 export const addUser = async (
   provider: string,
-  user: UserNodeProps,
-  providerProfile: ProviderProfileNodeProps
+  user: UserProperties,
+  providerProfile: ProviderProfileProperties
 ): Promise<void> => {
   // Connect to Neo4j
   const session = driver.session();
@@ -51,12 +49,12 @@ export const addUser = async (
  *
  * @param {string} email The user's email address
  * @param {string} provider The provider name
- * @param {ProviderProfileNodeProps} providerProfile The properties for the ProviderProfile node
+ * @param {ProviderProfileProperties} providerProfile The properties for the ProviderProfile node
  */
 export const addProviderProfile = async (
   email: string,
   provider: string,
-  providerProfile: ProviderProfileNodeProps
+  providerProfile: ProviderProfileProperties
 ): Promise<void> => {
   // Connect to Neo4j
   const session = driver.session();
@@ -80,12 +78,12 @@ export const addProviderProfile = async (
  *
  * @param {string} email - The user's email address
  * @param {string} provider - The provider name
- * @param {ProviderProfileNodeProps} providerProfile - The properties for the ProviderProfile node
+ * @param {ProviderProfileProperties} providerProfile - The properties for the ProviderProfile node
  */
 export const updateProviderProfile = async (
   email: string,
   provider: string,
-  providerProfile: ProviderProfileNodeProps
+  providerProfile: ProviderProfileProperties
 ): Promise<void> => {
   // Connect to Neo4j
   const session = driver.session();
@@ -93,7 +91,7 @@ export const updateProviderProfile = async (
   // Update the provider profile
   await session.run(
     `
-      MATCH (p:ProviderProfile:${provider})<-[:HAS_PROFILE]-(:User { email: $email })
+      MATCH (p:ProviderProfile:${provider})<-[:HAS_PROFILE]-(:User { email: $email, isActive: TRUE })
       SET p = $providerProfile
       `,
     { email, providerProfile }
@@ -107,18 +105,18 @@ export const updateProviderProfile = async (
  * Find a user by email
  *
  * @param {string} email The user's email address
- * @return {Promise<UserNodeProps | null>} The user node properties if found, null otherwise
+ * @return {Promise<UserProperties | null>} The user node properties if found, null otherwise
  */
 export const findUser = async (
   email: string
-): Promise<UserNodeProps | null> => {
+): Promise<UserProperties | null> => {
   // Connect to Neo4j
   const session = driver.session();
 
   // Find the user
   const result = await session.run(
     `
-      MATCH (u:User { email: $email })
+      MATCH (u:User { email: $email, isActive: TRUE })
       RETURN u
       `,
     { email }
@@ -126,7 +124,9 @@ export const findUser = async (
 
   // Close the session and return the user
   session.close();
-  return result.records.length ? result.records[0].get('u') : null;
+  return result.records.length
+    ? (result.records[0].get('u').properties as UserProperties)
+    : null;
 };
 
 /**
@@ -134,20 +134,20 @@ export const findUser = async (
  *
  * @param {string} email The user's email address
  * @param {string} provider The provider name
- * @return {Promise<UserWithProviderProfile>} The user and provider profile nodes
+ * @return {Promise<UserAndProviderProfile>} The user and provider profile nodes
  */
 export const findUserAndProviderProfile = async (
   email: string,
   provider: string
-): Promise<UserNodeWithProviderProfile> => {
+): Promise<UserAndProviderProfile> => {
   // Connect to Neo4j
   const session = driver.session();
 
   // Find the user and provider profile
   const result = await session.run(
     `
-      MATCH (u:User { email: $email })
-      OPTIONAL MATCH (u)-[:HAS_PROFILE]->(p:ProviderProfile:${provider})
+      MATCH (u:User { email: $email, isActive: TRUE })
+      OPTIONAL MATCH (u)-[:HAS_PROFILE]->(p:ProviderProfile:${provider} { isActive: TRUE })
       RETURN u, p
       `,
     { email }
@@ -159,8 +159,8 @@ export const findUserAndProviderProfile = async (
   // Pull the user and provider profile properties from the result
   return result.records.length
     ? {
-        user: result.records[0].get('u') ?? null,
-        profile: result.records[0].get('p') ?? null
+        user: result.records[0].get('u')?.properties ?? null,
+        profile: result.records[0].get('p')?.properties ?? null
       }
     : { user: null, profile: null };
 };

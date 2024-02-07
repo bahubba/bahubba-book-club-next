@@ -4,7 +4,11 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import slugify from 'slugify';
 
-import { Publicity, Role } from '@/db/models/book-club.models';
+import {
+  Publicity as MongoPublicity,
+  Publicity,
+  Role
+} from '@/db/models/book-club.models';
 import {
   addBookClub,
   addMongoBookClub,
@@ -32,9 +36,7 @@ export const handleCreateBookClub = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const {
-    properties: { email }
-  } = await ensureAuth();
+  const { email } = await ensureAuth();
 
   // Pull out the form data
   const name = formData.get('name')?.toString().trim() ?? '';
@@ -43,7 +45,7 @@ export const handleCreateBookClub = async (
     'A book club for reading books';
   const image = formData.get('image')?.toString() ?? '';
   let publicity =
-    formData.get('publicity')?.toString().trim().toUpperCase() ||
+    (formData.get('publicity')?.toString().trim().toUpperCase() as Publicity) ??
     Publicity.PRIVATE;
 
   // Slugify the name
@@ -65,8 +67,16 @@ export const handleCreateBookClub = async (
   try {
     await addBookClub(
       email,
-      { name, slug, description, image, publicity },
-      { joined: new Date().toISOString(), role: Role.OWNER }
+      {
+        name,
+        slug,
+        description,
+        image,
+        publicity,
+        isActive: true,
+        created: new Date().toISOString()
+      },
+      { role: Role.OWNER, joined: new Date().toISOString(), isActive: true }
     );
   } catch (e) {
     console.log('error adding book club', e);
@@ -104,8 +114,8 @@ export const handleCreateMongoBookClub = async (
   // Ensure publicity is a valid value
   let publicity =
     formData.get('publicity')?.toString().trim().toUpperCase() ||
-    Publicity.PRIVATE;
-  if (!(publicity in Publicity)) publicity = Publicity.PRIVATE;
+    MongoPublicity.PRIVATE;
+  if (!(publicity in MongoPublicity)) publicity = MongoPublicity.PRIVATE;
 
   // Create a slug for the book club from the name
   const slug = slugify(name, { lower: true });
@@ -118,7 +128,7 @@ export const handleCreateMongoBookClub = async (
       formData.get('description')?.toString().trim() ||
       'A book club for reading books',
     image: formData.get('image')?.toString() ?? '',
-    publicity: publicity as Publicity,
+    publicity: publicity as MongoPublicity,
     members: [
       {
         userEmail: user.email,
@@ -193,8 +203,8 @@ export const handleUpdateBookClub = async (
   // Ensure publicity is a valid value
   let publicity =
     formData.get('publicity')?.toString().trim().toUpperCase() ||
-    Publicity.PRIVATE;
-  if (!(publicity in Publicity)) publicity = existing.publicity;
+    MongoPublicity.PRIVATE;
+  if (!(publicity in MongoPublicity)) publicity = existing.publicity;
 
   // Create a book club doc out of the form data
   const updated = {
@@ -204,7 +214,7 @@ export const handleUpdateBookClub = async (
       formData.get('description')?.toString().trim() ||
       (props.APP.DEFAULT_CLUB_DESCRIPTION as string),
     image: formData.get('image')?.toString() || '',
-    publicity: publicity as Publicity
+    publicity: publicity as MongoPublicity
   };
 
   // Ensure there are actual changes
