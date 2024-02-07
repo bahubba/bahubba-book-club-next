@@ -1,4 +1,6 @@
 import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
+
+import { driver } from '@/db/connect-neo4j';
 import {
   BookClubDoc,
   BookClubMemberProjection,
@@ -9,8 +11,6 @@ import {
 } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
-import { withNeo4jSession } from '../connect-neo4j';
-import { Session } from 'neo4j-driver';
 import { BookClubProperties } from '../models/nodes';
 import { IsMemberOfProperties } from '../models/relationships';
 
@@ -22,15 +22,17 @@ import { IsMemberOfProperties } from '../models/relationships';
  * @param {IsMemberOfProperties} membershipProps The properties for the membership relationship
  * @return {Promise<void>}
  */
-export const addBookClub = withNeo4jSession()(
-  async (
-    session: Session,
-    email: string,
-    bookClub: BookClubProperties,
-    membershipProps: IsMemberOfProperties
-  ) => {
-    await session.run(
-      `
+export const addBookClub = async (
+  email: string,
+  bookClub: BookClubProperties,
+  membershipProps: IsMemberOfProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Create a book club node and a membership relationship for the user as an owner
+  await session.run(
+    `
       MATCH (u:User { email: $email })
       MERGE (c:BookClub {
         name: $bookClub.name,
@@ -45,10 +47,12 @@ export const addBookClub = withNeo4jSession()(
       }]->(c)
       RETURN c
       `,
-      { email, bookClub, membershipProps }
-    );
-  }
-);
+    { email, bookClub, membershipProps }
+  );
+
+  // Close the session
+  session.close();
+};
 
 /**
  * Checks if a book club exists with a given slug
@@ -56,19 +60,53 @@ export const addBookClub = withNeo4jSession()(
  * @param {string} slug The slug of the book club to check
  * @return {Promise<boolean>} True if the book club exists, false otherwise
  */
-export const bookClubExists = withNeo4jSession()(
-  async (session: Session, slug: string) => {
-    const result = await session.run(
-      `
+export const bookClubExists = async (slug: string): Promise<boolean> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Query for the existence of the book club
+  const result = await session.run(
+    `
       MATCH (b:BookClub { slug: $slug })
+      WHERE b.disbanded IS NULL
       RETURN COUNT(b) > 0 AS bookClubExists
       `,
-      { slug }
-    );
+    { slug }
+  );
 
-    return result.records[0].get('bookClubExists');
-  }
-);
+  // Close the session and return
+  session.close();
+  return result.records[0].get('bookClubExists');
+};
+
+/**
+ * Finds all book club nodes for a given user
+ *
+ * @param {string} email The email of the user to search for
+ * @return {Promise<BookClubProperties>} The book club nodes for the user
+ */
+export const findBookClubs = async (
+  email: string
+): Promise<BookClubProperties[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the book clubs for the user
+  const result = await session.run(
+    `
+      MATCH (u:User { email: $email })-[:IS_MEMBER_OF]->(b:BookClub)
+      WHERE b.disbanded IS NULL
+      RETURN b
+      `,
+    { email }
+  );
+
+  // Close the session and return the book clubs
+  session.close();
+  return result.records.map(
+    record => record.get('b').properties
+  ) as BookClubProperties[];
+};
 
 /**
  * Adds a book club to MongoDB
@@ -137,7 +175,7 @@ export const findByName = async (name: string): Promise<BookClubDoc | null> => {
  * @param {number} pageSize The number of results per page
  * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
  */
-export const findBookClubsForUser = async (
+export const findMongoBookClubsForUser = async (
   userEmail: string,
   pageNum: number = 0,
   pageSize: number = 24

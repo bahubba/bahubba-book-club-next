@@ -1,25 +1,36 @@
 'use server';
 
-import { ensureMongoAuth } from '@/api/auth.api';
+import { ensureAuth, ensureMongoAuth } from '@/api/auth.api';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
-  findBookClubsForUser,
+  findMongoBookClubsForUser,
   findBookClubByName,
   findBookClubBySlug,
   findMemberRoleBySlug,
   findMembersBySlug,
   findPublicityBySlug,
-  findNameBySlug
+  findNameBySlug,
+  findBookClubs
 } from '@/db/repositories/book-club.repository';
 import {
   BookClubMemberProjection,
   Publicity
 } from '@/db/models/book-club.models';
-import { BookClubNode } from '@/db/models/nodes';
+import { BookClubNode, BookClubProperties } from '@/db/models/nodes';
 
 /** Retrieves all book clubs for the logged-in user */
-// export const getBookClubs = async (): Promise<BookClubNode> => {};
+export const getBookClubs = async (): Promise<BookClubProperties[]> => {
+  // Ensure that the user is authenticated
+  const {
+    properties: { email }
+  } = await ensureAuth();
+
+  // Fetch and return the user's book clubs
+  // const bookClubs: BookClubProperties[] = await findBookClubs(email);
+  // return bookClubs;
+  return await findBookClubs(email);
+};
 
 /** Retrieves all book clubs for the logged-in user */
 export const getMongoBookClubsForUser = async (): Promise<BookClubDoc[]> => {
@@ -27,7 +38,7 @@ export const getMongoBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   const user = await ensureMongoAuth();
 
   // Fetch and return the user's book clubs
-  return await findBookClubsForUser(user.email);
+  return await findMongoBookClubsForUser(user.email);
 };
 
 /**

@@ -2,7 +2,7 @@ import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
 import { Session } from 'neo4j-driver';
 
 import { connectCollection } from '@/db/connect-mongo';
-import { withNeo4jSession } from '@/db/connect-neo4j';
+import { driver } from '@/db/connect-neo4j';
 import {
   UserDoc,
   noMembershipsUserProjection,
@@ -11,7 +11,8 @@ import {
 import {
   ProviderProfileNodeProps,
   UserNodeProps,
-  UserNodeWithProviderProfile
+  UserNodeWithProviderProfile,
+  UserWithProviderProfile
 } from '@/db/nodes/user.nodes';
 import props from '@/util/properties';
 
@@ -23,23 +24,27 @@ import props from '@/util/properties';
  * @param {ProviderProfileNodeProps} providerProfile The properties for the ProviderProfile node
  * @return {Promise<void>} A promise that resolves when the user is added
  */
-export const addUser = withNeo4jSession()(
-  async (
-    session: Session,
-    provider: string,
-    user: UserNodeProps,
-    providerProfile: ProviderProfileNodeProps
-  ) => {
-    await session.run(
-      `
+export const addUser = async (
+  provider: string,
+  user: UserNodeProps,
+  providerProfile: ProviderProfileNodeProps
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the user and provider profile
+  await session.run(
+    `
       CREATE (u:User $userProps)
       CREATE (p:ProviderProfile:${provider} $providerProfileProps)
       CREATE (u)-[:HAS_PROFILE]->(p)
       `,
-      { userProps: user, providerProfileProps: providerProfile }
-    );
-  }
-);
+    { userProps: user, providerProfileProps: providerProfile }
+  );
+
+  // Close the session
+  session.close();
+};
 
 /**
  * Adds a provider profile to a user in Neo4j
@@ -48,23 +53,27 @@ export const addUser = withNeo4jSession()(
  * @param {string} provider The provider name
  * @param {ProviderProfileNodeProps} providerProfile The properties for the ProviderProfile node
  */
-export const addProviderProfile = withNeo4jSession()(
-  async (
-    session: Session,
-    email: string,
-    provider: string,
-    providerProfile: ProviderProfileNodeProps
-  ) => {
-    await session.run(
-      `
+export const addProviderProfile = async (
+  email: string,
+  provider: string,
+  providerProfile: ProviderProfileNodeProps
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the provider profile with a relationship from the user
+  await session.run(
+    `
       MATCH (u:User { email: $email })
       CREATE (p:ProviderProfile:${provider} $providerProfileProps)
       CREATE (u)-[:HAS_PROFILE]->(p)
       `,
-      { email, providerProfileProps: providerProfile }
-    );
-  }
-);
+    { email, providerProfileProps: providerProfile }
+  );
+
+  // Close the session
+  session.close();
+};
 
 /**
  * Updates a provider profile for a user in Neo4j
@@ -73,22 +82,26 @@ export const addProviderProfile = withNeo4jSession()(
  * @param {string} provider - The provider name
  * @param {ProviderProfileNodeProps} providerProfile - The properties for the ProviderProfile node
  */
-export const updateProviderProfile = withNeo4jSession()(
-  async (
-    session: Session,
-    email: string,
-    provider: string,
-    providerProfile: ProviderProfileNodeProps
-  ) => {
-    await session.run(
-      `
+export const updateProviderProfile = async (
+  email: string,
+  provider: string,
+  providerProfile: ProviderProfileNodeProps
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Update the provider profile
+  await session.run(
+    `
       MATCH (p:ProviderProfile:${provider})<-[:HAS_PROFILE]-(:User { email: $email })
       SET p = $providerProfile
       `,
-      { email, providerProfile }
-    );
-  }
-);
+    { email, providerProfile }
+  );
+
+  // Close the session
+  session.close();
+};
 
 /**
  * Find a user by email
@@ -96,57 +109,61 @@ export const updateProviderProfile = withNeo4jSession()(
  * @param {string} email The user's email address
  * @return {Promise<UserNodeProps | null>} The user node properties if found, null otherwise
  */
-export const findUser = withNeo4jSession()(
-  async (session: Session, email: string): Promise<UserNodeProps | null> => {
-    const result = await session.run(
-      `
+export const findUser = async (
+  email: string
+): Promise<UserNodeProps | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user
+  const result = await session.run(
+    `
       MATCH (u:User { email: $email })
       RETURN u
       `,
-      { email }
-    );
+    { email }
+  );
 
-    return result.records.length ? result.records[0].get('u') : null;
-  }
-);
+  // Close the session and return the user
+  session.close();
+  return result.records.length ? result.records[0].get('u') : null;
+};
 
 /**
  * Find a user and provider profile by email and provider
  *
  * @param {string} email The user's email address
  * @param {string} provider The provider name
- * @return {Promise<UserNodeWithProviderProfile>} The user and provider profile nodes
+ * @return {Promise<UserWithProviderProfile>} The user and provider profile nodes
  */
-export const findUserAndProviderProfile = withNeo4jSession()(
-  async (
-    session: Session,
-    email: string,
-    provider: string
-  ): Promise<UserNodeWithProviderProfile> => {
-    console.log('email, provider', email, provider); // DELETEME
-    const result = await session.run(
-      `
+export const findUserAndProviderProfile = async (
+  email: string,
+  provider: string
+): Promise<UserNodeWithProviderProfile> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user and provider profile
+  const result = await session.run(
+    `
       MATCH (u:User { email: $email })
       OPTIONAL MATCH (u)-[:HAS_PROFILE]->(p:ProviderProfile:${provider})
       RETURN u, p
       `,
-      { email }
-    );
+    { email }
+  );
 
-    // console.log('u&p result', result); // DELETEME
-    // console.log('u&p result.records', result.records); // DELETEME
-    console.log('u&p result.records[0]', result.records[0]); // DELETEME
-    console.log('u&p result.records[0].get("u")', result.records[0].get('u')); // DELETEME
-    console.log('u&p result.records[0].get("p")', result.records[0].get('p')); // DELETEME
+  // Close the session
+  session.close();
 
-    return result.records.length
-      ? {
-          user: result.records[0].get('u'),
-          profile: result.records[0].get('p')
-        }
-      : { user: null, profile: null };
-  }
-);
+  // Pull the user and provider profile properties from the result
+  return result.records.length
+    ? {
+        user: result.records[0].get('u') ?? null,
+        profile: result.records[0].get('p') ?? null
+      }
+    : { user: null, profile: null };
+};
 
 /**
  * Adds a user document to MongoDB

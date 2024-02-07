@@ -17,6 +17,12 @@ export interface ProviderProfileNodeProps {
   image: string | null | undefined;
 }
 
+// User with provider profile
+export interface UserWithProviderProfile {
+  user: UserNode | null;
+  profile: ProviderProfileNode | null;
+}
+
 // User Node
 export interface UserNode extends Node<Integer, UserNodeProps, string> {}
 

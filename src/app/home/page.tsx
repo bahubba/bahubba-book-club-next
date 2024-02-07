@@ -3,13 +3,18 @@ import { Spinner } from '@nextui-org/spinner';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
-import { getMongoBookClubsForUser } from '@/api/fetchers/book-club.fetchers';
+import {
+  getBookClubs,
+  getMongoBookClubsForUser
+} from '@/api/fetchers/book-club.fetchers';
 import CreateBookClubButton from '@/components/buttons/create-book-club.button';
 import BookClubSearchButton from '@/components/buttons/book-club-search.button';
 
 /** Async component for loading book clubs to display */
 const BookClubs = async () => {
   const bookClubs = await getMongoBookClubsForUser();
+  const n4jBC = await getBookClubs();
+  console.log('n4jBC', n4jBC); // DELETEME
 
   // TODO - add key
   return <BookClubCardGridLayout bookClubs={bookClubs} />;
