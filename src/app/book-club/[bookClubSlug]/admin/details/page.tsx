@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Spinner } from '@nextui-org/spinner';
 
 import BookClubDetailsForm from '@/components/forms/book-club-details.form';
-import { getBookClubBySlug } from '@/api/fetchers/book-club.fetchers';
+import { getBookClub } from '@/api/fetchers/book-club.fetchers';
 
 // Page props
 interface BookClubAdminDetailsPageProps {
@@ -20,7 +20,7 @@ interface BookClubAdminDetailsPageProps {
 const BookClubDetailsFormWrapper = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
-  const bookClub = await getBookClubBySlug(bookClubSlug);
+  const bookClub = await getBookClub(bookClubSlug);
 
   return bookClub ? (
     <BookClubDetailsForm bookClub={bookClub} />

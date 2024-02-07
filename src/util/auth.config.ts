@@ -6,11 +6,9 @@ import _ from 'lodash';
 import {
   addProviderProfile,
   addUser,
-  addMongoUser,
-  findFullUserByEmail,
   findUserAndProviderProfile,
   updateProviderProfile,
-  updateUser
+  findUser
 } from '@/db/repositories/user.repository';
 import {
   ProviderProfileProperties,
@@ -30,7 +28,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user: authUser, account, profile }) {
       // Can't sign in without an email address
       if (!profile?.email || !account) {
         return false;
@@ -40,7 +38,7 @@ export const authOptions: NextAuthOptions = {
       const { email } = profile;
 
       // Check if the user exists in the database
-      const userDoc = await findFullUserByEmail(email);
+      const user = await findUser(email);
 
       // Format the provider
       const provider =
@@ -50,11 +48,11 @@ export const authOptions: NextAuthOptions = {
 
       // Collect the provider profile properties
       const providerProfile: ProviderProfileProperties = {
-        userId: account.userId ?? user.id,
+        userId: account.userId ?? authUser.id,
         providerAccountId: account.providerAccountId,
-        name: user.name ?? profile.name ?? 'Anonymous User',
+        name: authUser.name ?? profile.name ?? 'Anonymous User',
         sub: profile.sub,
-        image: profile.image ?? user.image
+        image: profile.image ?? authUser.image
       };
 
       // TODO - Catch error
@@ -70,7 +68,7 @@ export const authOptions: NextAuthOptions = {
           provider,
           {
             email,
-            preferredName: user.name ?? profile.name ?? 'Anonymous User',
+            preferredName: authUser.name ?? profile.name ?? 'Anonymous User',
             joined: new Date().toISOString(),
             isActive: true
           },
@@ -82,38 +80,6 @@ export const authOptions: NextAuthOptions = {
       } else {
         // Update the provider profile for the user
         await updateProviderProfile(email, provider, providerProfile);
-      }
-
-      // DELETEME - Remove MongoDB code
-      // If the user doesn't exist, add them to the database
-      if (!userDoc) {
-        await addMongoUser({
-          email,
-          preferredName: user.name ?? profile.name ?? 'Anonymous User',
-          providerProfiles: {
-            [account.provider]: {
-              userId: account.userId ?? user.id,
-              providerAccountId: account.providerAccountId,
-              name: user.name ?? profile.name ?? 'Anonymous User',
-              sub: profile.sub,
-              image: profile.image ?? user.image
-            }
-          },
-          memberships: [],
-          joined: new Date()
-        });
-      } else {
-        // If the user exists, update their profile with the current provider info
-        userDoc.providerProfiles[account.provider] = {
-          userId: account.userId ?? user.id,
-          providerAccountId: account.providerAccountId,
-          name: user.name ?? profile.name ?? 'Anonymous User',
-          sub: profile.sub,
-          image: profile.image ?? user.image
-        };
-
-        // Update the user in MongoDB
-        await updateUser(userDoc);
       }
 
       return true;

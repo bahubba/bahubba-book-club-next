@@ -1,5 +1,5 @@
 import BookClubCard from '@/components/cards/book-club.card';
-import { BookClubDoc } from '@/db/models/book-club.models';
+import { BookClubProperties } from '@/db/models/nodes';
 
 // Component props
 interface BookClubGridLayoutProps {
@@ -16,7 +16,7 @@ interface BookClubGridLayoutProps {
     | '10'
     | '11'
     | '12';
-  bookClubs: BookClubDoc[];
+  bookClubs: BookClubProperties[];
 }
 
 /**
@@ -24,7 +24,7 @@ interface BookClubGridLayoutProps {
  *
  * @param { BookClubGridLayoutProps } props - Component props
  * @param { number } props.cols - Number of columns to display
- * @param { BookClubDoc[] } props.bookClubs - Book clubs to display
+ * @param { BookClubProperties[] } props.bookClubs - Book clubs to display
  */
 const BookClubCardGridLayout = ({
   cols = '3',

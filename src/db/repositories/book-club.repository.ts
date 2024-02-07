@@ -4,15 +4,17 @@ import { driver } from '@/db/connect-neo4j';
 import {
   BookClubDoc,
   BookClubMemberProjection,
-  Publicity,
   PublicityProjection,
-  Role,
   rawBookClubProjection
 } from '@/db/models/book-club.models';
 import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
-import { BookClubProperties } from '../models/nodes';
-import { IsMemberOfProperties } from '../models/relationships';
+import { BookClubProperties, Publicity } from '@/db/models/nodes';
+import {
+  BookClubMembership,
+  IsMemberOfProperties,
+  Role
+} from '@/db/models/relationships';
 
 /**
  * Adds a book club node
@@ -109,6 +111,63 @@ export const findBookClubs = async (
 };
 
 /**
+ * Fetch a book club by its slug
+ *
+ * @param {string} slug The slug of the book club to fetch
+ * @param {string} email The email of the user to search for
+ * @return {Promise<BookClubProperties | null>} The book club with the given slug, or null if it doesn't exist
+ */
+export const findBookClub = async (
+  slug: string,
+  email: string
+): Promise<BookClubProperties | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the book club by its slug, where the user has a role in the book club
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b:BookClub { slug: $slug, isActive: TRUE })
+    RETURN b
+    `,
+    { slug, email }
+  );
+
+  // Close the session and return the book club
+  session.close();
+  return result.records[0]?.get('b')?.properties ?? null;
+};
+
+/**
+ * Find a book club where the user is an admin or owner
+ *
+ * @param {string} slug The slug of the book club to find
+ * @param {string} email The email of the user
+ * @return {Promise<BookClubProperties | null>} The book club if found, null otherwise
+ */
+export const findBookClubForAdmin = async (
+  slug: string,
+  email: string
+): Promise<BookClubProperties | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the book club where the user is an admin or owner
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    WHERE r.role IN ['ADMIN', 'OWNER']
+    RETURN b
+    `,
+    { email, slug }
+  );
+
+  // Close the session and return the book club
+  session.close();
+  return result.records[0]?.get('b')?.properties ?? null;
+};
+
+/**
  * Search for book clubs by name or description
  *
  * @param {string} email The email of the searching user
@@ -146,447 +205,116 @@ export const findBookClubsBySearch = async (
 };
 
 /**
- * Adds a book club to MongoDB
- *
- * @param {BookClubDoc} bookClub The book club to add
- * @return {Promise<InsertOneResult<BookClubDoc>>} The result of the insert operation
- */
-export const addMongoBookClub = async (
-  bookClub: BookClubDoc
-): Promise<InsertOneResult<BookClubDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Add the book club to the database
-  return await collection.insertOne(bookClub);
-};
-
-/**
- * Updates a book club
- *
- * @param {string} slug The slug of the book club to update
- * @param {Promise<UpdateResult<BookClubDoc>>} bookClub The book club to update
- */
-export const updateBookClub = async (
-  slug: string,
-  bookClub: BookClubDoc
-): Promise<UpdateResult<BookClubDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Update the book club in the database
-  return await collection.updateOne({ slug }, { $set: bookClub });
-};
-
-/**
- * Finds a book club by its name
- *
- * @param {string} name The name of the book club to find
- * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
- */
-export const findByName = async (name: string): Promise<BookClubDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book club in the database
-  return await collection.findOne(
-    { name },
-    {
-      collation: { locale: 'en', strength: 2 },
-      projection: rawBookClubProjection
-    }
-  );
-};
-
-/**
- * Find all book clubs for which a user is a member
- *
- * @param {string} userEmail The email of the user to search for
- * @param {number} pageNum The page number to retrieve
- * @param {number} pageSize The number of results per page
- * @return {Promise<BookClubDoc[]>} The book clubs for which the user is a member
- */
-export const findMongoBookClubsForUser = async (
-  userEmail: string,
-  pageNum: number = 0,
-  pageSize: number = 24
-): Promise<BookClubDoc[]> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book clubs in the database
-  return await collection
-    .find(
-      {
-        members: {
-          $elemMatch: {
-            userEmail,
-            departed: { $exists: false }
-          }
-        }
-      },
-      {
-        projection: rawBookClubProjection,
-        skip: pageNum * pageSize,
-        limit: pageSize
-      }
-    )
-    .toArray();
-};
-
-/**
- * Find all public book clubs that match a search term
- *
- * @param {string} query The search term to match
- * @param {string} userEmail The email of the searching user
- * @param {number} pageNum The page number to retrieve
- * @param {number} pageSize The number of results per page
- * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
- */
-export const findMongoBookClubsBySearch = async (
-  query: string,
-  userEmail: string,
-  pageNum: number = 0,
-  pageSize: number = 24
-): Promise<BookClubDoc[]> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book clubs in the database
-  return await collection
-    .find(
-      {
-        $and: [
-          {
-            disbanded: { $exists: false }
-          },
-          {
-            $or: [
-              { name: { $regex: query, $options: 'i' } },
-              { description: { $regex: query, $options: 'i' } }
-            ]
-          },
-          {
-            $or: [
-              { publicity: Publicity.PUBLIC },
-              {
-                $and: [
-                  { publicity: Publicity.PRIVATE },
-                  {
-                    members: {
-                      $elemMatch: {
-                        userEmail,
-                        departed: { $exists: false }
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        projection: rawBookClubProjection,
-        skip: pageNum * pageSize,
-        limit: pageSize
-      }
-    )
-    .toArray();
-};
-
-/**
- * Find a book club by its name
- *
- * @param {string} name The name of the book club to find
- * @param {string} userEmail The email of the user to search for
- * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
- */
-export const findBookClubByName = async (
-  name: string,
-  userEmail: string
-): Promise<BookClubDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book club in the database
-  return await collection.findOne(
-    {
-      departed: { $exists: false },
-      name,
-      $or: [
-        { publicity: Publicity.PUBLIC },
-        {
-          members: {
-            $elemMatch: {
-              userEmail,
-              departed: { $exists: false }
-            }
-          }
-        }
-      ]
-    },
-    { projection: rawBookClubProjection }
-  );
-};
-
-/**
- * Find a book club by its slug
- *
- * @param {string} slug The slug of the book club to find
- * @param {string} userEmail The email of the user to search for
- * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
- */
-export const findBookClubBySlug = async (
-  slug: string,
-  userEmail: string
-): Promise<BookClubDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book club in the database
-  return await collection.findOne(
-    {
-      departed: { $exists: false },
-      slug,
-      $or: [
-        { publicity: Publicity.PUBLIC },
-        {
-          members: {
-            $elemMatch: {
-              userEmail,
-              departed: { $exists: false }
-            }
-          }
-        }
-      ]
-    },
-    { projection: rawBookClubProjection }
-  );
-};
-
-/**
- * Find a user's membership in a book club by slug
+ * Find a user's role in a book club by slug
  *
  * @param {string} slug The slug of the book club
- * @param {string} userEmail The email of the user to search for
+ * @param {string} email The email of the user to search for
  * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
  */
-export const findMemberRoleBySlug = async (
+export const findBookClubRole = async (
   slug: string,
-  userEmail: string
+  email: string
 ): Promise<Role | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Create an aggregation pipeline to find the user's role in the book club
-  const aggregation = [
-    {
-      $unwind: {
-        path: '$members'
-      }
-    },
-    {
-      $match: {
-        slug,
-        'members.userEmail': userEmail,
-        'members.departed': {
-          $exists: false
-        }
-      }
-    },
-    {
-      $project: {
-        role: '$members.role'
-      }
-    }
-  ];
+  // Connect to Neo4j
+  const session = driver.session();
 
   // Find the user's role in the book club
-  const result = await collection.aggregate(aggregation).toArray();
-  return result.length > 0 ? result[0].role : null;
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF]->(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN m.role AS role
+    `,
+    { slug, email }
+  );
+
+  // Close the session and return the user's role
+  session.close();
+  return result.records[0]?.get('role') ?? null;
 };
 
 /**
  * Find a book club's publicity by its slug
  *
  * @param {string} slug The slug of the book club
+ * @param {email} email The email of the requesting user
  * @return {Promise<Publicity | null>} The publicity of the book club, or null if not found
  */
-export const findPublicityBySlug = async (
+export const findBookClubPublicity = async (
   slug: string
 ): Promise<Publicity | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the book club's publicity
+  const result = await session.run(
+    `
+    MATCH (b:BookClub { slug: $slug, isActive: TRUE })
+    RETURN b.publicity AS publicity
+    `,
+    { slug }
   );
 
-  // Find the book club in the database
-  const publicityProjection: PublicityProjection | null =
-    await collection.findOne(
-      { slug, disbanded: { $exists: false } },
-      { projection: { publicity: 1 } }
-    );
-
-  return publicityProjection?.publicity || null;
+  // Close the session and return the publicity
+  session.close();
+  return result.records[0]?.get('publicity') ?? null;
 };
 
 /**
  * Find a book club's members by its slug
  *
  * @param {string} slug The slug of the book club to find
- * @param {number} pageNum The page number to retrieve
- * @param {number} pageSize The number of results per page
- * @return {Promise<BookClubMemberProjection[]>} The members of the book club
+ * @return {Promise<BookClubMembership[]>} The members of the book club
  */
-export const findMembersBySlug = async (
-  slug: string,
-  pageNum: number = 0,
-  pageSize: number = 24
-): Promise<BookClubMemberProjection[]> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+export const findBookClubMembers = async (
+  slug: string
+): Promise<BookClubMembership[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the members of the book club
+  const result = await session.run(
+    `
+    MATCH (u:User { isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN m, u
+    `,
+    { slug }
   );
 
-  // Generate the aggregation pipeline
-  const aggregation = [
-    {
-      $match: {
-        slug,
-        disbanded: {
-          $exists: false
-        }
-      }
-    },
-    {
-      $unwind: {
-        path: '$members'
-      }
-    },
-    {
-      $match: {
-        'members.departed': {
-          $exists: false
-        }
-      }
-    },
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'members.userEmail',
-        foreignField: 'email',
-        as: 'memberDetails'
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        preferredName: {
-          $arrayElemAt: ['$memberDetails.preferredName', 0]
-        },
-        email: {
-          $arrayElemAt: ['$memberDetails.email', 0]
-        },
-        role: '$members.role',
-        joined: {
-          $arrayElemAt: ['$memberDetails.joined', 0]
-        }
-      }
-    },
-    { $skip: pageNum * pageSize },
-    { $limit: pageSize }
-  ];
+  // Close the session
+  session.close();
 
-  // Run the aggregation to get the members and return
-  return await collection
-    .aggregate<BookClubMemberProjection>(aggregation)
-    .toArray();
+  // Return the members
+  return result.records.map(record => ({
+    ...record.get('m').properties,
+    email: record.get('u').properties.email,
+    preferredName: record.get('u').properties.preferredName
+  })) as BookClubMembership[];
 };
 
 /**
- * Finds a book club by its slug where the requesting user is an admin (or owner)
- *
- * @param {string} slug The slug of the book club to find
- * @param {string} userEmail The email of the requesting user
- * @return {Promise<BookClubDoc | null>} The book club if found, null otherwise
- */
-export const findBookClubBySlugForAdmin = async (
-  slug: string,
-  userEmail: string
-): Promise<BookClubDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Find the book club in the database
-  return await collection.findOne(
-    {
-      slug,
-      members: {
-        $elemMatch: {
-          userEmail,
-          role: { $in: [Role.OWNER, Role.ADMIN] },
-          departed: { $exists: false }
-        }
-      }
-    },
-    { projection: rawBookClubProjection }
-  );
-};
-
-/**
- * Find a book club's name by its slug
+ * Find a book club's name where the user is a member
  *
  * @param {string} slug The slug of the book club
- * @param {string} userEmail The email of the requesting user
- * @return {Promise<string | null>} The name of the book club, or null if not found
+ * @param {string} email The email of the user
+ * @return {Promise<string | null>} The name of the book club, or null if the user is not a member
  */
-export const findNameBySlug = async (
+export const findBookClubName = async (
   slug: string,
-  userEmail: string
+  email: string
 ): Promise<string | null> => {
-  // Connect to the database and collection
-  const collection: Collection<BookClubDoc> = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the book club's name
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    RETURN b.name AS name
+    `,
+    { slug, email }
   );
 
-  // Find the book club in the database
-  const nameProjection = await collection.findOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      $or: [
-        { publicity: Publicity.PUBLIC },
-        {
-          members: {
-            $elemMatch: {
-              userEmail,
-              departed: { $exists: false }
-            }
-          }
-        }
-      ]
-    },
-    { projection: { name: 1 } }
-  );
-
-  return nameProjection?.name ?? null;
+  // Close the session and return the name
+  session.close();
+  return result.records[0]?.get('name') ?? null;
 };

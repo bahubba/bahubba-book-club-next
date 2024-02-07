@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 
 import { ensureMongoAuth } from '../auth.api';
-import { findMemberRoleBySlug } from '@/db/repositories/book-club.repository';
+import { findMongoMemberRoleBySlug } from '@/db/repositories/book-club.repository';
 import { removeMember } from '@/db/repositories/membership.repository';
 import { Role } from '@/db/models/book-club.models';
 import { ErrorFormState } from './state-interfaces';
@@ -32,12 +32,12 @@ export const handleRemoveMember = async (
     return { error: 'Incomplete form data' };
 
   // Ensure the requesting user is an admin (or owner) of the club
-  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
+  const adminRole = await findMongoMemberRoleBySlug(slug, adminEmail);
   if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
     return { error: 'Unauthorized' };
 
   // Ensure the member exists in the club and they're not an owner and they're not an admin removing another admin
-  const memberRole = await findMemberRoleBySlug(slug, memberEmail);
+  const memberRole = await findMongoMemberRoleBySlug(slug, memberEmail);
   if (
     !memberRole ||
     memberRole === Role.OWNER ||

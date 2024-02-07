@@ -1,13 +1,4 @@
-import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
-
-import { connectCollection } from '@/db/connect-mongo';
 import { driver } from '@/db/connect-neo4j';
-import {
-  UserDoc,
-  noMembershipsUserProjection,
-  rawUserProjection
-} from '@/db/models/user.models';
-import props from '@/util/properties';
 import {
   ProviderProfileProperties,
   UserAndProviderProfile,
@@ -62,7 +53,7 @@ export const addProviderProfile = async (
   // Add the provider profile with a relationship from the user
   await session.run(
     `
-      MATCH (u:User { email: $email })
+      MATCH (u:User { email: $email, isActive: TRUE })
       CREATE (p:ProviderProfile:${provider} $providerProfileProps)
       CREATE (u)-[:HAS_PROFILE]->(p)
       `,
@@ -91,7 +82,7 @@ export const updateProviderProfile = async (
   // Update the provider profile
   await session.run(
     `
-      MATCH (p:ProviderProfile:${provider})<-[:HAS_PROFILE]-(:User { email: $email, isActive: TRUE })
+      MATCH (p:ProviderProfile:${provider} { isActive: TRUE })<-[:HAS_PROFILE]-(:User { email: $email, isActive: TRUE })
       SET p = $providerProfile
       `,
     { email, providerProfile }
@@ -147,7 +138,7 @@ export const findUserAndProviderProfile = async (
   const result = await session.run(
     `
       MATCH (u:User { email: $email, isActive: TRUE })
-      OPTIONAL MATCH (u)-[:HAS_PROFILE]->(p:ProviderProfile:${provider} { isActive: TRUE })
+      OPTIONAL MATCH (u)-[:HAS_PROFILE { isActive: TRUE }]->(p:ProviderProfile:${provider} { isActive: TRUE })
       RETURN u, p
       `,
     { email }
@@ -163,80 +154,4 @@ export const findUserAndProviderProfile = async (
         profile: result.records[0].get('p')?.properties ?? null
       }
     : { user: null, profile: null };
-};
-
-/**
- * Adds a user document to MongoDB
- *
- * @param {UserDoc} user The user document to add
- * @return {Promise<InsertOneResult<UserDoc>>} The result of the insert operation
- */
-export const addMongoUser = async (
-  user: UserDoc
-): Promise<InsertOneResult<UserDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
-  );
-
-  // Add the user to the database
-  return await collection.insertOne(user);
-};
-
-/**
- * Updates a user document in MongoDB
- *
- * @param {UserDoc} user The user document to update
- * @return {Promise<UpdateResult<UserDoc>>} The result of the update operation
- */
-export const updateUser = async (
-  user: UserDoc
-): Promise<UpdateResult<UserDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
-  );
-
-  // TODO - Throw error if user._id is undefined
-  // Update the user in the database
-  return await collection.updateOne({ email: user.email }, { $set: user });
-};
-
-/**
- * Finds a user document by email
- *
- * @param {string} email The email address to search for
- * @return {UserDoc | null} The user document if found, null otherwise
- */
-export const findFullUserByEmail = async (
-  email: string
-): Promise<UserDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
-  );
-
-  // Find the user in the database
-  return await collection.findOne(
-    { email },
-    { projection: noMembershipsUserProjection }
-  );
-};
-
-/**
- * Finds a user document by email, without memberships or provider profiles
- *
- * @param {string} email The email address to search for
- * @return {UserDoc | null} The user document if found, null otherwise
- */
-export const findUserByEmail = async (
-  email: string
-): Promise<UserDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
-  );
-
-  // Find the user in the database
-  return await collection.findOne({ email }, { projection: rawUserProjection });
 };

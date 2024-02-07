@@ -8,7 +8,7 @@ import {
   getBookClubName,
   getBookClubRole
 } from '@/api/fetchers/book-club.fetchers';
-import { Role } from '@/db/models/book-club.models';
+import { Role } from '@/db/models/relationships';
 
 // Component props
 interface BookClubHomePageProps {

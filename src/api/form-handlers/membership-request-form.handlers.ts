@@ -9,7 +9,7 @@ import {
 } from '@/db/repositories/membership-request.repository';
 import { ErrorFormState } from './state-interfaces';
 import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
-import { findMemberRoleBySlug } from '@/db/repositories/book-club.repository';
+import { findMongoMemberRoleBySlug } from '@/db/repositories/book-club.repository';
 import { Role } from '@/db/models/book-club.models';
 import {
   addMember,
@@ -80,7 +80,7 @@ export const handleReviewMembershipRequest = async (
     return { error: 'Invalid status' };
 
   // Ensure the requesting user is an admin or owner of the book club
-  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
+  const adminRole = await findMongoMemberRoleBySlug(slug, adminEmail);
   if (!adminRole || ![Role.OWNER, Role.ADMIN].includes(adminRole))
     return { error: 'Unauthorized' };
 

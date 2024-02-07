@@ -15,7 +15,7 @@ import {
   bookClubExists,
   findBookClubBySlugForAdmin,
   findByName,
-  findMemberRoleBySlug,
+  findMongoMemberRoleBySlug,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
 import { updateUser } from '@/db/repositories/user.repository';
@@ -257,7 +257,7 @@ export const handleUpdateMemberRole = async (
     return { error: 'Cannot change own role' };
 
   // Ensure the requesting user is an admin (or owner) of the club and they aren't an admin trying to change ownership of the club
-  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
+  const adminRole = await findMongoMemberRoleBySlug(slug, adminEmail);
   if (
     !adminRole ||
     ![Role.ADMIN, Role.OWNER].includes(adminRole) ||
@@ -266,7 +266,7 @@ export const handleUpdateMemberRole = async (
     return { error: 'Unauthorized' };
 
   // Ensure the member exists in the club and they are getting a new role
-  const existingRole = await findMemberRoleBySlug(slug, memberEmail);
+  const existingRole = await findMongoMemberRoleBySlug(slug, memberEmail);
   if (!existingRole || existingRole === newRole || existingRole === Role.OWNER)
     return { error: 'Invalid role change' };
 

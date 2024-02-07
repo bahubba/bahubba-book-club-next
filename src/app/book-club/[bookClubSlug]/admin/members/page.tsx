@@ -5,9 +5,9 @@ import { Spinner } from '@nextui-org/spinner';
 import BookClubAdminMembersTable from '@/components/tables/book-club-admin-members.table';
 import {
   getBookClubRole,
-  getMembersBySlug
+  getBookClubMembers
 } from '@/api/fetchers/book-club.fetchers';
-import { Role } from '@/db/models/book-club.models';
+import { Role } from '@/db/models/relationships';
 
 // Page props
 interface BookClubAdminMembersPageProps {
@@ -30,7 +30,7 @@ const BookClubAdminMembersTableWrapper = async ({
 
   // Fetch the members and the current user's role
   const adminRole = await getBookClubRole(bookClubSlug);
-  const members = await getMembersBySlug(bookClubSlug);
+  const members = await getBookClubMembers(bookClubSlug);
 
   return (
     <BookClubAdminMembersTable

@@ -11,11 +11,10 @@ import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
 import {
   handleCreateBookClub,
-  handleCreateMongoBookClub,
   handleUpdateBookClub
 } from '@/api/form-handlers/book-club-form.handlers';
-import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import { BookClubProperties, Publicity } from '@/db/models/nodes';
 
 // Interface for form values
 interface FormValues {
@@ -29,14 +28,14 @@ interface FormValues {
  * Form for creating or updating a book club's details
  *
  * @prop {Object} props - The component props
- * @prop {BookClubDoc} props.bookClub - The book club to edit
+ * @prop {BookClubProperties} props.bookClub - The book club to edit
  */
 const BookClubDetailsForm = ({
   bookClub
-}: Readonly<{ bookClub?: BookClubDoc }>) => {
+}: Readonly<{ bookClub?: BookClubProperties }>) => {
   // Form state
   const [formState, formAction] = useFormState(
-    !!bookClub ? handleUpdateBookClub : handleCreateBookClub, //handleCreateMongoBookClub,
+    !!bookClub ? handleUpdateBookClub : handleCreateBookClub,
     {
       error: ''
     } as ErrorFormState
@@ -146,7 +145,9 @@ const BookClubDetailsForm = ({
             name: formData.name,
             description: formData.description,
             image: formData.imageName,
-            publicity: formData.publicity
+            publicity: formData.publicity,
+            isActive: true,
+            created: new Date()
           }}
         />
       </div>

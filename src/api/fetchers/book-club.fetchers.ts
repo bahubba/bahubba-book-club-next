@@ -1,24 +1,17 @@
 'use server';
 
-import { ensureAuth, ensureMongoAuth } from '@/api/auth.api';
-import { BookClubDoc, Role } from '@/db/models/book-club.models';
+import { ensureAuth } from '@/api/auth.api';
 import {
-  findMongoBookClubsBySearch,
-  findMongoBookClubsForUser,
-  findBookClubByName,
-  findBookClubBySlug,
-  findMemberRoleBySlug,
-  findMembersBySlug,
-  findPublicityBySlug,
-  findNameBySlug,
   findBookClubs,
-  findBookClubsBySearch
+  findBookClubsBySearch,
+  findBookClub,
+  findBookClubRole,
+  findBookClubPublicity,
+  findBookClubMembers,
+  findBookClubName
 } from '@/db/repositories/book-club.repository';
-import {
-  BookClubMemberProjection,
-  Publicity
-} from '@/db/models/book-club.models';
-import { BookClubNode, BookClubProperties } from '@/db/models/nodes';
+import { BookClubProperties, Publicity } from '@/db/models/nodes';
+import { BookClubMembership, Role } from '@/db/models/relationships';
 
 /**
  * Retrieve all book clubs for the logged-in user
@@ -28,10 +21,28 @@ import { BookClubNode, BookClubProperties } from '@/db/models/nodes';
 export const getBookClubs = async (): Promise<BookClubProperties[]> => {
   // Ensure that the user is authenticated
   const { email } = await ensureAuth();
-  console.log('email', email); // DELETEME
 
   // Fetch and return the user's book clubs
   return await findBookClubs(email);
+};
+
+/**
+ * Retrieve a book club by slug
+ *
+ * @param {string} slug The slug of the book club to retrieve
+ * @return {Promise<BookClubProperties | null>} The book club with the given slug, or null if it doesn't exist
+ */
+export const getBookClub = async (
+  slug: string
+): Promise<BookClubProperties | null> => {
+  // Ensure that the user is authenticated
+  const { email } = await ensureAuth();
+
+  // Fetch the book club
+  const bookClub = await findBookClub(slug, email);
+
+  // Return the book club
+  return bookClub;
 };
 
 /**
@@ -50,85 +61,22 @@ export const searchForBookClubs = async (
   return await findBookClubsBySearch(email, search);
 };
 
-/** Retrieves all book clubs for the logged-in user */
-export const getMongoBookClubsForUser = async (): Promise<BookClubDoc[]> => {
-  // Ensure that the user is authenticated
-  const user = await ensureMongoAuth();
-
-  // Fetch and return the user's book clubs
-  return await findMongoBookClubsForUser(user.email);
-};
-
 /**
- * Searches for book clubs by name or description
- *
- * @param {string} search The search term to find book clubs by
- * @return {Promise<BookClubDoc[]>} The book clubs that match the search term
- */
-export const searchMongoBookClubs = async (
-  search: string
-): Promise<BookClubDoc[]> => {
-  // Ensure that the user is authenticated
-  const { email } = await ensureMongoAuth();
-
-  // Fetch and return the user's book clubs
-  return await findMongoBookClubsBySearch(search, email);
-};
-
-/**
- * Gets a book club by name
- *
- * @param {string} name The name of the book club to find
- * @return {Promise<BookClubDoc | null>} The book club with the given name, or null if it doesn't exist
- */
-export const getBookClubByName = async (
-  name: string
-): Promise<BookClubDoc | null> => {
-  // Ensure that the user is authenticated
-  const user = await ensureMongoAuth();
-
-  // Fetch the book club
-  const bookClub = await findBookClubByName(name, user.email);
-
-  // Return the book club
-  return !!bookClub ? bookClub : null;
-};
-
-/**
- * Gets a book club by slug
- *
- * @param {string} slug The slug of the book club to find
- * @return {Promise<BookClubDoc | null>} The book club with the given slug, or null if it doesn't exist
- */
-export const getBookClubBySlug = async (
-  slug: string
-): Promise<BookClubDoc | null> => {
-  // Ensure that the user is authenticated
-  const user = await ensureMongoAuth();
-
-  // Fetch the book club
-  const bookClub = await findBookClubBySlug(slug, user.email);
-
-  // Return the book club
-  return !!bookClub ? bookClub : null;
-};
-
-/**
- * Gets a user's membership in a book club by slug
+ * Retrieve a user's role in a book club
  *
  * @param {string} slug The slug of the book club
  * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
  */
 export const getBookClubRole = async (slug: string): Promise<Role | null> => {
   // Ensure that the user is authenticated
-  const user = await ensureMongoAuth();
+  const { email } = await ensureAuth();
 
   // Fetch the user's role in the book club and return
-  return await findMemberRoleBySlug(slug, user.email);
+  return await findBookClubRole(slug, email);
 };
 
 /**
- * Gets a book club's publicity
+ * Get a book club's publicity
  *
  * @param {string} slug The slug of the book club
  * @return {Promise<Publicity | null>} The publicity of the book club
@@ -137,49 +85,33 @@ export const getBookClubPublicity = async (
   slug: string
 ): Promise<Publicity | null> => {
   // Ensure that the user is authenticated
-  await ensureMongoAuth();
+  await ensureAuth();
 
   // Fetch and return the book club's publicity
-  return await findPublicityBySlug(slug);
+  return await findBookClubPublicity(slug);
 };
 
 /**
- * Gets a book club's members by slug
+ * Get a book club's members
+ *
  * @param {string} slug The slug of the book club
- * @return {Promise<BookClubMemberProjection[]>} The members of the book club
+ * @return {Promise<BookClubMembership[]>} The members of the book club
  */
-export const getMembersBySlug = async (
+export const getBookClubMembers = async (
   slug: string
-): Promise<BookClubMemberProjection[]> => {
+): Promise<BookClubMembership[]> => {
   // Ensure that the user is authenticated
-  const user = await ensureMongoAuth();
+  const { email } = await ensureAuth();
 
-  // Ensure the user is an admin or owner of the book club
-  const role = await findMemberRoleBySlug(slug, user.email);
+  // Fetch the user's membership in the club and ensure they're an admin or owner
+  const role = await findBookClubRole(slug, email);
   if (!role || ![Role.ADMIN, Role.OWNER].includes(role)) {
     // TODO - Handle this error more gracefully
     throw new Error('You are not authorized to perform this action');
   }
 
   // Fetch the book club and return its members
-  return await findMembersBySlug(slug);
-};
-
-/**
- * Checks whether a user is a member of a book club
- *
- * @param {string} slug The slug of the book club
- * @return {Promise<boolean>} Whether the user is a member of the book club
- */
-export const isBookClubMember = async (slug: string): Promise<boolean> => {
-  // Ensure that the user is authenticated
-  const { email } = await ensureMongoAuth();
-
-  // Fetch the user's role in the book club
-  const role = await findMemberRoleBySlug(slug, email);
-
-  // Return whether the user is a member
-  return !!role;
+  return await findBookClubMembers(slug);
 };
 
 /**
@@ -190,8 +122,8 @@ export const isBookClubMember = async (slug: string): Promise<boolean> => {
  */
 export const getBookClubName = async (slug: string): Promise<string | null> => {
   // Ensure that the user is authenticated and pull the user's email
-  const { email } = await ensureMongoAuth();
+  const { email } = await ensureAuth();
 
   // Fetch the book club and return its name
-  return await findNameBySlug(slug, email);
+  return await findBookClubName(slug, email);
 };

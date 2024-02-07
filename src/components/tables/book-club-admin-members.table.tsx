@@ -10,16 +10,16 @@ import {
   TableRow
 } from '@nextui-org/table';
 
-import { BookClubMemberProjection, Role } from '@/db/models/book-club.models';
 import MemberRoleForm from '../forms/member-role.form';
 import RemoveMemberButton from '../buttons/remove-member.button';
+import { BookClubMembership, Role } from '@/db/models/relationships';
 
 // Component props
 interface BookClubAdminMembersTableProps {
   bookClubSlug: string;
   adminEmail: string;
   adminRole: Role;
-  members: BookClubMemberProjection[];
+  members: BookClubMembership[];
 }
 
 /**
@@ -28,7 +28,7 @@ interface BookClubAdminMembersTableProps {
  * @prop {Object} props Component props
  * @prop {string} props.bookClubSlug The slug of the book club
  * @prop {Role} props.adminRole The role of the current user
- * @prop {BookClubMemberProjection[]} props.members The members of the book club
+ * @prop {BookClubMembership[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({
   bookClubSlug,
@@ -72,11 +72,13 @@ const BookClubAdminMembersTable = ({
               />
             </TableCell>
             <TableCell>
-              {new Intl.DateTimeFormat('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              }).format(member.joined)}
+              {typeof member.joined === 'string'
+                ? member.joined
+                : new Intl.DateTimeFormat('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }).format(member.joined)}
             </TableCell>
             <TableCell>
               <RemoveMemberButton

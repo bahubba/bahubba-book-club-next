@@ -1,10 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Input } from '@nextui-org/input';
-import {
-  searchForBookClubs,
-  searchMongoBookClubs
-} from '@/api/fetchers/book-club.fetchers';
+import { searchForBookClubs } from '@/api/fetchers/book-club.fetchers';
 import { BookClubDoc } from '@/db/models/book-club.models';
 import { Button } from '@nextui-org/button';
 import { Divider } from '@nextui-org/divider';
@@ -14,7 +11,7 @@ import { BookClubProperties } from '@/db/models/nodes';
 
 /** Async function for loading book clubs to display */
 const fetchBookClubs = async (searchQuery: string) =>
-  !searchQuery ? [] : await searchForBookClubs(searchQuery); // searchMongoBookClubs(searchQuery);
+  !searchQuery ? [] : await searchForBookClubs(searchQuery);
 
 /** Search page for finding book clubs */
 const SearchPage = () => {
@@ -60,7 +57,7 @@ const SearchPage = () => {
           {bookClubs && (
             <BookClubCardGridLayout
               cols="6"
-              bookClubs={bookClubs as BookClubDoc[]}
+              bookClubs={bookClubs}
             />
           )}
         </ScrollShadow>

@@ -7,15 +7,15 @@ import { Tooltip } from '@nextui-org/tooltip';
 import { Card, CardBody, CardHeader } from '@nextui-org/card';
 
 import { getPreSignedBookClubImageURL } from '@/api/fetchers/s3.fetchers';
-import { BookClubDoc } from '@/db/models/book-club.models';
 import slugify from 'slugify';
+import { BookClubProperties } from '@/db/models/nodes';
 
 /**
  * Card display component for book clubs
  *
- * @param {BookClubDoc} bookClub - Book club
+ * @param {BookClubProperties} bookClub - Book club
  */
-const BookClubCard = ({ bookClub }: { bookClub: BookClubDoc }) => {
+const BookClubCard = ({ bookClub }: { bookClub: BookClubProperties }) => {
   // State for the pre-signed image URL
   const [url, setURL] = useState<string>('');
 

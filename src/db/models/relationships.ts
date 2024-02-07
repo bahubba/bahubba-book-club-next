@@ -32,3 +32,11 @@ export interface IsMemberOf
   type: 'IS_MEMBER_OF';
   properties: IsMemberOfProperties;
 }
+
+/** TUPLES/COMBOS */
+
+// Membership relationship properties with User email and preferred name properties
+export interface BookClubMembership extends IsMemberOfProperties {
+  email: string;
+  preferredName: string;
+}
