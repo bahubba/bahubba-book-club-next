@@ -11,6 +11,7 @@ import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
 import {
   handleCreateBookClub,
+  handleCreateMongoBookClub,
   handleUpdateBookClub
 } from '@/api/form-handlers/book-club-form.handlers';
 import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
@@ -35,7 +36,7 @@ const BookClubDetailsForm = ({
 }: Readonly<{ bookClub?: BookClubDoc }>) => {
   // Form state
   const [formState, formAction] = useFormState(
-    !!bookClub ? handleUpdateBookClub : handleCreateBookClub,
+    !!bookClub ? handleUpdateBookClub : handleCreateBookClub, //handleCreateMongoBookClub,
     {
       error: ''
     } as ErrorFormState

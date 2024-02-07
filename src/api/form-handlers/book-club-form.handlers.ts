@@ -7,6 +7,8 @@ import slugify from 'slugify';
 import { Publicity, Role } from '@/db/models/book-club.models';
 import {
   addBookClub,
+  addMongoBookClub,
+  bookClubExists,
   findBookClubBySlugForAdmin,
   findByName,
   findMemberRoleBySlug,
@@ -14,7 +16,7 @@ import {
 } from '@/db/repositories/book-club.repository';
 import { updateUser } from '@/db/repositories/user.repository';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
-import { ensureAuth } from '@/api/auth.api';
+import { ensureAuth, ensureMongoAuth } from '@/api/auth.api';
 import props from '@/util/properties';
 import { updateMemberRole } from '@/db/repositories/membership.repository';
 
@@ -23,14 +25,72 @@ import { updateMemberRole } from '@/db/repositories/membership.repository';
  *
  * @param {ErrorFormState} _ Form state from the previous render; Unused
  * @param {FormData} formData The book club form's data, matching the Book Club interface
- * @return {ErrorFormState} The new form state; Used for passing back error messages
+ * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
 export const handleCreateBookClub = async (
   _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const user = await ensureAuth();
+  const {
+    properties: { email }
+  } = await ensureAuth();
+
+  // Pull out the form data
+  const name = formData.get('name')?.toString().trim() ?? '';
+  const description =
+    formData.get('description')?.toString().trim() ||
+    'A book club for reading books';
+  const image = formData.get('image')?.toString() ?? '';
+  let publicity =
+    formData.get('publicity')?.toString().trim().toUpperCase() ||
+    Publicity.PRIVATE;
+
+  // Slugify the name
+  const slug = slugify(name, { lower: true });
+
+  // Ensure the slug is not empty or a reserved word
+  if (props.APP.RESERVED_CLUB_NAMES.includes(slug))
+    return { error: 'Invalid name' };
+
+  // Ensure there isn't an existing book club with the same slug
+  const existing = await bookClubExists(slug);
+  if (existing) return { error: 'Name already in use' };
+
+  // Ensure publicity is a valid value; default to PRIVATE if not
+  if (!(publicity in Publicity)) publicity = Publicity.PRIVATE;
+
+  // Create the new book club (with the user as the owner)
+  // TODO - Error handling
+  try {
+    await addBookClub(
+      email,
+      { name, slug, description, image, publicity },
+      { joined: new Date().toISOString(), role: Role.OWNER }
+    );
+  } catch (e) {
+    console.log('error adding book club', e);
+    return { error: 'Failed to create book club' };
+  }
+
+  // On success, redirect to the home page
+  revalidatePath('/home');
+  redirect('/home');
+};
+
+/**
+ * Handle submitting a new book club
+ *
+ * @param {ErrorFormState} _ Form state from the previous render; Unused
+ * @param {FormData} formData The book club form's data, matching the Book Club interface
+ * @return {ErrorFormState} The new form state; Used for passing back error messages
+ */
+export const handleCreateMongoBookClub = async (
+  _: ErrorFormState,
+  formData: FormData
+): Promise<ErrorFormState> => {
+  // Get the user and ensure that they're authenticated
+  const user = await ensureMongoAuth();
 
   // Pull out the club's name and ensure that it is not a reserved word
   const name = formData.get('name')?.toString().trim() ?? '';
@@ -51,7 +111,7 @@ export const handleCreateBookClub = async (
   const slug = slugify(name, { lower: true });
 
   // Create the new club
-  await addBookClub({
+  await addMongoBookClub({
     name,
     slug,
     description:
@@ -98,7 +158,7 @@ export const handleUpdateBookClub = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Ensure all form fields are present and valid
   if (
@@ -171,7 +231,7 @@ export const handleUpdateMemberRole = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email: adminEmail } = await ensureAuth();
+  const { email: adminEmail } = await ensureMongoAuth();
 
   // Pull out the form data
   const slug = formData.get('slug')?.toString().trim() || '';

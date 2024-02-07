@@ -5,11 +5,70 @@ import {
   Publicity,
   PublicityProjection,
   Role,
-  isMemberRoleProjection,
   rawBookClubProjection
 } from '@/db/models/book-club.models';
-import { connectCollection } from '@/db/connect-neo4j';
+import { connectCollection } from '@/db/connect-mongo';
 import props from '@/util/properties';
+import { withNeo4jSession } from '../connect-neo4j';
+import { Session } from 'neo4j-driver';
+import { BookClubProperties } from '../models/nodes';
+import { IsMemberOfProperties } from '../models/relationships';
+
+/**
+ * Adds a book club node
+ *
+ * @param {string} email The email of the user adding the book club
+ * @param {BookClubProperties} bookClub The properties for the book club
+ * @param {IsMemberOfProperties} membershipProps The properties for the membership relationship
+ * @return {Promise<void>}
+ */
+export const addBookClub = withNeo4jSession()(
+  async (
+    session: Session,
+    email: string,
+    bookClub: BookClubProperties,
+    membershipProps: IsMemberOfProperties
+  ) => {
+    await session.run(
+      `
+      MATCH (u:User { email: $email })
+      MERGE (c:BookClub {
+        name: $bookClub.name,
+        slug: $bookClub.slug,
+        description: $bookClub.description,
+        image: $bookClub.image,
+        publicity: $bookClub.publicity
+      })
+      MERGE (u)-[:IS_MEMBER_OF {
+        joined: $membershipProps.joined,
+        role: $membershipProps.role
+      }]->(c)
+      RETURN c
+      `,
+      { email, bookClub, membershipProps }
+    );
+  }
+);
+
+/**
+ * Checks if a book club exists with a given slug
+ *
+ * @param {string} slug The slug of the book club to check
+ * @return {Promise<boolean>} True if the book club exists, false otherwise
+ */
+export const bookClubExists = withNeo4jSession()(
+  async (session: Session, slug: string) => {
+    const result = await session.run(
+      `
+      MATCH (b:BookClub { slug: $slug })
+      RETURN COUNT(b) > 0 AS bookClubExists
+      `,
+      { slug }
+    );
+
+    return result.records[0].get('bookClubExists');
+  }
+);
 
 /**
  * Adds a book club to MongoDB
@@ -17,7 +76,7 @@ import props from '@/util/properties';
  * @param {BookClubDoc} bookClub The book club to add
  * @return {Promise<InsertOneResult<BookClubDoc>>} The result of the insert operation
  */
-export const addBookClub = async (
+export const addMongoBookClub = async (
   bookClub: BookClubDoc
 ): Promise<InsertOneResult<BookClubDoc>> => {
   // Connect to the database and collection

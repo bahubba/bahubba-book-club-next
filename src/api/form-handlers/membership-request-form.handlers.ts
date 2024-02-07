@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 
-import { ensureAuth } from '@/api/auth.api';
+import { ensureMongoAuth } from '@/api/auth.api';
 import {
   requestMembership,
   reviewMembershipRequest
@@ -30,7 +30,7 @@ export const handleSubmitMembershipRequest = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Pull out the slug and ensure it exists
   const slug = formData.get('slug')?.toString().trim();
@@ -60,7 +60,7 @@ export const handleReviewMembershipRequest = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email: adminEmail } = await ensureAuth();
+  const { email: adminEmail } = await ensureMongoAuth();
 
   // Pull out the form data and ensure it's valid
   const slug = formData.get('slug')?.toString().trim();

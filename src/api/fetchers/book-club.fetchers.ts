@@ -1,6 +1,6 @@
 'use server';
 
-import { ensureAuth } from '@/api/auth.api';
+import { ensureMongoAuth } from '@/api/auth.api';
 import { BookClubDoc, Role } from '@/db/models/book-club.models';
 import {
   findBookClubsBySearch,
@@ -16,11 +16,15 @@ import {
   BookClubMemberProjection,
   Publicity
 } from '@/db/models/book-club.models';
+import { BookClubNode } from '@/db/models/nodes';
 
 /** Retrieves all book clubs for the logged-in user */
-export const getBookClubsForUser = async (): Promise<BookClubDoc[]> => {
+// export const getBookClubs = async (): Promise<BookClubNode> => {};
+
+/** Retrieves all book clubs for the logged-in user */
+export const getMongoBookClubsForUser = async (): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Fetch and return the user's book clubs
   return await findBookClubsForUser(user.email);
@@ -36,7 +40,7 @@ export const searchBookClubs = async (
   search: string
 ): Promise<BookClubDoc[]> => {
   // Ensure that the user is authenticated
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Fetch and return the user's book clubs
   return await findBookClubsBySearch(search, email);
@@ -52,7 +56,7 @@ export const getBookClubByName = async (
   name: string
 ): Promise<BookClubDoc | null> => {
   // Ensure that the user is authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Fetch the book club
   const bookClub = await findBookClubByName(name, user.email);
@@ -71,7 +75,7 @@ export const getBookClubBySlug = async (
   slug: string
 ): Promise<BookClubDoc | null> => {
   // Ensure that the user is authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Fetch the book club
   const bookClub = await findBookClubBySlug(slug, user.email);
@@ -88,7 +92,7 @@ export const getBookClubBySlug = async (
  */
 export const getBookClubRole = async (slug: string): Promise<Role | null> => {
   // Ensure that the user is authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Fetch the user's role in the book club and return
   return await findMemberRoleBySlug(slug, user.email);
@@ -104,7 +108,7 @@ export const getBookClubPublicity = async (
   slug: string
 ): Promise<Publicity | null> => {
   // Ensure that the user is authenticated
-  await ensureAuth();
+  await ensureMongoAuth();
 
   // Fetch and return the book club's publicity
   return await findPublicityBySlug(slug);
@@ -119,7 +123,7 @@ export const getMembersBySlug = async (
   slug: string
 ): Promise<BookClubMemberProjection[]> => {
   // Ensure that the user is authenticated
-  const user = await ensureAuth();
+  const user = await ensureMongoAuth();
 
   // Ensure the user is an admin or owner of the book club
   const role = await findMemberRoleBySlug(slug, user.email);
@@ -140,7 +144,7 @@ export const getMembersBySlug = async (
  */
 export const isBookClubMember = async (slug: string): Promise<boolean> => {
   // Ensure that the user is authenticated
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Fetch the user's role in the book club
   const role = await findMemberRoleBySlug(slug, email);
@@ -157,7 +161,7 @@ export const isBookClubMember = async (slug: string): Promise<boolean> => {
  */
 export const getBookClubName = async (slug: string): Promise<string | null> => {
   // Ensure that the user is authenticated and pull the user's email
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Fetch the book club and return its name
   return await findNameBySlug(slug, email);

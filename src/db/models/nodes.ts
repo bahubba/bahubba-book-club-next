@@ -1,5 +1,13 @@
 import { Node } from 'neo4j-driver';
 
+/** ENUMS */
+
+// Book club publicity enum
+export enum Publicity {
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE'
+}
+
 /** PROPERTIES */
 
 // Provider profile node properties
@@ -19,6 +27,16 @@ export interface UserProperties {
   departed?: Date;
 }
 
+// Book club node properties
+export interface BookClubProperties {
+  name: string;
+  slug?: string;
+  description: string;
+  image: string;
+  publicity: Publicity;
+  disbanded?: Date;
+}
+
 /** NODES */
 
 // OAuth2 provider profile node
@@ -29,4 +47,9 @@ export interface ProviderProfileNode extends Node {
 // User node
 export interface UserNode extends Node {
   properties: UserProperties;
+}
+
+// Book club node
+export interface BookClubNode extends Node {
+  properties: BookClubProperties;
 }

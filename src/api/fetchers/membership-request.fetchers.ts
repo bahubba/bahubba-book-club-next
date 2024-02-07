@@ -1,4 +1,4 @@
-import { ensureAuth } from '@/api/auth.api';
+import { ensureMongoAuth } from '@/api/auth.api';
 import {
   hasOpenRequest as fetchHasOpenRequest,
   findMembershipRequests
@@ -13,7 +13,7 @@ import { BookClubMembershipRequest } from '@/db/models/membership-request.models
  */
 export const hasOpenRequest = async (slug: string): Promise<boolean> => {
   // Ensure that the user is authenticated
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Fetch the user's open request presence
   return await fetchHasOpenRequest(slug, email);
@@ -30,7 +30,7 @@ export const getMembershipRequests = async (
   slug: string
 ): Promise<BookClubMembershipRequest[]> => {
   // Ensure that the user is authenticated and get their email
-  const { email } = await ensureAuth();
+  const { email } = await ensureMongoAuth();
 
   // Fetch the membership requests
   return await findMembershipRequests(slug, email);

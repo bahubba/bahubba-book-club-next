@@ -1,5 +1,5 @@
 import { UpdateResult } from 'mongodb';
-import { connectCollection } from '../connect-neo4j';
+import { connectCollection } from '../connect-mongo';
 
 import { BookClubDoc, Role } from '../models/book-club.models';
 import props from '@/util/properties';

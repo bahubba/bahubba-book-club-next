@@ -1,7 +1,7 @@
 'use server';
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { ensureAuth } from '../auth.api';
+import { ensureMongoAuth } from '../auth.api';
 import { s3Client } from '@/util/s3.config';
 import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import props from '@/util/properties';
@@ -11,7 +11,7 @@ export const getPreSignedBookClubImageURL = async (
   imageName: string
 ): Promise<string> => {
   // Ensure that the user is authenticated
-  await ensureAuth();
+  await ensureMongoAuth();
 
   // Generate a pre-signed URL for the given image name
   const imageURL = await getSignedUrl(
@@ -29,7 +29,7 @@ export const getPreSignedBookClubImageURL = async (
 /** Retrieves a list of stock book club image file names */
 export const getStockBookClubImageNames = async (): Promise<string[]> => {
   // Ensure that the user is authenticated
-  await ensureAuth();
+  await ensureMongoAuth();
 
   // List all stock book club images
   const { Contents: imageList } = await s3Client.send(

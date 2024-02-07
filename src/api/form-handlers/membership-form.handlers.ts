@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { ensureAuth } from '../auth.api';
+import { ensureMongoAuth } from '../auth.api';
 import { findMemberRoleBySlug } from '@/db/repositories/book-club.repository';
 import { removeMember } from '@/db/repositories/membership.repository';
 import { Role } from '@/db/models/book-club.models';
@@ -21,7 +21,7 @@ export const handleRemoveMember = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email: adminEmail } = await ensureAuth();
+  const { email: adminEmail } = await ensureMongoAuth();
 
   // Pull out the form data
   const slug = formData.get('slug')?.toString().trim() || '';

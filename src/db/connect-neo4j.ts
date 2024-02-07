@@ -4,8 +4,8 @@ import props from '@/util/properties';
 
 // Neo4j driver and session
 export const driver = neo4j.driver(
-  props.DB.BBCM_AURA_URI,
-  neo4j.auth.basic(props.DB.BBCM_AURA_USERNAME, props.DB.BBCM_AURA_PW)
+  props.DB.AURA_URI,
+  neo4j.auth.basic(props.DB.AURA_USERNAME, props.DB.AURA_PW)
 );
 
 export const withNeo4jSession =
