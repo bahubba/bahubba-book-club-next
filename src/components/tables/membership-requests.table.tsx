@@ -10,9 +10,9 @@ import {
 } from '@nextui-org/table';
 
 import {
-  BookClubMembershipRequest,
-  BookClubMembershipRequestStatus
-} from '@/db/models/membership-request.models';
+  MembershipRequestStatus,
+  UserAndMembershipRequest
+} from '@/db/models/nodes';
 import ReviewMembershipRequestButton from '../buttons/review-membership-request.button';
 
 /**
@@ -20,14 +20,14 @@ import ReviewMembershipRequestButton from '../buttons/review-membership-request.
  *
  * @prop {Object} props Component props
  * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {BookClubMembershipRequest[]} props.membershipRequests The membership requests
+ * @prop {MembershipRequestProperties[]} props.membershipRequests The membership requests
  */
 const MembershipRequestsTable = ({
   bookClubSlug,
   membershipRequests
 }: Readonly<{
   bookClubSlug: string;
-  membershipRequests: BookClubMembershipRequest[];
+  membershipRequests: UserAndMembershipRequest[];
 }>) => (
   <Table
     aria-label="Table of membership requests"
@@ -53,41 +53,35 @@ const MembershipRequestsTable = ({
     <TableBody>
       {membershipRequests.map(membershipRequest => (
         <TableRow
-          key={`${membershipRequest.userEmail}-${membershipRequest.requested}`}
+          key={`${membershipRequest.user.email}-${membershipRequest.request.requested}`}
           className={
-            membershipRequest.status ===
-            BookClubMembershipRequestStatus.APPROVED
+            membershipRequest.request.status ===
+            MembershipRequestStatus.APPROVED
               ? 'bg-green-200'
-              : membershipRequest.status ===
-                BookClubMembershipRequestStatus.REJECTED
+              : membershipRequest.request.status ===
+                MembershipRequestStatus.REJECTED
               ? 'bg-red-200'
               : ''
           }
         >
-          <TableCell>{membershipRequest.userEmail}</TableCell>
-          <TableCell>{membershipRequest.message}</TableCell>
+          <TableCell>{membershipRequest.user.email}</TableCell>
+          <TableCell>{membershipRequest.request.requestMessage}</TableCell>
+          <TableCell>{membershipRequest.request.requested as string}</TableCell>
           <TableCell>
-            {new Intl.DateTimeFormat('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            }).format(membershipRequest.requested)}
-          </TableCell>
-          <TableCell>
-            {membershipRequest.status ===
-              BookClubMembershipRequestStatus.PENDING && (
+            {membershipRequest.request.status ===
+              MembershipRequestStatus.PENDING && (
               <ReviewMembershipRequestButton
                 bookClubSlug={bookClubSlug}
-                userEmail={membershipRequest.userEmail}
+                userEmail={membershipRequest.user.email}
               />
             )}
           </TableCell>
           <TableCell>
-            {membershipRequest.status ===
-              BookClubMembershipRequestStatus.PENDING && (
+            {membershipRequest.request.status ===
+              MembershipRequestStatus.PENDING && (
               <ReviewMembershipRequestButton
                 bookClubSlug={bookClubSlug}
-                userEmail={membershipRequest.userEmail}
+                userEmail={membershipRequest.user.email}
                 isRejecting
               />
             )}

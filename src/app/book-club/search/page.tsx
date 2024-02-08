@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Input } from '@nextui-org/input';
 import { searchForBookClubs } from '@/api/fetchers/book-club.fetchers';
-import { BookClubDoc } from '@/db/models/book-club.models';
 import { Button } from '@nextui-org/button';
 import { Divider } from '@nextui-org/divider';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
