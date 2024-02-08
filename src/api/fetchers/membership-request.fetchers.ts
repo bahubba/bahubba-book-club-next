@@ -1,7 +1,7 @@
 import { ensureMongoAuth } from '@/api/auth.api';
 import {
-  hasOpenRequest as fetchHasOpenRequest,
-  findMembershipRequests
+  hasOpenMogoRequest as fetchHasOpenRequest,
+  findMongoMembershipRequests
 } from '@/db/repositories/membership-request.repository';
 import { BookClubMembershipRequest } from '@/db/models/membership-request.models';
 
@@ -33,5 +33,5 @@ export const getMembershipRequests = async (
   const { email } = await ensureMongoAuth();
 
   // Fetch the membership requests
-  return await findMembershipRequests(slug, email);
+  return await findMongoMembershipRequests(slug, email);
 };

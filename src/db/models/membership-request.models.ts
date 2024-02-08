@@ -2,7 +2,7 @@
 
 export enum BookClubMembershipRequestStatus {
   PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
+  APPROVED = 'APPROVED',
   REJECTED = 'REJECTED'
 }
 

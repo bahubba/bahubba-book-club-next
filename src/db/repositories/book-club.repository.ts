@@ -1,23 +1,12 @@
-import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
-
 import { driver } from '@/db/connect-neo4j';
-import {
-  BookClubDoc,
-  BookClubMemberProjection,
-  PublicityProjection,
-  rawBookClubProjection
-} from '@/db/models/book-club.models';
-import { connectCollection } from '@/db/connect-mongo';
-import props from '@/util/properties';
 import { BookClubProperties, Publicity } from '@/db/models/nodes';
 import {
   BookClubMembership,
-  IsMemberOfProperties,
-  Role
+  IsMemberOfProperties
 } from '@/db/models/relationships';
 
 /**
- * Adds a book club node
+ * Add a book club node with the user as an owner
  *
  * @param {string} email The email of the user adding the book club
  * @param {BookClubProperties} bookClub The properties for the book club
@@ -56,6 +45,32 @@ export const addBookClub = async (
 
   // Close the session
   session.close();
+};
+
+/**
+ * Update a book club node
+ *
+ * @param {string} slug The slug of the existing book club node to update
+ * @param {email} email The email of the user updating the book club
+ * @param {BookClubProperties} bookClub The new properties for the book club node
+ */
+export const updateBookClub = async (
+  slug: string,
+  email: string,
+  bookClub: BookClubProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Update the book club node
+  await session.run(
+    `
+    MATCH (u:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    WHERE u.role IN ['ADMIN', 'OWNER']
+    SET b $bookClub
+    `,
+    { slug, email, bookClub }
+  );
 };
 
 /**
@@ -202,34 +217,6 @@ export const findBookClubsBySearch = async (
   return result.records.map(
     record => record.get('b').properties
   ) as BookClubProperties[];
-};
-
-/**
- * Find a user's role in a book club by slug
- *
- * @param {string} slug The slug of the book club
- * @param {string} email The email of the user to search for
- * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
- */
-export const findBookClubRole = async (
-  slug: string,
-  email: string
-): Promise<Role | null> => {
-  // Connect to Neo4j
-  const session = driver.session();
-
-  // Find the user's role in the book club
-  const result = await session.run(
-    `
-    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF]->(:BookClub { slug: $slug, isActive: TRUE })
-    RETURN m.role AS role
-    `,
-    { slug, email }
-  );
-
-  // Close the session and return the user's role
-  session.close();
-  return result.records[0]?.get('role') ?? null;
 };
 
 /**

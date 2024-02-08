@@ -57,7 +57,7 @@ const ReviewMembershipRequestButton = ({
           value={
             isRejecting
               ? BookClubMembershipRequestStatus.REJECTED
-              : BookClubMembershipRequestStatus.ACCEPTED
+              : BookClubMembershipRequestStatus.APPROVED
           }
         />
         <SubmitButton

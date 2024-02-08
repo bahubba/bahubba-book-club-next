@@ -6,8 +6,8 @@ import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 
 import SubmitButton from '@/components/buttons/submit.button';
-import { handleUpdateMemberRole } from '@/api/form-handlers/book-club-form.handlers';
-import { Role } from '@/db/models/book-club.models';
+import { handleUpdateMemberRole } from '@/api/form-handlers/membership-form.handlers';
+import { Role } from '@/db/models/relationships';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 
 // Component props
@@ -33,7 +33,6 @@ const MemberRoleForm = ({
   bookClubSlug,
   email,
   memberEmail,
-  adminRole,
   role
 }: Readonly<MemberRoleFormProps>) => {
   // Form state

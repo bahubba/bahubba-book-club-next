@@ -56,7 +56,7 @@ const MembershipRequestsTable = ({
           key={`${membershipRequest.userEmail}-${membershipRequest.requested}`}
           className={
             membershipRequest.status ===
-            BookClubMembershipRequestStatus.ACCEPTED
+            BookClubMembershipRequestStatus.APPROVED
               ? 'bg-green-200'
               : membershipRequest.status ===
                 BookClubMembershipRequestStatus.REJECTED

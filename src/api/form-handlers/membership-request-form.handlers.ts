@@ -4,17 +4,16 @@ import { redirect } from 'next/navigation';
 
 import { ensureMongoAuth } from '@/api/auth.api';
 import {
-  requestMembership,
-  reviewMembershipRequest
+  requestMongoMembership,
+  reviewMongoMembershipRequest
 } from '@/db/repositories/membership-request.repository';
 import { ErrorFormState } from './state-interfaces';
 import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
-import { findMongoMemberRoleBySlug } from '@/db/repositories/book-club.repository';
-import { Role } from '@/db/models/book-club.models';
+import { Role } from '@/db/models/relationships';
 import {
-  addMember,
-  checkMembership,
-  reinstateMembership
+  addMongoMember,
+  checkMongoMembership,
+  reinstatemMongoMembership
 } from '@/db/repositories/membership.repository';
 import { revalidatePath } from 'next/cache';
 
@@ -37,7 +36,7 @@ export const handleSubmitMembershipRequest = async (
   if (!slug) return { error: 'Invalid book club' };
 
   // Request membership in the book club
-  await requestMembership(
+  await requestMongoMembership(
     slug,
     email,
     formData.get('requestMessage')?.toString().trim() ?? ''
@@ -73,7 +72,7 @@ export const handleReviewMembershipRequest = async (
   if (
     !status ||
     ![
-      BookClubMembershipRequestStatus.ACCEPTED,
+      BookClubMembershipRequestStatus.APPROVED,
       BookClubMembershipRequestStatus.REJECTED
     ].includes(status as BookClubMembershipRequestStatus)
   )
@@ -85,20 +84,20 @@ export const handleReviewMembershipRequest = async (
     return { error: 'Unauthorized' };
 
   // Approve or reject the membership request
-  await reviewMembershipRequest(
+  await reviewMongoMembershipRequest(
     slug,
     userEmail,
     status as BookClubMembershipRequestStatus
   );
 
   // If the approving the request, add  or reinstate the user as a member
-  if (status === BookClubMembershipRequestStatus.ACCEPTED) {
+  if (status === BookClubMembershipRequestStatus.APPROVED) {
     // Check to see if the user is a departed member
-    const departed = await checkMembership(slug, userEmail, true);
+    const departed = await checkMongoMembership(slug, userEmail, true);
 
     // If the user is a departed member, reinstate them
-    if (departed) await reinstateMembership(slug, userEmail);
-    else await addMember(slug, userEmail);
+    if (departed) await reinstatemMongoMembership(slug, userEmail);
+    else await addMongoMember(slug, userEmail);
   }
 
   // Return no error
