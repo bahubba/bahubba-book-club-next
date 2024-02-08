@@ -102,34 +102,6 @@ export const removeMember = async (
 };
 
 /**
- * Find a user's role in a book club by slug
- *
- * @param {string} slug The slug of the book club
- * @param {string} email The email of the user to search for
- * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
- */
-export const findBookClubRole = async (
-  slug: string,
-  email: string
-): Promise<Role | null> => {
-  // Connect to Neo4j
-  const session = driver.session();
-
-  // Find the user's role in the book club
-  const result = await session.run(
-    `
-    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF]->(:BookClub { slug: $slug, isActive: TRUE })
-    RETURN m.role AS role
-    `,
-    { slug, email }
-  );
-
-  // Close the session and return the user's role
-  session.close();
-  return result.records[0]?.get('role') ?? null;
-};
-
-/**
  * Reinstate a user's membership in a book club
  *
  * @param {string} slug The club's slug
@@ -158,4 +130,62 @@ export const reinstateMember = async (
 
   // Close the session
   session.close();
+};
+
+/**
+ * Find a user's role in a book club by slug
+ *
+ * @param {string} slug The slug of the book club
+ * @param {string} email The email of the user to search for
+ * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
+ */
+export const findBookClubRole = async (
+  slug: string,
+  email: string
+): Promise<Role | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user's role in the book club
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF]->(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN m.role AS role
+    `,
+    { slug, email }
+  );
+
+  // Close the session and return the user's role
+  session.close();
+  return result.records[0]?.get('role') ?? null;
+};
+
+/**
+ * Check a user's [previous] membership in a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} userEmail The user's email
+ * @param {boolean} departed Whether to check for a departed membership
+ * @return {Promise<boolean>}
+ */
+export const checkMembership = async (
+  slug: string,
+  userEmail: string,
+  isActive = true
+): Promise<boolean> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Check the user's membership
+  const result = await session.run(
+    `
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: $isActive }]->(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN COUNT(m) > 0 AS isMember
+    `,
+    { slug, userEmail, isActive }
+  );
+
+  // Close the session and return whether the user is a member
+  session.close();
+  return result.records[0].get('isMember');
 };

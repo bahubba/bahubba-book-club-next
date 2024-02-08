@@ -51,7 +51,7 @@ export const requestMembership = async (
  * @param {string} reviewMessage The approval or rejection message
  * @return {Promise<void>}
  */
-export const reviewMembershipRequesta = async (
+export const reviewMembershipRequest = async (
   slug: string,
   userEmail: string,
   adminEmail: string,

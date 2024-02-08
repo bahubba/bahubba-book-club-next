@@ -1,21 +1,22 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { ensureMongoAuth } from '@/api/auth.api';
+import { ensureAuth } from '../auth.api';
 import {
-  requestMongoMembership,
-  reviewMongoMembershipRequest
+  requestMembership,
+  reviewMembershipRequest
 } from '@/db/repositories/membership-request.repository';
-import { ErrorFormState } from './state-interfaces';
-import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
-import { Role } from '@/db/models/relationships';
 import {
-  addMongoMember,
-  checkMongoMembership,
-  reinstatemMongoMembership
+  addMember,
+  checkMembership,
+  findBookClubRole,
+  reinstateMember
 } from '@/db/repositories/membership.repository';
-import { revalidatePath } from 'next/cache';
+import { MembershipRequestStatus } from '@/db/models/nodes';
+import { Role } from '@/db/models/relationships';
+import { ErrorFormState } from './state-interfaces';
 
 /**
  * Handle submitting a membership request
@@ -29,18 +30,20 @@ export const handleSubmitMembershipRequest = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email } = await ensureMongoAuth();
+  const { email } = await ensureAuth();
 
   // Pull out the slug and ensure it exists
   const slug = formData.get('slug')?.toString().trim();
   if (!slug) return { error: 'Invalid book club' };
 
   // Request membership in the book club
-  await requestMongoMembership(
-    slug,
-    email,
-    formData.get('requestMessage')?.toString().trim() ?? ''
-  );
+  await requestMembership(slug, email, {
+    status: MembershipRequestStatus.PENDING,
+    requested: new Date().toISOString(),
+    requestMessage:
+      formData.get('requestMessage')?.toString().trim() ??
+      'Please allow me to join your book club!'
+  });
 
   // Redirect to the book club page
   // TODO - toast
@@ -59,45 +62,54 @@ export const handleReviewMembershipRequest = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
-  const { email: adminEmail } = await ensureMongoAuth();
+  const { email: adminEmail } = await ensureAuth();
 
-  // Pull out the form data and ensure it's valid
+  // Pull out the book club slug and ensure it is not empty
   const slug = formData.get('slug')?.toString().trim();
   if (!slug) return { error: 'Invalid book club' };
 
+  // Pull out the user's email and ensure it is not empty
   const userEmail = formData.get('userEmail')?.toString().trim();
   if (!userEmail) return { error: 'Invalid user' };
 
+  // Pull out the status and ensure it is approving or rejecting
   const status = formData.get('status')?.toString().trim();
   if (
     !status ||
     ![
-      BookClubMembershipRequestStatus.APPROVED,
-      BookClubMembershipRequestStatus.REJECTED
-    ].includes(status as BookClubMembershipRequestStatus)
+      MembershipRequestStatus.APPROVED,
+      MembershipRequestStatus.REJECTED
+    ].includes(status as MembershipRequestStatus)
   )
     return { error: 'Invalid status' };
 
   // Ensure the requesting user is an admin or owner of the book club
-  const adminRole = await findMongoMemberRoleBySlug(slug, adminEmail);
+  const adminRole = await findBookClubRole(slug, adminEmail);
   if (!adminRole || ![Role.OWNER, Role.ADMIN].includes(adminRole))
     return { error: 'Unauthorized' };
 
   // Approve or reject the membership request
-  await reviewMongoMembershipRequest(
+  await reviewMembershipRequest(
     slug,
     userEmail,
-    status as BookClubMembershipRequestStatus
+    adminEmail,
+    status as MembershipRequestStatus,
+    '' // TODO - Allow admins to leave a message
   );
 
   // If the approving the request, add  or reinstate the user as a member
-  if (status === BookClubMembershipRequestStatus.APPROVED) {
+  if (status === MembershipRequestStatus.APPROVED) {
     // Check to see if the user is a departed member
-    const departed = await checkMongoMembership(slug, userEmail, true);
+    const departed = await checkMembership(slug, userEmail, false);
 
     // If the user is a departed member, reinstate them
-    if (departed) await reinstatemMongoMembership(slug, userEmail);
-    else await addMongoMember(slug, userEmail);
+    if (departed) await reinstateMember(slug, userEmail, adminEmail);
+    else
+      await addMember(slug, userEmail, adminEmail, {
+        role: Role.READER,
+        joined: new Date().toISOString(),
+        isActive: true
+      });
   }
 
   // Return no error

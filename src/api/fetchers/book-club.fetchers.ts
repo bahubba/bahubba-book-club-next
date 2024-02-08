@@ -5,11 +5,11 @@ import {
   findBookClubs,
   findBookClubsBySearch,
   findBookClub,
-  findBookClubRole,
   findBookClubPublicity,
   findBookClubMembers,
   findBookClubName
 } from '@/db/repositories/book-club.repository';
+import { findBookClubRole } from '@/db/repositories/membership.repository';
 import { BookClubProperties, Publicity } from '@/db/models/nodes';
 import { BookClubMembership, Role } from '@/db/models/relationships';
 
