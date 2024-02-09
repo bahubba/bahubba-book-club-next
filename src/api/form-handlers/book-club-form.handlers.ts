@@ -11,7 +11,6 @@ import {
   findBookClubForAdmin,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
-import { updateMemberRole } from '@/db/repositories/membership.repository';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 import { Publicity } from '@/db/models/nodes';
 import { Role } from '@/db/models/relationships';
@@ -124,7 +123,7 @@ export const handleUpdateBookClub = async (
     created: existing.created
   });
 
-  // On success, redirect to the home page
-  revalidatePath('/home');
-  redirect(`/book-club/${slug}/admin/details`);
+  // On success, return no error
+  revalidatePath('/book-club/[slug]/admin/details');
+  return { error: '' };
 };

@@ -60,8 +60,8 @@ export const updateMemberRole = async (
   // Update the member's role
   await session.run(
     `
-    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[a:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
-    WHERE a.role IN ['ADMIN', 'OWNER']
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.role = $newRole
     `,
     { slug, memberEmail, adminEmail, newRole }
@@ -90,8 +90,8 @@ export const removeMember = async (
   // Remove the member from the club
   await session.run(
     `
-    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[a:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
-    WHERE a.role IN ['ADMIN', 'OWNER']
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.isActive = FALSE, m.departed = date()
     `,
     { slug, memberEmail, adminEmail }
@@ -120,8 +120,8 @@ export const reinstateMember = async (
   // Reinstate the user's membership
   await session.run(
     `
-    MATCH (:User { email: $userEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: FALSE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[a:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
-    WHERE a.role IN ['ADMIN', 'OWNER']
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: FALSE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.isActive = TRUE
     REMOVE m.departed
     `,

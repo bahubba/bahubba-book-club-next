@@ -65,9 +65,9 @@ export const updateBookClub = async (
   // Update the book club node
   await session.run(
     `
-    MATCH (u:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
-    WHERE u.role IN ['ADMIN', 'OWNER']
-    SET b $bookClub
+    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    WHERE m.role IN ['ADMIN', 'OWNER']
+    SET b = $bookClub
     `,
     { slug, email, bookClub }
   );
@@ -170,8 +170,8 @@ export const findBookClubForAdmin = async (
   // Find the book club where the user is an admin or owner
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
-    WHERE r.role IN ['ADMIN', 'OWNER']
+    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    WHERE m.role IN ['ADMIN', 'OWNER']
     RETURN b
     `,
     { email, slug }
