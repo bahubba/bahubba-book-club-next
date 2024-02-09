@@ -3,15 +3,18 @@
 import { ensureAuth } from '@/api/auth.api';
 import {
   findBookClubs,
-  findBookClubsBySearch,
   findBookClub,
   findBookClubPublicity,
   findBookClubMembers,
   findBookClubName
 } from '@/db/repositories/book-club.repository';
 import { findBookClubRole } from '@/db/repositories/membership.repository';
-import { BookClubProperties, Publicity } from '@/db/models/nodes';
-import { BookClubMembership, Role } from '@/db/models/relationships';
+import {
+  BookClubProperties,
+  Publicity,
+  Role,
+  UserAndMembership
+} from '@/db/models/nodes';
 
 /**
  * Retrieve all book clubs for the logged-in user
@@ -79,11 +82,11 @@ export const getBookClubPublicity = async (
  * Get a book club's members
  *
  * @param {string} slug The slug of the book club
- * @return {Promise<BookClubMembership[]>} The members of the book club
+ * @return {Promise<UserAndMembership[]>} The members of the book club
  */
 export const getBookClubMembers = async (
   slug: string
-): Promise<BookClubMembership[]> => {
+): Promise<UserAndMembership[]> => {
   // Ensure that the user is authenticated
   const { email } = await ensureAuth();
 

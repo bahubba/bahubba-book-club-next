@@ -14,8 +14,7 @@ import {
   findBookClubRole,
   reinstateMember
 } from '@/db/repositories/membership.repository';
-import { MembershipRequestStatus } from '@/db/models/nodes';
-import { Role } from '@/db/models/relationships';
+import { MembershipRequestStatus, Role } from '@/db/models/nodes';
 import { ErrorFormState } from './state-interfaces';
 
 /**

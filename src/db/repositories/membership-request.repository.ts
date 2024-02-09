@@ -64,7 +64,7 @@ export const reviewMembershipRequest = async (
   // Approve or reject the membership request
   await session.run(
     `
-    MATCH (:User { email: $userEmail, isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest { status: 'PENDING' })<-[:HAS_MEMBERSHIP_REQUEST]-(b:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF]-(a:User { email: $adminEmail, isActive: TRUE })
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest { status: 'PENDING' })<-[:HAS_MEMBERSHIP_REQUEST]-(b:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(a:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
     SET mr.status = $status, mr.reviewed = date(), mr.reviewMessage = $reviewMessage
     MERGE (a)-[:REVIEWED_MEMBERSHIP_REQUEST]->(mr)
@@ -122,7 +122,7 @@ export const findMembershipRequests = async (
   // Find the membership requests for the book club
   const result = await session.run(
     `
-    MATCH (u:User { isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest)<-[:HAS_MEMBERSHIP_REQUEST]-(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF]-(:User { email: $email, isActive: TRUE })
+    MATCH (u:User { isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest)<-[:HAS_MEMBERSHIP_REQUEST]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $email, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
     RETURN u, mr
     `,

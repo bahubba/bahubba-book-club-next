@@ -10,7 +10,7 @@ import {
 import { ErrorFormState } from './state-interfaces';
 import { ensureAuth } from '../auth.api';
 import { findBookClubRole } from '@/db/repositories/membership.repository';
-import { Role } from '@/db/models/relationships';
+import { Role } from '@/db/models/nodes';
 
 /**
  * Handle adding a member to a book club

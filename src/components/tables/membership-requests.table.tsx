@@ -20,7 +20,7 @@ import ReviewMembershipRequestButton from '../buttons/review-membership-request.
  *
  * @prop {Object} props Component props
  * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {MembershipRequestProperties[]} props.membershipRequests The membership requests
+ * @prop {UserAndMembershipRequest[]} props.membershipRequests The membership requests
  */
 const MembershipRequestsTable = ({
   bookClubSlug,
