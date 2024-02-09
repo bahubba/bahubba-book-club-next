@@ -9,9 +9,13 @@ import {
   addBookClub,
   bookClubExists,
   findBookClubForAdmin,
+  findBookClubsBySearch,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
-import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import {
+  ErrorFormState,
+  SearchFormState
+} from '@/api/form-handlers/state-interfaces';
 import { Publicity } from '@/db/models/nodes';
 import { Role } from '@/db/models/relationships';
 import props from '@/util/properties';
@@ -126,4 +130,28 @@ export const handleUpdateBookClub = async (
   // On success, return no error
   revalidatePath('/book-club/[slug]/admin/details');
   return { error: '' };
+};
+
+/**
+ * Search for book clubs by name or description
+ *
+ * @param {SearchFormState} _ Form state from the previous render; Unused
+ * @param {FormData} formData The search form's data, containing the search term
+ * @return {Promise<SearchFormState>} The new form state; Used for passing back search results or error messages
+ */
+export const handleBookClubSearch = async (
+  _: SearchFormState,
+  formData: FormData
+): Promise<SearchFormState> => {
+  // Get the user and ensure that they're authenticated
+  const { email } = await ensureAuth();
+
+  // Pull out the search term
+  const search = formData.get('search')?.toString().trim() || '';
+
+  // Ensure the search term is not empty
+  if (!search) return { error: 'Invalid search term', bookClubs: [] };
+
+  // Fetch and return the book clubs
+  return { error: '', bookClubs: await findBookClubsBySearch(email, search) };
 };
