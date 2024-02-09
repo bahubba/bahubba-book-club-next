@@ -46,22 +46,6 @@ export const getBookClub = async (
 };
 
 /**
- * Search for book clubs by name or description
- *
- * @param {string} search The search term to find book clubs by
- * @return {Promise<BookClubProperties[]>}
- */
-export const searchForBookClubs = async (
-  search: string
-): Promise<BookClubProperties[]> => {
-  // Ensure that the user is authenticated
-  const { email } = await ensureAuth();
-
-  // Fetch and return the user's book clubs
-  return await findBookClubsBySearch(email, search);
-};
-
-/**
  * Retrieve a user's role in a book club
  *
  * @param {string} slug The slug of the book club
