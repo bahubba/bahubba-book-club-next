@@ -51,7 +51,7 @@ const BookClubPageHeader = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the book club name
-  const bookClubName = await getBookClubName(bookClubSlug); // TODO - Returning null where it shouldn't
+  const bookClubName = await getBookClubName(bookClubSlug);
 
   return (
     <div className="flex-shrink">

@@ -296,7 +296,7 @@ export const findBookClubName = async (
   // Find the book club's name
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (b:BookClub { slug: $slug, isActive: TRUE })
     RETURN b.name AS name
     `,
     { slug, email }
