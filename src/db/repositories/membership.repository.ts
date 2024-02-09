@@ -1,6 +1,6 @@
 import { driver } from '@/db/connect-neo4j';
 
-import { IsMemberOfProperties, Role } from '../models/relationships';
+import { MembershipProperties, Role } from '../models/nodes';
 
 /**
  * Add a member to a book club
@@ -15,7 +15,7 @@ export const addMember = async (
   slug: string,
   memberEmail: string,
   adminEmail: string,
-  membershipProps: IsMemberOfProperties
+  membershipProps: MembershipProperties
 ): Promise<void> => {
   // Connect to Neo4j
   const session = driver.session();
@@ -24,15 +24,25 @@ export const addMember = async (
   await session.run(
     `
     MATCH (u:User { email: $memberEmail, isActive: TRUE })
-    MATCH (:User { email: $adminEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $adminEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
     WHERE m.role IN ['ADMIN', 'OWNER']
-    MERGE (u)-[:IS_MEMBER_OF {
+    MERGE (u)-[:HAS_MEMBERSHIP]->(:Membership {
       role: $membershipProps.role,
       joined: $membershipProps.joined,
       isActive: $membershipProps.isActive
-    }]->(c)
+    })<-[:HAS_MEMBER]-(b)
     `,
     { slug, memberEmail, adminEmail, membershipProps }
+  );
+
+  // Add the member as the last picker
+  await session.run(
+    `
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[h:HAS_CURRENT_PICKER]->(c:Membership { isActive: TRUE })<-[p:PICKS_BEFORE]-(l:Membership { isActive: TRUE })
+    DELETE p
+    MERGE (l)-[:PICKS_BEFORE]->(m)-[:PICKS_BEFORE]->(c)
+    `,
+    { slug, memberEmail }
   );
 
   // Close the session
@@ -60,7 +70,7 @@ export const updateMemberRole = async (
   // Update the member's role
   await session.run(
     `
-    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.role = $newRole
     `,
@@ -90,7 +100,7 @@ export const removeMember = async (
   // Remove the member from the club
   await session.run(
     `
-    MATCH (:User { email: $memberEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.isActive = FALSE, m.departed = date()
     `,
@@ -120,7 +130,7 @@ export const reinstateMember = async (
   // Reinstate the user's membership
   await session.run(
     `
-    MATCH (:User { email: $userEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: FALSE }]->(:BookClub { slug: $slug, isActive: TRUE })<-[am:IS_MEMBER_OF { isActive: TRUE }]-(:User { email: $adminEmail, isActive: TRUE })
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: FALSE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
     SET m.isActive = TRUE
     REMOVE m.departed
@@ -149,7 +159,7 @@ export const findBookClubRole = async (
   // Find the user's role in the book club
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF]->(:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })
     RETURN m.role AS role
     `,
     { slug, email }
@@ -179,7 +189,7 @@ export const checkMembership = async (
   // Check the user's membership
   const result = await session.run(
     `
-    MATCH (:User { email: $userEmail, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: $isActive }]->(:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: $isActive })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })
     RETURN COUNT(m) > 0 AS isMember
     `,
     { slug, userEmail, isActive }

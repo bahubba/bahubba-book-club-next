@@ -16,8 +16,7 @@ import {
   ErrorFormState,
   SearchFormState
 } from '@/api/form-handlers/state-interfaces';
-import { Publicity } from '@/db/models/nodes';
-import { Role } from '@/db/models/relationships';
+import { Publicity, Role } from '@/db/models/nodes';
 import props from '@/util/properties';
 
 /**

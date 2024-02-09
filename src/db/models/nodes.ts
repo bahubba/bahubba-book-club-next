@@ -1,5 +1,4 @@
 import { Node } from 'neo4j-driver';
-import { IsMemberOfProperties } from './relationships';
 
 /** ENUMS */
 
@@ -7,6 +6,13 @@ import { IsMemberOfProperties } from './relationships';
 export enum Publicity {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE'
+}
+
+// Book club role enum
+export enum Role {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  READER = 'READER'
 }
 
 // Membership request status enum
@@ -48,6 +54,14 @@ export interface BookClubProperties {
   disbanded?: Date | string;
 }
 
+// Membership node properties
+export interface MembershipProperties {
+  role: Role;
+  joined: Date | string;
+  isActive: boolean;
+  departed?: Date | string;
+}
+
 // Membership request node properties
 export interface MembershipRequestProperties {
   status: MembershipRequestStatus;
@@ -65,16 +79,16 @@ export interface UserAndProviderProfile {
   profile: ProviderProfileProperties | null;
 }
 
+// Combined user and book club membership properties
+export interface UserAndMembership {
+  user: UserProperties;
+  membership: MembershipProperties;
+}
+
 // Combined user and book club membership request properties
 export interface UserAndMembershipRequest {
   user: UserProperties;
   request: MembershipRequestProperties;
-}
-
-// Combined user and book club membership properties
-export interface UserAndBookClubMembership {
-  user: UserProperties;
-  membership: IsMemberOfProperties;
 }
 
 /** NODES */
@@ -92,6 +106,11 @@ export interface UserNode extends Node {
 // Book club node
 export interface BookClubNode extends Node {
   properties: BookClubProperties;
+}
+
+// Membership node
+export interface MembershipNode extends Node {
+  properties: MembershipProperties;
 }
 
 // Membership request node

@@ -12,14 +12,14 @@ import {
 
 import MemberRoleForm from '../forms/member-role.form';
 import RemoveMemberButton from '../buttons/remove-member.button';
-import { BookClubMembership, Role } from '@/db/models/relationships';
+import { UserAndMembership, Role } from '@/db/models/nodes';
 
 // Component props
 interface BookClubAdminMembersTableProps {
   bookClubSlug: string;
   adminEmail: string;
   adminRole: Role;
-  members: BookClubMembership[];
+  members: UserAndMembership[];
 }
 
 /**
@@ -28,7 +28,7 @@ interface BookClubAdminMembersTableProps {
  * @prop {Object} props Component props
  * @prop {string} props.bookClubSlug The slug of the book club
  * @prop {Role} props.adminRole The role of the current user
- * @prop {BookClubMembership[]} props.members The members of the book club
+ * @prop {UserAndMembership[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({
   bookClubSlug,
@@ -59,34 +59,34 @@ const BookClubAdminMembersTable = ({
       </TableHeader>
       <TableBody>
         {members.map(member => (
-          <TableRow key={member.email}>
-            <TableCell>{member.preferredName}</TableCell>
-            <TableCell>{member.email}</TableCell>
+          <TableRow key={member.user.email}>
+            <TableCell>{member.user.preferredName}</TableCell>
+            <TableCell>{member.user.email}</TableCell>
             <TableCell>
               <MemberRoleForm
                 bookClubSlug={bookClubSlug}
                 email={data?.user?.email ?? ''}
-                memberEmail={member.email}
+                memberEmail={member.user.email}
                 adminRole={adminRole}
-                role={member.role}
+                role={member.membership.role}
               />
             </TableCell>
             <TableCell>
-              {typeof member.joined === 'string'
-                ? member.joined
+              {typeof member.membership.joined === 'string'
+                ? member.membership.joined
                 : new Intl.DateTimeFormat('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric'
-                  }).format(member.joined)}
+                  }).format(member.membership.joined)}
             </TableCell>
             <TableCell>
               <RemoveMemberButton
                 bookClubSlug={bookClubSlug}
                 adminEmail={adminEmail}
                 adminRole={adminRole}
-                userEmail={member.email}
-                memberRole={member.role}
+                userEmail={member.user.email}
+                memberRole={member.membership.role}
               />
             </TableCell>
           </TableRow>

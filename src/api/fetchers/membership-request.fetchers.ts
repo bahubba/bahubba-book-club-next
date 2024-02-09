@@ -4,6 +4,7 @@ import {
   findMembershipRequests
 } from '@/db/repositories/membership-request.repository';
 import { UserAndMembershipRequest } from '@/db/models/nodes';
+import { toJSON } from '@/util/helpers';
 
 /**
  * Find whether a user has an open membership request for a given book club
@@ -33,5 +34,5 @@ export const getMembershipRequests = async (
   const { email } = await ensureAuth();
 
   // Fetch the membership requests
-  return await findMembershipRequests(slug, email);
+  return toJSON(await findMembershipRequests(slug, email));
 };

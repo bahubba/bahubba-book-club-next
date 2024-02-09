@@ -1,22 +1,23 @@
 import { driver } from '@/db/connect-neo4j';
-import { BookClubProperties, Publicity } from '@/db/models/nodes';
 import {
-  BookClubMembership,
-  IsMemberOfProperties
-} from '@/db/models/relationships';
+  BookClubProperties,
+  MembershipProperties,
+  Publicity,
+  UserAndMembership
+} from '@/db/models/nodes';
 
 /**
  * Add a book club node with the user as an owner
  *
  * @param {string} email The email of the user adding the book club
  * @param {BookClubProperties} bookClub The properties for the book club
- * @param {IsMemberOfProperties} membershipProps The properties for the membership relationship
+ * @param {MembershipProperties} membershipProps The properties for the membership relationship
  * @return {Promise<void>}
  */
 export const addBookClub = async (
   email: string,
   bookClub: BookClubProperties,
-  membershipProps: IsMemberOfProperties
+  membershipProps: MembershipProperties
 ): Promise<void> => {
   // Connect to Neo4j
   const session = driver.session();
@@ -25,7 +26,7 @@ export const addBookClub = async (
   await session.run(
     `
       MATCH (u:User { email: $email, isActive: TRUE })
-      MERGE (c:BookClub {
+      MERGE (bc:BookClub {
         name: $bookClub.name,
         slug: $bookClub.slug,
         description: $bookClub.description,
@@ -33,12 +34,13 @@ export const addBookClub = async (
         publicity: $bookClub.publicity,
         isActive: TRUE
       })
-      MERGE (u)-[:IS_MEMBER_OF {
+      MERGE (u)-[:HAS_MEMBERSHIP]->(m:Membership {
         role: $membershipProps.role,
         joined: $membershipProps.joined,
         isActive: TRUE
-      }]->(c)
-      RETURN c
+      })<-[:HAS_MEMBER]-(bc)
+      MERGE (bc)-[:HAS_CURRENT_PICKER]->(m)
+      MERGE (m)-[:PICKS_BEFORE]->(m)
       `,
     { email, bookClub, membershipProps }
   );
@@ -65,7 +67,7 @@ export const updateBookClub = async (
   // Update the book club node
   await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
     WHERE m.role IN ['ADMIN', 'OWNER']
     SET b = $bookClub
     `,
@@ -112,7 +114,7 @@ export const findBookClubs = async (
   // Find the book clubs for the user
   const result = await session.run(
     `
-      MATCH (u:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b:BookClub { isActive: TRUE })
+      MATCH (u:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { isActive: TRUE })
       RETURN b
       `,
     { email }
@@ -142,7 +144,7 @@ export const findBookClub = async (
   // Find the book club by its slug, where the user has a role in the book club
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
     RETURN b
     `,
     { slug, email }
@@ -170,7 +172,7 @@ export const findBookClubForAdmin = async (
   // Find the book club where the user is an admin or owner
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
     WHERE m.role IN ['ADMIN', 'OWNER']
     RETURN b
     `,
@@ -204,7 +206,7 @@ export const findBookClubsBySearch = async (
       toLower(b.description) CONTAINS toLower($search)
     ) AND (
       b.publicity = 'PUBLIC' OR (
-        EXISTS((:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF]->(b))
+        EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership {isActive: TRUE})<-[:HAS_MEMBER]-(b))
       )
     )
     RETURN b
@@ -250,18 +252,18 @@ export const findBookClubPublicity = async (
  * Find a book club's members by its slug
  *
  * @param {string} slug The slug of the book club to find
- * @return {Promise<BookClubMembership[]>} The members of the book club
+ * @return {Promise<UserAndMembership[]>} The members of the book club
  */
 export const findBookClubMembers = async (
   slug: string
-): Promise<BookClubMembership[]> => {
+): Promise<UserAndMembership[]> => {
   // Connect to Neo4j
   const session = driver.session();
 
   // Find the members of the book club
   const result = await session.run(
     `
-    MATCH (u:User { isActive: TRUE })-[m:IS_MEMBER_OF { isActive: TRUE }]->(:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (u:User { isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })
     RETURN m, u
     `,
     { slug }
@@ -272,10 +274,9 @@ export const findBookClubMembers = async (
 
   // Return the members
   return result.records.map(record => ({
-    ...record.get('m').properties,
-    email: record.get('u').properties.email,
-    preferredName: record.get('u').properties.preferredName
-  })) as BookClubMembership[];
+    membership: record.get('m').properties,
+    user: record.get('u').properties
+  })) as UserAndMembership[];
 };
 
 /**
@@ -295,7 +296,7 @@ export const findBookClubName = async (
   // Find the book club's name
   const result = await session.run(
     `
-    MATCH (:User { email: $email, isActive: TRUE })-[:IS_MEMBER_OF { isActive: TRUE }]->(b:BookClub { slug: $slug, isActive: TRUE })
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
     RETURN b.name AS name
     `,
     { slug, email }

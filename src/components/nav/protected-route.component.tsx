@@ -5,8 +5,7 @@ import {
   getBookClubRole,
   getBookClubPublicity
 } from '@/api/fetchers/book-club.fetchers';
-import { Publicity } from '@/db/models/nodes';
-import { Role } from '@/db/models/relationships';
+import { Publicity, Role } from '@/db/models/nodes';
 
 // Component props
 interface ProtectedRouteProps {

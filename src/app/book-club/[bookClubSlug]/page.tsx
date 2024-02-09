@@ -8,7 +8,7 @@ import {
   getBookClubName,
   getBookClubRole
 } from '@/api/fetchers/book-club.fetchers';
-import { Role } from '@/db/models/relationships';
+import { Role } from '@/db/models/nodes';
 
 // Component props
 interface BookClubHomePageProps {
@@ -51,7 +51,7 @@ const BookClubPageHeader = async ({
   bookClubSlug
 }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the book club name
-  const bookClubName = await getBookClubName(bookClubSlug);
+  const bookClubName = await getBookClubName(bookClubSlug); // TODO - Returning null where it shouldn't
 
   return (
     <div className="flex-shrink">

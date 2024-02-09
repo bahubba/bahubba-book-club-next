@@ -7,7 +7,7 @@ import { Select, SelectItem } from '@nextui-org/select';
 
 import SubmitButton from '@/components/buttons/submit.button';
 import { handleUpdateMemberRole } from '@/api/form-handlers/membership-form.handlers';
-import { Role } from '@/db/models/relationships';
+import { Role } from '@/db/models/nodes';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 
 // Component props

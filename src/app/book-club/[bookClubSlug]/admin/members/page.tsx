@@ -7,7 +7,7 @@ import {
   getBookClubRole,
   getBookClubMembers
 } from '@/api/fetchers/book-club.fetchers';
-import { Role } from '@/db/models/relationships';
+import { Role } from '@/db/models/nodes';
 
 // Page props
 interface BookClubAdminMembersPageProps {
