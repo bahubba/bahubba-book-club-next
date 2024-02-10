@@ -21,6 +21,8 @@ export const addUser = async (
   // Connect to Neo4j
   const session = driver.session();
 
+  console.log('user', user); // DELETEME
+
   // Add the user and provider profile
   await session.run(
     `
