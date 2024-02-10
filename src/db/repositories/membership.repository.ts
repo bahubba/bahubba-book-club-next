@@ -1,6 +1,6 @@
 import { driver } from '@/db/connect-neo4j';
 
-import { MembershipProperties, Role } from '../models/nodes';
+import { MembershipProperties, Role, UserAndMembership } from '../models/nodes';
 
 /**
  * Add a member to a book club
@@ -198,4 +198,41 @@ export const checkMembership = async (
   // Close the session and return whether the user is a member
   session.close();
   return result.records[0].get('isMember');
+};
+
+/**
+ * Retrieve the pick list for a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} email The requesting user's email
+ * @return {Promise<UserAndMembership[]>} The pick list
+ */
+export const findBookClubPickList = async (
+  slug: string,
+  email: string
+): Promise<UserAndMembership[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Retrieve the pick list
+  const result = await session.run(
+    `
+    MATCH (:User { isActive: TRUE, email: $email })-[:HAS_MEMBERSHIP]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_CURRENT_PICKER]->(m:Membership { isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    MATCH path = (m)-[:PICKS_BEFORE*0..]->(nextM:Membership {isActive: TRUE})
+    MATCH (nextM)<-[:HAS_MEMBERSHIP]-(u:User)
+    RETURN nextM, u
+    ORDER BY length(path)
+    `,
+    { email, slug }
+  );
+
+  // Close the session
+  session.close();
+
+  // Gather the user and membership properties and return the pick list
+  return result.records.map(record => ({
+    user: record.get('u').properties,
+    membership: record.get('nextM').properties
+  }));
 };

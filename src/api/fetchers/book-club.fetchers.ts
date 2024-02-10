@@ -15,6 +15,7 @@ import {
   Role,
   UserAndMembership
 } from '@/db/models/nodes';
+import { toJSON } from '@/util/helpers';
 
 /**
  * Retrieve all book clubs for the logged-in user
@@ -98,7 +99,7 @@ export const getBookClubMembers = async (
   }
 
   // Fetch the book club and return its members
-  return await findBookClubMembers(slug);
+  return toJSON(await findBookClubMembers(slug));
 };
 
 /**
