@@ -4,11 +4,14 @@ import PageSectionLayout from '@/components/layout/page-section.layout';
 import SectionHeaderLayout from '@/components/layout/section-header.layout';
 import RequestMembershipButton from '@/components/buttons/request-membership.button';
 import BookClubAdminButton from '@/components/buttons/book-club-admin.button';
+import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
 import {
   getBookClubName,
   getBookClubRole
 } from '@/api/fetchers/book-club.fetchers';
+import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { Role } from '@/db/models/nodes';
+import { Spinner } from '@nextui-org/react';
 
 // Component props
 interface BookClubHomePageProps {
@@ -16,6 +19,28 @@ interface BookClubHomePageProps {
     bookClubSlug: string;
   };
 }
+
+/**
+ * Async component for fetching and displaying the pick order
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ */
+const PickOrderWrapper = async ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  // Fetch the pick order and user's role
+  const pickOrder = await getBookClubPickList(bookClubSlug);
+  const memberRole = await getBookClubRole(bookClubSlug);
+
+  return (
+    <BookClubPickOrderList
+      pickOrder={pickOrder}
+      bookClubSlug={bookClubSlug}
+      memberRole={memberRole as Role}
+    />
+  );
+};
 
 /**
  * Async component for displaying the book club admin button or the request membership button
@@ -89,7 +114,15 @@ const BookClubHomePage = ({
       </div>
       <div className="flex flex-1 w-full">
         <PageSectionLayout header="Members">
-          <span>Members go here</span>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center w-full h-36">
+                <Spinner />
+              </div>
+            }
+          >
+            <PickOrderWrapper bookClubSlug={bookClubSlug} />
+          </Suspense>
         </PageSectionLayout>
         <PageSectionLayout header="Books">
           <div>Some long text string that will take up some width</div>

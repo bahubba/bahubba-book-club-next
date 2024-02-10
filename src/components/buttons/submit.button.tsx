@@ -44,7 +44,11 @@ const SubmitButton = ({
       isIconOnly={!!buttonIcon}
       disabled={disabled || pending}
     >
-      {pending ? <Spinner /> : buttonIcon ?? buttonText}
+      {pending ? (
+        <Spinner color={color === 'primary' ? 'secondary' : 'primary'} />
+      ) : (
+        buttonIcon ?? buttonText
+      )}
     </Button>
   );
 };

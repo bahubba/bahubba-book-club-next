@@ -39,6 +39,10 @@ const BookClubAdminTabs = () => {
         key="membership-requests"
         title="Membership Requests"
       />
+      <Tab
+        key="pick-order"
+        title="Pick Order"
+      />
     </Tabs>
   );
 };

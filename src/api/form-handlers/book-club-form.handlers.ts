@@ -18,6 +18,11 @@ import {
 } from '@/api/form-handlers/state-interfaces';
 import { Publicity, Role } from '@/db/models/nodes';
 import props from '@/util/properties';
+import {
+  advancePicker,
+  findBookClubRole
+} from '@/db/repositories/membership.repository';
+import { getServerSession } from 'next-auth';
 
 /**
  * Handle submitting a new book club
@@ -153,4 +158,38 @@ export const handleBookClubSearch = async (
 
   // Fetch and return the book clubs
   return { error: '', bookClubs: await findBookClubsBySearch(email, search) };
+};
+
+/**
+ * Handle advancing the current picker of the book club
+ *
+ * @param {ErrorFormState} _ Form state from the previous render; Unused
+ * @param {FormData} formData The form data, containing the book club slug
+ * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
+ */
+export const handleAdvancePicker = async (
+  _: ErrorFormState,
+  formData: FormData
+): Promise<ErrorFormState> => {
+  // Get the user and ensure that they're authenticated
+  const { email } = await ensureAuth();
+
+  // Pull out the form data
+  const slug = formData.get('slug')?.toString().trim() || '';
+  const pageRoute = formData.get('pageRoute')?.toString().trim() || '';
+
+  // Ensure the slug is not empty
+  if (!slug || !pageRoute) return { error: 'Invalid form data' };
+
+  // Get the user's role in the book club
+  const role = await findBookClubRole(slug, email);
+  if (!role || ![Role.ADMIN, Role.OWNER].includes(role))
+    return { error: 'Unauthorized' };
+
+  // Advance the picker
+  await advancePicker(slug, email);
+
+  // Revalidate the path and redirect back to it to refresh
+  revalidatePath(pageRoute);
+  redirect(pageRoute);
 };

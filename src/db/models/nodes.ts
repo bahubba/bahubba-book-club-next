@@ -37,6 +37,7 @@ export interface ProviderProfileProperties {
 export interface UserProperties {
   email: string;
   preferredName: string;
+  preferredImage?: string;
   joined: Date | string;
   isActive: boolean;
   departed?: Date | string;
