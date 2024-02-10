@@ -69,6 +69,7 @@ export const authOptions: NextAuthOptions = {
           {
             email,
             preferredName: authUser.name ?? profile.name ?? 'Anonymous User',
+            preferredImage: profile.image ?? authUser.image ?? undefined,
             joined: new Date().toISOString(),
             isActive: true
           },
