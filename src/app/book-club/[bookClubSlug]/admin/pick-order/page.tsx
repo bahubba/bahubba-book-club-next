@@ -3,6 +3,8 @@ import { Spinner } from '@nextui-org/spinner';
 
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
+import { getBookClubRole } from '@/api/fetchers/book-club.fetchers';
+import { Role } from '@/db/models/nodes';
 
 // Page props
 interface BookClubAdminPickOrderPageProps {
@@ -22,11 +24,14 @@ const PickOrderWrapper = async ({
 }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the pick order
   const pickOrder = await getBookClubPickList(bookClubSlug);
+  const memberRole = await getBookClubRole(bookClubSlug);
 
   return (
     <BookClubPickOrderList
       pickOrder={pickOrder}
-      sortable
+      bookClubSlug={bookClubSlug}
+      memberRole={memberRole as Role}
+      inAdminPage
     />
   );
 };

@@ -36,7 +36,8 @@ const PickOrderWrapper = async ({
   return (
     <BookClubPickOrderList
       pickOrder={pickOrder}
-      sortable={[Role.ADMIN, Role.OWNER].includes(memberRole ?? Role.READER)}
+      bookClubSlug={bookClubSlug}
+      memberRole={memberRole as Role}
     />
   );
 };
