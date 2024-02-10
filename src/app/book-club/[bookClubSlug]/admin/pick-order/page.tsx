@@ -23,8 +23,12 @@ const PickOrderWrapper = async ({
   // Fetch the pick order
   const pickOrder = await getBookClubPickList(bookClubSlug);
 
-  // TODO - Sortable pick order component
-  return <BookClubPickOrderList pickOrder={pickOrder} />;
+  return (
+    <BookClubPickOrderList
+      pickOrder={pickOrder}
+      sortable
+    />
+  );
 };
 
 /**

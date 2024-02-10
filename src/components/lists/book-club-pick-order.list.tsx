@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
+import { User } from '@nextui-org/user';
 
 import { UserAndMembership } from '@/db/models/nodes';
 
@@ -10,10 +11,12 @@ import { UserAndMembership } from '@/db/models/nodes';
  *
  * @param {Object} props - Component props
  * @param {UserAndMembership[]} props.pickOrder - The pick order
+ * @param {boolean} props.sortable - Whether the list is sortable; true if the user is an admin or owner
  */
 const BookClubPickOrderList = ({
-  pickOrder
-}: Readonly<{ pickOrder: UserAndMembership[] }>) => {
+  pickOrder,
+  sortable = false
+}: Readonly<{ pickOrder: UserAndMembership[]; sortable: boolean }>) => {
   const [order, setOrder] = useState(
     pickOrder.map(picker => ({ id: picker.user.email, ...picker }))
   );
@@ -22,12 +25,24 @@ const BookClubPickOrderList = ({
     <ReactSortable
       list={order}
       setList={setOrder}
+      sort={sortable}
     >
       {order.map(picker => (
         <div
           key={picker.user.email}
-          className="m-2 p-2 cursor-move border-medium border-gray-200 rounded-lg shadow-lg"
-        >{`${picker.user.preferredName} (${picker.user.email})`}</div>
+          className={`m-2 p-2 ${
+            sortable ? 'cursor-move' : ''
+          } border-medium border-gray-200 rounded-lg shadow-lg`}
+        >
+          <User
+            name={picker.user.preferredName}
+            description={picker.user.email}
+            avatarProps={{
+              src: picker.user.preferredImage,
+              alt: picker.user.preferredName
+            }}
+          />
+        </div>
       ))}
     </ReactSortable>
   );
