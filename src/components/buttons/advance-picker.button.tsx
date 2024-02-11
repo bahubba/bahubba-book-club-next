@@ -2,7 +2,6 @@ import { useFormState } from 'react-dom';
 import { Input } from '@nextui-org/input';
 
 import { handleAdvancePicker } from '@/api/form-handlers/book-club-form.handlers';
-import { Role } from '@/db/models/nodes';
 import SubmitButton from './submit.button';
 
 /**
@@ -15,11 +14,9 @@ import SubmitButton from './submit.button';
  */
 const AdvancePickerButton = ({
   bookClubSlug,
-  memberRole,
   inAdminPage = false
 }: Readonly<{
   bookClubSlug: string;
-  memberRole: Role;
   inAdminPage?: boolean;
 }>) => {
   // Form state
@@ -27,7 +24,7 @@ const AdvancePickerButton = ({
     error: ''
   });
 
-  return [Role.ADMIN, Role.OWNER].includes(memberRole) ? (
+  return (
     <form action={formAction}>
       <Input
         className="hidden"
@@ -45,8 +42,6 @@ const AdvancePickerButton = ({
       />
       <SubmitButton buttonText="Advance Picker" />
     </form>
-  ) : (
-    <></>
   );
 };
 

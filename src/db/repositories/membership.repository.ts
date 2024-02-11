@@ -218,7 +218,6 @@ export const findBookClubPickList = async (
   const result = await session.run(
     `
     MATCH (:User { isActive: TRUE, email: $email })-[:HAS_MEMBERSHIP]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_CURRENT_PICKER]->(m:Membership { isActive: TRUE })
-    WHERE am.role IN ['ADMIN', 'OWNER']
     MATCH path = (m)-[:PICKS_BEFORE*0..]->(nextM:Membership {isActive: TRUE})
     MATCH (nextM)<-[:HAS_MEMBERSHIP]-(u:User)
     RETURN nextM, u
@@ -260,6 +259,53 @@ export const advancePicker = async (
     MERGE (bc)-[:HAS_CURRENT_PICKER]->(np)
     `,
     { email, slug }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Adjust the pick order of a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} adminEmail The requesting user's email
+ * @param {string[]} pickerEmails The emails of the pickers in the new order
+ * @return {Promise<void>}
+ */
+export const adjustPickOrder = async (
+  slug: string,
+  adminEmail: string,
+  pickerEmails: string[]
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Delete the existing pick order
+  await session.run(
+    `
+    MATCH (bc:BookClub { isActive: TRUE, slug: $slug })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { isActive: TRUE, email: $adminEmail })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    MATCH (bc)-[:HAS_MEMBER]->()-[p:PICKS_BEFORE]->()
+    DELETE p
+    `,
+    { slug, adminEmail }
+  );
+
+  // Create the new pick order
+  await session.run(
+    `
+    MATCH (bc:BookClub { isActive: TRUE, slug: $slug })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { isActive: TRUE, email: $adminEmail })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    UNWIND $pickerEmails AS memberEmail
+    MATCH (u:User { email: memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc)
+    WITH COLLECT(m) AS members
+    UNWIND RANGE(0, SIZE(members) - 2) AS i
+    WITH members[i] AS n1, members[i+1] AS n2, members[SIZE(members) - 1] AS l, members[0] AS f
+    MERGE (n1)-[:PICKS_BEFORE]-(n2)
+    MERGE (l)-[:PICKS_BEFORE]->(f)
+    `,
+    { slug, adminEmail, pickerEmails }
   );
 
   // Close the session

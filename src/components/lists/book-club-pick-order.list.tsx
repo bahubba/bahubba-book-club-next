@@ -6,6 +6,8 @@ import { User } from '@nextui-org/user';
 
 import { Role, UserAndMembership } from '@/db/models/nodes';
 import AdvancePickerButton from '../buttons/advance-picker.button';
+import _ from 'lodash';
+import AdjustPickOrderButton from '../buttons/adjust-pick-order.button';
 
 // Component props
 interface BookClubPickOrderListProps {
@@ -35,17 +37,29 @@ const BookClubPickOrderList = ({
 
   // State for the pick order
   const [order, setOrder] = useState(
-    pickOrder.map(picker => ({ id: picker.user.email, ...picker }))
+    _.map(pickOrder, picker => ({ id: picker.user.email, ...picker }))
   );
 
   return (
     <>
-      <div className="flex justify-center w-full">
-        <AdvancePickerButton
-          bookClubSlug={bookClubSlug}
-          memberRole={memberRole}
-          inAdminPage={inAdminPage}
-        />
+      <div className="flex justify-center gap-x-2 w-full">
+        {sortable && (
+          <AdvancePickerButton
+            bookClubSlug={bookClubSlug}
+            inAdminPage={inAdminPage}
+          />
+        )}
+        {sortable &&
+          !_.isEqual(
+            _.map(order, picker => picker.user.email),
+            _.map(pickOrder, picker => picker.user.email)
+          ) && (
+            <AdjustPickOrderButton
+              bookClubSlug={bookClubSlug}
+              pickOrder={_.map(order, picker => picker.user.email)}
+              inAdminPage={inAdminPage}
+            />
+          )}
       </div>
       <ReactSortable
         list={order}
