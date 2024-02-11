@@ -12,7 +12,12 @@ interface AdjustPickOrderButtonProps {
 }
 
 /**
+ * Button (and form) for adjusting the pick order of a book club
  *
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {string[]} props.pickOrder - The new pick order
+ * @param {boolean} props.inAdminPage - Whether the button is in the admin page
  */
 const AdjustPickOrderButton = ({
   bookClubSlug,
