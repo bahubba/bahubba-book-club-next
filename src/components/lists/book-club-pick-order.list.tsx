@@ -5,9 +5,9 @@ import { ReactSortable } from 'react-sortablejs';
 import { User } from '@nextui-org/user';
 
 import { Role, UserAndMembership } from '@/db/models/nodes';
-import AdvancePickerButton from '../buttons/advance-picker.button';
+import AdvancePickerButton from '@/components/buttons/advance-picker.button';
+import AdjustPickOrderButton from '@/components/buttons/adjust-pick-order.button';
 import _ from 'lodash';
-import AdjustPickOrderButton from '../buttons/adjust-pick-order.button';
 
 // Component props
 interface BookClubPickOrderListProps {
