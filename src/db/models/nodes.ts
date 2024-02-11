@@ -72,6 +72,16 @@ export interface MembershipRequestProperties {
   reviewMessage?: string;
 }
 
+// Discussion node properties
+export interface DiscussionProperties {
+  title: string;
+  description?: string;
+  isActive: boolean;
+  created: Date | string;
+  lastUpdated: Date | string;
+  closed?: Date | string;
+}
+
 /** TUPLES/COMBOS OF NODE PROPERTIES */
 
 // Combined user and provider profile properties
@@ -117,4 +127,9 @@ export interface MembershipNode extends Node {
 // Membership request node
 export interface MembershipRequestNode extends Node {
   properties: MembershipRequestProperties;
+}
+
+// Discussion node
+export interface DiscussionNode extends Node {
+  properties: DiscussionProperties;
 }
