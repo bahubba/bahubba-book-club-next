@@ -102,7 +102,7 @@ export const removeMember = async (
     `
     MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
-    SET m.isActive = FALSE, m.departed = date()
+    SET m.isActive = FALSE, m.departed = ${new Date().toISOString()}
     `,
     { slug, memberEmail, adminEmail }
   );

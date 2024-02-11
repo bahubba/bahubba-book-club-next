@@ -1,4 +1,4 @@
-import { Integer, Relationship } from 'neo4j-driver';
+import { Relationship } from 'neo4j-driver';
 
 /** RELATIONSHIPS */
 
