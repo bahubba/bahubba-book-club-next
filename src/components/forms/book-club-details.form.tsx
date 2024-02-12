@@ -98,6 +98,7 @@ const BookClubDetailsForm = ({
           label="Name"
           name="name"
           required
+          isRequired
           value={formData.name}
           onChange={handleInputChange}
         />
@@ -106,6 +107,7 @@ const BookClubDetailsForm = ({
           label="Description"
           name="description"
           required
+          isRequired
           value={formData.description}
           onChange={handleInputChange}
         />
@@ -116,6 +118,7 @@ const BookClubDetailsForm = ({
           name="image"
           value={formData.imageName}
           required
+          isRequired
         />
         <BookClubImagePickerModal
           selectedImage={formData.imageName}
