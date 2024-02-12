@@ -4,8 +4,9 @@ import { Spinner } from '@nextui-org/spinner';
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
 import { getBookClubs } from '@/api/fetchers/book-club.fetchers';
-import CreateBookClubButton from '@/components/buttons/create-book-club.button';
-import BookClubSearchButton from '@/components/buttons/book-club-search.button';
+import LinkButton from '@/components/buttons/link.button';
+import SearchIcon from '@/components/icons/search.icon';
+import PlusIcon from '@/components/icons/plus.icon';
 
 /** Async component for loading book clubs to display */
 const BookClubs = async () => {
@@ -24,8 +25,18 @@ const HomePage = () => (
         header="Clubs"
         sectionHeaderChildren={
           <div className="flex gap-0.5">
-            <CreateBookClubButton />
-            <BookClubSearchButton />
+            <LinkButton
+              uri="/book-club/create"
+              tooltip="Create a book club"
+            >
+              <PlusIcon />
+            </LinkButton>
+            <LinkButton
+              uri="/book-club/search"
+              tooltip="Search for book clubs"
+            >
+              <SearchIcon />
+            </LinkButton>
           </div>
         }
       >
