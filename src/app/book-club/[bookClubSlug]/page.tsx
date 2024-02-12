@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { Spinner } from '@nextui-org/react';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import SectionHeaderLayout from '@/components/layout/section-header.layout';
@@ -10,8 +11,9 @@ import {
   getBookClubRole
 } from '@/api/fetchers/book-club.fetchers';
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
+import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';
-import { Spinner } from '@nextui-org/react';
+import DiscussionCard from '@/components/cards/discussion.card';
 
 // Component props
 interface BookClubHomePageProps {
@@ -19,6 +21,30 @@ interface BookClubHomePageProps {
     bookClubSlug: string;
   };
 }
+
+/**
+ * Async component for fetching and displaying ad-hoc discussions
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ */
+const AdHocDiscussions = async ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  // Fetch the ad-hoc discussions
+  const discussions = await getAdHocDiscussions(bookClubSlug);
+
+  return (
+    <div className="flex flex-col gap-y-2 p-2">
+      {discussions.map(discussion => (
+        <DiscussionCard
+          key={discussion.title}
+          discussion={discussion}
+        />
+      ))}
+    </div>
+  );
+};
 
 /**
  * Async component for fetching and displaying the pick order
@@ -78,11 +104,7 @@ const BookClubPageHeader = async ({
   // Fetch the book club name
   const bookClubName = await getBookClubName(bookClubSlug);
 
-  return (
-    <div className="flex-shrink">
-      <h1 className="text-3xl font-bold">{bookClubName}</h1>
-    </div>
-  );
+  return <>{bookClubName}</>;
 };
 
 /**
@@ -96,23 +118,21 @@ const BookClubHomePage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubHomePageProps>) => {
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-shrink ms-2 mb-2">
-        <div className="flex items-center">
-          <SectionHeaderLayout
-            title={
-              <Suspense fallback={<></>}>
-                <BookClubPageHeader bookClubSlug={bookClubSlug} />
-              </Suspense>
-            }
-          >
+    <div className="flex-1 flex flex-col h-full pb-2">
+      <SectionHeaderLayout
+        title={
+          <h1 className="flex-shrink ms-2 mb-2 text-3xl font-bold">
             <Suspense fallback={<></>}>
-              <BookClubButtons bookClubSlug={bookClubSlug} />
+              <BookClubPageHeader bookClubSlug={bookClubSlug} />
             </Suspense>
-          </SectionHeaderLayout>
-        </div>
-      </div>
-      <div className="flex flex-1 w-full">
+          </h1>
+        }
+      >
+        <Suspense fallback={<></>}>
+          <BookClubButtons bookClubSlug={bookClubSlug} />
+        </Suspense>
+      </SectionHeaderLayout>
+      <div className="flex flex-1 w-full pb-2">
         <PageSectionLayout header="Members">
           <Suspense
             fallback={
@@ -128,7 +148,16 @@ const BookClubHomePage = ({
           <div>Some long text string that will take up some width</div>
         </PageSectionLayout>
         <PageSectionLayout header="Discussions">
-          <div>Some long text string that will take up some width</div>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center w-full h-36">
+                <Spinner />
+              </div>
+            }
+          >
+            <AdHocDiscussions bookClubSlug={bookClubSlug} />
+          </Suspense>
+          <span>Link to add discussion goes here</span>
         </PageSectionLayout>
       </div>
     </div>

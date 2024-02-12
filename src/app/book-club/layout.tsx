@@ -9,9 +9,7 @@ import ProtectedRoute from '@/components/nav/protected-route.component';
 const BookClubPageLayout = ({
   children
 }: Readonly<{ children: React.ReactNode }>) => (
-  <ProtectedRoute>
-    <div className="flex items-start justify-center w-full">{children}</div>
-  </ProtectedRoute>
+  <ProtectedRoute>{children}</ProtectedRoute>
 );
 
 export default BookClubPageLayout;

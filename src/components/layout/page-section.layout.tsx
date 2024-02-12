@@ -23,7 +23,7 @@ const PageSectionLayout = ({
   sectionHeaderChildren,
   children
 }: Readonly<PageSectionLayoutProps>) => (
-  <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white">
+  <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white h-full p-2">
     <SectionHeaderLayout
       title={<h1 className="text-2xl font-bold">{header}</h1>}
     >
