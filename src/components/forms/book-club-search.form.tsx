@@ -29,6 +29,7 @@ const BookClubSearchForm = () => {
             variant="bordered"
             placeholder="Search for a book club"
             required
+            isRequired
           />
           <div className="flex-shrink">
             <SubmitButton
