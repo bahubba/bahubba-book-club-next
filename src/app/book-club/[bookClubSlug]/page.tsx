@@ -4,7 +4,9 @@ import { Spinner } from '@nextui-org/react';
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import SectionHeaderLayout from '@/components/layout/section-header.layout';
 import RequestMembershipButton from '@/components/buttons/request-membership.button';
-import BookClubAdminButton from '@/components/buttons/book-club-admin.button';
+import DiscussionCard from '@/components/cards/discussion.card';
+import LinkButton from '@/components/buttons/link.button';
+import AdminIcon from '@/components/icons/admin.icon';
 import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
 import {
   getBookClubName,
@@ -13,7 +15,7 @@ import {
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';
-import DiscussionCard from '@/components/cards/discussion.card';
+import PlusIcon from '@/components/icons/plus.icon';
 
 // Component props
 interface BookClubHomePageProps {
@@ -84,7 +86,12 @@ const BookClubButtons = async ({
   return (
     <div className="flex-1 justify-start">
       {!!role && [Role.ADMIN, Role.OWNER].includes(role) ? (
-        <BookClubAdminButton bookClubSlug={bookClubSlug} />
+        <LinkButton
+          uri={`/book-club/${bookClubSlug}/admin/details`}
+          tooltip="Book Club Admin"
+        >
+          <AdminIcon />
+        </LinkButton>
       ) : (
         <>{!role && <RequestMembershipButton bookClubSlug={bookClubSlug} />}</>
       )}
@@ -147,7 +154,17 @@ const BookClubHomePage = ({
         <PageSectionLayout header="Books">
           <div>Some long text string that will take up some width</div>
         </PageSectionLayout>
-        <PageSectionLayout header="Discussions">
+        <PageSectionLayout
+          header="Discussions"
+          sectionHeaderChildren={
+            <LinkButton
+              uri={`/book-club/${bookClubSlug}/discussions/create`}
+              tooltip="Create a discussion"
+            >
+              <PlusIcon />
+            </LinkButton>
+          }
+        >
           <Suspense
             fallback={
               <div className="flex justify-center items-center w-full h-36">
