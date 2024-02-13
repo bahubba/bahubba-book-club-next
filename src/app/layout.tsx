@@ -31,7 +31,7 @@ const RootLayout = async ({
           <SessionProvider session={session}>
             <main className="flex flex-col h-screen">
               <AppBar />
-              <div className="pt-2 flex-1 bg-gray-100 max-h-fill-below-header">
+              <div className="flex-1 bg-gray-100 max-h-fill-below-header">
                 {children}
               </div>
             </main>

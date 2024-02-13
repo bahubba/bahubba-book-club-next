@@ -16,6 +16,7 @@ import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';
 import PlusIcon from '@/components/icons/plus.icon';
+import Link from 'next/link';
 
 // Component props
 interface BookClubHomePageProps {
@@ -128,7 +129,7 @@ const BookClubHomePage = ({
     <div className="flex-1 flex flex-col h-full pb-2">
       <SectionHeaderLayout
         title={
-          <h1 className="flex-shrink ms-2 mb-2 text-3xl font-bold">
+          <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
             <Suspense fallback={<></>}>
               <BookClubPageHeader bookClubSlug={bookClubSlug} />
             </Suspense>
@@ -139,7 +140,7 @@ const BookClubHomePage = ({
           <BookClubButtons bookClubSlug={bookClubSlug} />
         </Suspense>
       </SectionHeaderLayout>
-      <div className="flex flex-1 w-full pb-2">
+      <div className="flex flex-1 w-full">
         <PageSectionLayout header="Members">
           <Suspense
             fallback={
@@ -155,7 +156,11 @@ const BookClubHomePage = ({
           <div>Some long text string that will take up some width</div>
         </PageSectionLayout>
         <PageSectionLayout
-          header="Discussions"
+          header={
+            <Link href={`/book-club/${bookClubSlug}/discussions`}>
+              Discussions
+            </Link>
+          }
           sectionHeaderChildren={
             <LinkButton
               uri={`/book-club/${bookClubSlug}/discussions/create`}

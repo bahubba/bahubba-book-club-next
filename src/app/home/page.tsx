@@ -19,8 +19,8 @@ const BookClubs = async () => {
 /** The home page for the application, showing a user's clubs, books, and trending info */
 const HomePage = () => (
   <div className="flex-1 flex flex-col h-full pb-2">
-    <h1 className="flex-shrink ms-2 mb-2 text-3xl font-bold">Home</h1>
-    <div className="flex-1 flex w-full pb-2">
+    <h1 className="flex-shrink ms-2 my-2 text-3xl font-bold">Home</h1>
+    <div className="flex-1 flex w-full">
       <PageSectionLayout
         header="Clubs"
         sectionHeaderChildren={
