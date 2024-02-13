@@ -10,7 +10,12 @@ import DiscussionForm from '@/components/forms/discussion.form';
 const CreateDiscussionPage = ({
   params: { bookClubSlug }
 }: Readonly<{ params: { bookClubSlug: string } }>) => (
-  <DiscussionForm bookClubSlug={bookClubSlug} />
+  <>
+    <h1 className="flex-shrink text-2xl font-bold">
+      Start New Book Club Discussion
+    </h1>
+    <DiscussionForm bookClubSlug={bookClubSlug} />
+  </>
 );
 
 export default CreateDiscussionPage;

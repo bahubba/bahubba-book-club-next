@@ -25,12 +25,7 @@ const CreateDiscussionLayout = ({
     needsAdmin
   >
     <div className="flex justify-center w-full max-h-fill-below-header">
-      <div className="flex flex-col min-w-[50vw] max-w-[75vw] gap-y-2">
-        <h1 className="flex-shrink text-2xl font-bold">
-          Start New Book Club Discussion
-        </h1>
-        {children}
-      </div>
+      <div className="flex flex-col min-w-[50vw] max-w-[75vw]">{children}</div>
     </div>
   </ProtectedRoute>
 );
