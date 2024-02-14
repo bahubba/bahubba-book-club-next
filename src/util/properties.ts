@@ -9,6 +9,7 @@ const props: Props = {
   APP: {
     NAME: process.env.BBCM_APP_NAME || 'BAHubba Book Club Manager',
     RESERVED_CLUB_NAMES: ['', '_', 'create', 'search', 'default'],
+    RESERVED_DISCUSSION_NAMES: ['', '_', 'create', 'search', 'default'],
     DEFAULT_BOOK_CLUB_DESCRIPTION: 'A book club for reading books'
   },
   DB: {

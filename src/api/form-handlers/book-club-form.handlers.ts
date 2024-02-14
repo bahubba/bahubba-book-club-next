@@ -49,7 +49,10 @@ export const handleCreateBookClub = async (
     Publicity.PRIVATE;
 
   // Slugify the name
-  const slug = slugify(name, { lower: true });
+  const slug = slugify(name, {
+    lower: true,
+    remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
+  });
 
   // Ensure the slug is not empty or a reserved word
   if (props.APP.RESERVED_CLUB_NAMES.includes(slug))
@@ -105,7 +108,10 @@ export const handleUpdateBookClub = async (
   // Pull out the form data and ensure it's valid
   const previousSlug = formData.get('previousSlug')?.toString().trim() || '';
   const name = formData.get('name')?.toString().trim() ?? '';
-  const slug = slugify(name, { lower: true });
+  const slug = slugify(name, {
+    lower: true,
+    remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
+  });
   const description =
     formData.get('description')?.toString().trim() ||
     'A book club for reading books';

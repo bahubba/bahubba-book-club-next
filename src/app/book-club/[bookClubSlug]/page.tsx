@@ -43,6 +43,7 @@ const AdHocDiscussions = async ({
         <DiscussionCard
           key={discussion.title}
           discussion={discussion}
+          bookClubSlug={bookClubSlug}
         />
       ))}
     </div>

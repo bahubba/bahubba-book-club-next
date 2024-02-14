@@ -21,6 +21,7 @@ const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
           <DiscussionCard
             key={discussion.title}
             discussion={discussion}
+            bookClubSlug={bookClubSlug}
           />
         </>
       ))}
