@@ -75,6 +75,7 @@ export interface MembershipRequestProperties {
 // Discussion node properties
 export interface DiscussionProperties {
   title: string;
+  slug: string;
   description?: string;
   isActive: boolean;
   created: Date | string;

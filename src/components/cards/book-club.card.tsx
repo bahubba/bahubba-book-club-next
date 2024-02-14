@@ -34,7 +34,12 @@ const BookClubCard = ({ bookClub }: { bookClub: BookClubProperties }) => {
 
   return (
     // TODO - Get the image from S3
-    <Link href={`/book-club/${slugify(bookClub.name, { lower: true })}`}>
+    <Link
+      href={`/book-club/${slugify(bookClub.name, {
+        lower: true,
+        remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
+      })}`}
+    >
       <Tooltip
         className="bg-opacity-75 bg-black text-white"
         showArrow
