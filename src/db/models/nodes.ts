@@ -74,13 +74,21 @@ export interface MembershipRequestProperties {
 
 // Discussion node properties
 export interface DiscussionProperties {
+  id: string;
   title: string;
-  slug: string;
   description?: string;
   isActive: boolean;
   created: Date | string;
   lastUpdated: Date | string;
   closed?: Date | string;
+}
+
+// Reply node properties
+export interface ReplyProperties {
+  id: string;
+  content: string;
+  isActive: boolean;
+  created: Date | string;
 }
 
 /** TUPLES/COMBOS OF NODE PROPERTIES */
