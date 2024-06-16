@@ -39,9 +39,12 @@ export const handleCreateAdHocDiscussion = async (
   const role = await findBookClubRole(bookClubSlug, email);
   if (!role) return { error: 'Unauthorized' };
 
+  // Create an ID for the discussion
+  const id = uuidv4();
+
   // Create the discussion
   await createAdHocDiscussion(bookClubSlug, email, {
-    id: uuidv4(),
+    id,
     title,
     description,
     isActive: true,
@@ -49,10 +52,8 @@ export const handleCreateAdHocDiscussion = async (
     lastUpdated: new Date().toISOString()
   });
 
-  // On success, revalidate the book club home page and redirect to it
-  // TODO - go to the book club's discussion page
-  revalidatePath(`/book-club/${bookClubSlug}`);
-  redirect(`/book-club/${bookClubSlug}`);
+  // On success, navigate to the new discussion page
+  redirect(`/book-club/${bookClubSlug}/discussions/${id}`);
 };
 
 /**
@@ -71,6 +72,7 @@ export const handleReplyToDiscussion = async (
 
   // Pull out the form data
   const bookClubSlug = formData.get('slug')?.toString().trim() || '';
+  const discussionID = formData.get('discussionID')?.toString().trim() || '';
   const nodeID = formData.get('nodeID')?.toString().trim() || '';
   const content = formData.get('content')?.toString().trim() || '';
 
@@ -83,7 +85,8 @@ export const handleReplyToDiscussion = async (
   ); // DELETEME
 
   // Ensure the slug is not empty
-  if (!bookClubSlug || !nodeID || !content)
+  // TODO - Move error messages/statuses into an enum for easier maintenance
+  if (!bookClubSlug || !discussionID || !nodeID || !content)
     return { error: 'Invalid form data' };
 
   // Ensure the user is a member of the book club
@@ -98,8 +101,7 @@ export const handleReplyToDiscussion = async (
     created: new Date().toISOString()
   });
 
-  // On success, revalidate the book club home page and redirect to it
-  // TODO - go to the book club's discussion page
-  revalidatePath(`/book-club/${bookClubSlug}`);
-  redirect(`/book-club/${bookClubSlug}`);
+  // On success, revalidate the discussion page and return a success status
+  revalidatePath(`/book-club/${bookClubSlug}/discussions/${discussionID}`);
+  return { error: '', succeeded: true };
 };
