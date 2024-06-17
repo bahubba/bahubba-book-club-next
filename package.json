@@ -14,7 +14,6 @@
     "@nextui-org/react": "^2.2.9",
     "@types/uuid": "^9.0.8",
     "framer-motion": "^11.0.3",
-    "lodash": "^4.17.21",
     "neo4j-driver": "^5.17.0",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
@@ -26,7 +25,6 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.202",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

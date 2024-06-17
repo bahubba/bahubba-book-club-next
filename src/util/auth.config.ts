@@ -1,7 +1,6 @@
 import { NextAuthOptions } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
-import _ from 'lodash';
 
 import {
   addProviderProfile,
@@ -14,6 +13,8 @@ import {
   ProviderProfileProperties,
   UserAndProviderProfile
 } from '@/db/models/nodes';
+
+import props from '@/util/properties';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -41,10 +42,7 @@ export const authOptions: NextAuthOptions = {
       const user = await findUser(email);
 
       // Format the provider
-      const provider =
-        account.provider === 'github'
-          ? 'GitHub'
-          : _.startCase(account.provider);
+      const provider = account.provider.toUpperCase();
 
       // Collect the provider profile properties
       const providerProfile: ProviderProfileProperties = {
