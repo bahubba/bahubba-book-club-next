@@ -46,24 +46,25 @@ export const authOptions: NextAuthOptions = {
 
       // Collect the provider profile properties
       const providerProfile: ProviderProfileProperties = {
+        provider,
         userId: account.userId ?? authUser.id,
         providerAccountId: account.providerAccountId,
         name: authUser.name ?? profile.name ?? 'Anonymous User',
         sub: profile.sub,
-        image: profile.image ?? authUser.image
+        image: profile.image ?? authUser.image,
+        isActive: true
       };
 
       // TODO - Catch error
       // Check if the user exists in Neo4j
       const neo4jUser: UserAndProviderProfile =
-        await findUserAndProviderProfile(email, provider);
+        await findUserAndProviderProfile(email, provider, account.userId ?? authUser.id);
 
       // Update user info in Neo4j if necessary
       if (!neo4jUser.user) {
         // Create a new user with the provider profile
         // TODO - Catch error
         await addUser(
-          provider,
           {
             email,
             preferredName: authUser.name ?? profile.name ?? 'Anonymous User',
@@ -75,10 +76,10 @@ export const authOptions: NextAuthOptions = {
         );
       } else if (!neo4jUser.profile) {
         // Create a new provider profile for the user
-        await addProviderProfile(email, provider, providerProfile);
+        await addProviderProfile(email, providerProfile);
       } else {
         // Update the provider profile for the user
-        await updateProviderProfile(email, provider, providerProfile);
+        await updateProviderProfile(email, providerProfile);
       }
 
       return true;

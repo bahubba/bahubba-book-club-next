@@ -99,7 +99,7 @@ export const getBookClubMembers = async (
   }
 
   // Fetch the book club and return its members
-  return toJSON(await findBookClubMembers(slug));
+  return toJSON(await findBookClubMembers(slug)) as UserAndMembership[];
 };
 
 /**
