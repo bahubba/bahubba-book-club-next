@@ -10,7 +10,8 @@ const props: Props = {
     NAME: process.env.BBCM_APP_NAME || 'BAHubba Book Club Manager',
     RESERVED_CLUB_NAMES: ['', '_', 'create', 'search', 'default'],
     RESERVED_DISCUSSION_NAMES: ['', '_', 'create', 'search', 'default'],
-    DEFAULT_BOOK_CLUB_DESCRIPTION: 'A book club for reading books'
+    DEFAULT_BOOK_CLUB_DESCRIPTION: 'A book club for reading books',
+    LOGOUT_ERRORS: ['Not authenticated', 'No user found']
   },
   DB: {
     ATLAS_URI: `mongodb+srv://${process.env.BBCM_ATLAS_USER}:${process.env.BBCM_ATLAS_PW}@${process.env.BBCM_ATLAS_URI}`,
@@ -24,7 +25,9 @@ const props: Props = {
   },
   AWS: {
     S3_PRE_SIGNED_URL_EXPIRATION:
-      process.env.BBCM_AWS_S3_PRE_SIGNED_URL_EXPIRATION || 60 * 5 // 5 minutes
+      process.env.BBCM_AWS_S3_PRE_SIGNED_URL_EXPIRATION || 60 * 5, // 5 minutes
+    S3_BUCKET: process.env.BBCM_AWS_S3_BUCKET || '',
+    S3_BOOK_CLUB_IMAGE_PATH: process.env.BBCM_AWS_S3_BOOK_CLUB_IMAGE_PATH || ''
   }
 };
 

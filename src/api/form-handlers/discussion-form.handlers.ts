@@ -76,14 +76,6 @@ export const handleReplyToDiscussion = async (
   const nodeID = formData.get('nodeID')?.toString().trim() || '';
   const content = formData.get('content')?.toString().trim() || '';
 
-  console.log(
-    'bookClubSlug, email, nodeID, content',
-    bookClubSlug,
-    email,
-    nodeID,
-    content
-  ); // DELETEME
-
   // Ensure the slug is not empty
   // TODO - Move error messages/statuses into an enum for easier maintenance
   if (!bookClubSlug || !discussionID || !nodeID || !content)

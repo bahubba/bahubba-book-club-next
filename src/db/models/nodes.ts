@@ -26,11 +26,13 @@ export enum MembershipRequestStatus {
 
 // Provider profile node properties
 export interface ProviderProfileProperties {
+  provider: string;
   userId: string | undefined;
   providerAccountId: string;
   name: string;
   sub: string | undefined;
   image: string | null | undefined;
+  isActive: boolean;
 }
 
 // User node properties
