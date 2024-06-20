@@ -8,10 +8,7 @@ import DiscussionCard from '@/components/cards/discussion.card';
 import LinkButton from '@/components/buttons/link.button';
 import AdminIcon from '@/components/icons/admin.icon';
 import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
-import {
-  getBookClubName,
-  getBookClubRole
-} from '@/api/fetchers/book-club.fetchers';
+import { getBookClubName, getBookClubRole } from '@/api/fetchers/book-club.fetchers';
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';

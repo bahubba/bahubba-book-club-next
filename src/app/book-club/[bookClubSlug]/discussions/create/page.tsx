@@ -3,9 +3,9 @@ import DiscussionForm from '@/components/forms/discussion.form';
 /**
  * Page for creating a new discussion
  *
- * @prop {Object} props - Component props
- * @prop {Object} props.params - The route parameters
- * @prop {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Object} props - Component props
+ * @param {Object} props.params - The route parameters
+ * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const CreateDiscussionPage = ({
   params: { bookClubSlug }

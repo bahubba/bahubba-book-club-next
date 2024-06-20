@@ -3,16 +3,8 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Button } from '@nextui-org/button';
-import { Input } from '@nextui-org/input';
-import { Textarea } from '@nextui-org/input';
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  useDisclosure
-} from '@nextui-org/modal';
+import { Input, Textarea } from '@nextui-org/input';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/modal';
 import { handleReplyToDiscussion } from '@/api/form-handlers/discussion-form.handlers';
 import SubmitButton from '../buttons/submit.button';
 import { ReplyComponentProps } from '@/components/buttons/reply.button';

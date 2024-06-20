@@ -1,7 +1,7 @@
 import { ensureAuth } from '../auth.api';
 import {
-  hasOpenRequest as fetchHasOpenRequest,
-  findMembershipRequests
+  findMembershipRequests,
+  hasOpenRequest as fetchHasOpenRequest
 } from '@/db/repositories/membership-request.repository';
 import { UserAndMembershipRequest } from '@/db/models/nodes';
 import { toJSON } from '@/util/helpers';
@@ -34,5 +34,5 @@ export const getMembershipRequests = async (
   const { email } = await ensureAuth();
 
   // Fetch the membership requests
-  return toJSON(await findMembershipRequests(slug, email));
+  return toJSON(await findMembershipRequests(slug, email)) as UserAndMembershipRequest[];
 };

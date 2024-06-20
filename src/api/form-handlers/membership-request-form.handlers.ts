@@ -4,16 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { ensureAuth } from '../auth.api';
-import {
-  requestMembership,
-  reviewMembershipRequest
-} from '@/db/repositories/membership-request.repository';
-import {
-  addMember,
-  checkMembership,
-  findBookClubRole,
-  reinstateMember
-} from '@/db/repositories/membership.repository';
+import { requestMembership, reviewMembershipRequest } from '@/db/repositories/membership-request.repository';
+import { addMember, checkMembership, findBookClubRole, reinstateMember } from '@/db/repositories/membership.repository';
 import { MembershipRequestStatus, Role } from '@/db/models/nodes';
 import { ErrorFormState } from './state-interfaces';
 

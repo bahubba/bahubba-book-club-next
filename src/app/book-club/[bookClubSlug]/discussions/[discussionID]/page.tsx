@@ -16,9 +16,9 @@ interface BookClubDiscussionPageProps {
 /**
  * Async component for the book club discussion header
  *
- * @prop {Object} props - Component props
- * @prop {string} props.bookClubSlug - The slug of the book club
- * @prop {string} props.discussionID - The slug of the discussion
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {string} props.discussionID - The slug of the discussion
  */
 const BookClubDiscussionHeader = async ({
   bookClubSlug,
@@ -31,7 +31,7 @@ const BookClubDiscussionHeader = async ({
     <>
       <h1 className="text-2xl font-bold my-2">{discussion.title}</h1>
       <p className="text-gray-500">{discussion.description}</p>
-      <div className="flex justify-end w-full">
+      <div className="flex justify-center w-full">
         <ReplyButton
           bookClubSlug={bookClubSlug}
           discussionID={discussionID}
@@ -47,9 +47,9 @@ const BookClubDiscussionHeader = async ({
 /**
  * Book club discussion page
  *
- * @prop {Object} props - Component props
- * @prop {Object} props.params - The route parameters
- * @prop {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Object} props - Component props
+ * @param {Object} props.params - The route parameters
+ * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const BookClubDiscussionPage = ({
   params: { bookClubSlug, discussionID }

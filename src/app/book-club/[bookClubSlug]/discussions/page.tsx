@@ -7,8 +7,8 @@ import DiscussionCard from '@/components/cards/discussion.card';
 /**
  * Async component for loading book club discussion cards
  *
- * @prop {Object} props - Component props
- * @prop {string} props.bookClubSlug - The slug of the book club
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
  */
 const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
   // Load the discussions
@@ -32,9 +32,9 @@ const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
 /**
  * Book club discussions home page
  *
- * @prop {Object} props - Component props
- * @prop {Object} props.params - The route parameters
- * @prop {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Object} props - Component props
+ * @param {Object} props.params - The route parameters
+ * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const BookClubDiscussionsPage = ({
   params: { bookClubSlug }

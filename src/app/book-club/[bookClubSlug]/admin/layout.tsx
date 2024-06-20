@@ -12,8 +12,8 @@ interface BookClubLayoutProps {
 /**
  * Book club admin layout
  *
- * @prop {Object} props - The component props
- * @prop {React.ReactNode} props.children - The children components
+ * @param {Object} props - The component props
+ * @param {React.ReactNode} props.children - The children components
  * @param {Object} props.params - The route parameters
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */

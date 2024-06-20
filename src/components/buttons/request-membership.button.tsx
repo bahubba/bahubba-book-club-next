@@ -40,9 +40,9 @@ const FilteredRequestMembershipButton = async ({
 /**
  * Button linking to the request membership page for a book club
  *
- * @prop {Object} props - The component's props
- * @prop {string} props.bookClubSlug - The slug of the book club
- * @prop {boolean} props.isMember - Whether the user is a member of the book club
+ * @param {Object} props - The component's props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {boolean} props.isMember - Whether the user is a member of the book club
  */
 const RequestMembershipButton = ({
   bookClubSlug

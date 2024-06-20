@@ -12,10 +12,10 @@ interface LinkButtonProps {
 /**
  * Icon button linking to a page
  *
- * @prop {Object} props - The component's props
- * @prop {string} props.uri - The URI to link to
- * @prop {string} props.tooltip - The text to display in the tooltip
- * @prop {React.ReactNode} props.children - The icon to display in the button
+ * @param {Object} props - The component's props
+ * @param {string} props.uri - The URI to link to
+ * @param {string} props.tooltip - The text to display in the tooltip
+ * @param {React.ReactNode} props.children - The icon to display in the button
  */
 const LinkButton = ({ uri, tooltip, children }: Readonly<LinkButtonProps>) => (
   <Tooltip

@@ -12,17 +12,10 @@ import {
   findBookClubsBySearch,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
-import {
-  ErrorFormState,
-  SearchFormState
-} from '@/api/form-handlers/state-interfaces';
+import { ErrorFormState, SearchFormState } from '@/api/form-handlers/state-interfaces';
 import { Publicity, Role } from '@/db/models/nodes';
 import props from '@/util/properties';
-import {
-  advancePicker,
-  findBookClubRole
-} from '@/db/repositories/membership.repository';
-import { getServerSession } from 'next-auth';
+import { advancePicker, findBookClubRole } from '@/db/repositories/membership.repository';
 
 /**
  * Handle submitting a new book club

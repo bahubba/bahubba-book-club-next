@@ -5,16 +5,11 @@ import GoogleProvider from 'next-auth/providers/google';
 import {
   addProviderProfile,
   addUser,
+  findUser,
   findUserAndProviderProfile,
-  updateProviderProfile,
-  findUser
+  updateProviderProfile
 } from '@/db/repositories/user.repository';
-import {
-  ProviderProfileProperties,
-  UserAndProviderProfile
-} from '@/db/models/nodes';
-
-import props from '@/util/properties';
+import { ProviderProfileProperties, UserAndProviderProfile } from '@/db/models/nodes';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,

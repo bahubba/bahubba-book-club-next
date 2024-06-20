@@ -1,5 +1,5 @@
 import { driver } from '@/db/connect-neo4j';
-import { DiscussionProperties, ReplyProperties } from '@/db/models/nodes';
+import { DiscussionPreview, DiscussionProperties, ReplyProperties } from '@/db/models/nodes';
 
 /**
  * Create an ad-hoc discussion for a book club and relate the book club and member to it
@@ -42,12 +42,12 @@ export const createAdHocDiscussion = async (
  *
  * @param {string} bookClubSlug - The slug of the book club
  * @param {string} email - The email of the member
- * @return {Promise<DiscussionProperties[]>} - The discussions
+ * @return {Promise<DiscussionPreview[]>} - The discussions
  */
 export const findAdHocDiscussions = async (
   bookClubSlug: string,
   email: string
-): Promise<DiscussionProperties[]> => {
+): Promise<DiscussionPreview[]> => {
   // Connect to Neo4j
   const session = driver.session();
 
@@ -59,14 +59,21 @@ export const findAdHocDiscussions = async (
     WHERE bc.publicity = 'PUBLIC' OR (
       EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
     )
-    RETURN d
+    OPTIONAL MATCH (d)-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+    WITH d, r { .*, user: u { .* } }
+    ORDER BY r.created DESC
+    WITH d, COLLECT(r)[..2] AS latestReplies
+    RETURN d {
+      .*,
+      replies: latestReplies
+    }
     `,
     { bookClubSlug, email }
   );
 
   // Close the session and return the discussions
   session.close();
-  return result.records.map(record => record.get('d').properties);
+  return result.records.map(record => record.get('d'));
 };
 
 /**

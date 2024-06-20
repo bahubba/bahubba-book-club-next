@@ -9,10 +9,7 @@ import { Radio, RadioGroup } from '@nextui-org/radio';
 import BookClubImagePickerModal from '@/components/modals/book-club-image-picker.modal';
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
-import {
-  handleCreateBookClub,
-  handleUpdateBookClub
-} from '@/api/form-handlers/book-club-form.handlers';
+import { handleCreateBookClub, handleUpdateBookClub } from '@/api/form-handlers/book-club-form.handlers';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 import { BookClubProperties, Publicity } from '@/db/models/nodes';
 
@@ -27,8 +24,8 @@ interface FormValues {
 /**
  * Form for creating or updating a book club's details
  *
- * @prop {Object} props - The component props
- * @prop {BookClubProperties} props.bookClub - The book club to edit
+ * @param {Object} props - The component props
+ * @param {BookClubProperties} props.bookClub - The book club to edit
  */
 const BookClubDetailsForm = ({
   bookClub
