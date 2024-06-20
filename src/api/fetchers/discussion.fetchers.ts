@@ -1,6 +1,6 @@
-import { DiscussionProperties, DiscussionPreview } from '@/db/models/nodes';
+import { DiscussionProperties, DiscussionPreview, RepliesAndTotalPage } from '@/db/models/nodes';
 import { ensureAuth } from '@/api/auth.api';
-import { findAdHocDiscussions, findDiscussion } from '@/db/repositories/discussion.repository';
+import { findAdHocDiscussions, findDiscussion, findDiscussionReplies } from '@/db/repositories/discussion.repository';
 
 /**
  * Get ad-hoc discussions for a book club
@@ -35,3 +35,25 @@ export const getDiscussion = async (
   // Fetch and return the discussion
   return await findDiscussion(bookClubSlug, discussionID, email);
 };
+
+/**
+ * Get a paginated list of discussion replies along with the total number of replies
+ *
+ * @param {string} bookClubSlug The slug of the book club
+ * @param {string} discussionID The ID of the discussion
+ * @param {number} pageSize The number of results to return in a page
+ * @param {number} pageNum The page number
+ * @return {Promise<RepliesAndTotalPage>} The replies and total
+ */
+export const getDiscussionReplies = async (
+  bookClubSlug: string,
+  discussionID: string,
+  pageSize: number,
+  pageNum: number
+): Promise<RepliesAndTotalPage> => {
+  // Ensure the user is authenticated and get their email
+  const { email } = await ensureAuth();
+
+  // Fetch and return a page of replies for the discussion
+  return await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum);
+}

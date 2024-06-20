@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { Spinner } from '@nextui-org/react';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
@@ -12,8 +13,7 @@ import { getBookClubName, getBookClubRole } from '@/api/fetchers/book-club.fetch
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';
-import PlusIcon from '@/components/icons/plus.icon';
-import Link from 'next/link';
+import ChatIcon from '@/components/icons/chat.icon';
 
 // Component props
 interface BookClubHomePageProps {
@@ -138,7 +138,7 @@ const BookClubHomePage = ({
           <BookClubButtons bookClubSlug={bookClubSlug} />
         </Suspense>
       </SectionHeaderLayout>
-      <div className="flex flex-1 w-full">
+      <div className="flex flex-1 w-full h-1">
         <PageSectionLayout header="Members">
           <Suspense
             fallback={
@@ -164,7 +164,7 @@ const BookClubHomePage = ({
               uri={`/book-club/${bookClubSlug}/discussions/create`}
               tooltip="Create a discussion"
             >
-              <PlusIcon />
+              <ChatIcon />
             </LinkButton>
           }
         >
@@ -177,7 +177,6 @@ const BookClubHomePage = ({
           >
             <AdHocDiscussions bookClubSlug={bookClubSlug} />
           </Suspense>
-          <span>Link to add discussion goes here</span>
         </PageSectionLayout>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { driver } from '@/db/connect-neo4j';
-import { DiscussionPreview, DiscussionProperties, ReplyProperties } from '@/db/models/nodes';
+import { DiscussionPreview, DiscussionProperties, RepliesAndTotalPage, ReplyProperties } from '@/db/models/nodes';
+import { int } from 'neo4j-driver';
 
 /**
  * Create an ad-hoc discussion for a book club and relate the book club and member to it
@@ -108,6 +109,51 @@ export const findDiscussion = async (
   session.close();
   return result.records[0].get('d').properties;
 };
+
+/**
+ * Retrieve a paginated list of discussion replies along with the total number of replies
+ *
+ * @param {string} bookClubSlug The slug of the book club
+ * @param {string} discussionID The ID of the discussion
+ * @param {string} email The user's email
+ * @param {number} pageSize The number of results to return in a page
+ * @param {number} pageNum The page number
+ * @return {Promise<RepliesAndTotalPage>} The replies and total
+ */
+export const findDiscussionReplies = async (
+  bookClubSlug: string,
+  discussionID: string,
+  email: string,
+  pageSize: number,
+  pageNum: number
+): Promise<RepliesAndTotalPage> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Get the replies and total
+  const result = await session.run(
+    `
+    MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+    WHERE bc.publicity = 'PUBLIC' OR (
+      EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
+    )
+    WITH r { .*, user: u { .* } }
+    ORDER BY r.created
+    SKIP $skip
+    LIMIT $limit
+    WITH collect(r) as replies
+    RETURN replies, size(replies) as total
+    `,
+    { bookClubSlug, discussionID, email, skip: int(pageSize * pageNum), limit: int(pageSize) }
+  );
+
+  // Close the session and return
+  session.close();
+  return {
+    replies: result.records[0].get('replies'),
+    total: result.records[0].get('total')
+  };
+}
 
 /**
  * Check existence of a discussion slug within a book club

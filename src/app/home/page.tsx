@@ -20,7 +20,7 @@ const BookClubs = async () => {
 const HomePage = () => (
   <div className="flex-1 flex flex-col h-full pb-2">
     <h1 className="flex-shrink ms-2 my-2 text-3xl font-bold">Home</h1>
-    <div className="flex-1 flex w-full">
+    <div className="flex-1 flex w-full h-1">
       <PageSectionLayout
         header="Clubs"
         sectionHeaderChildren={

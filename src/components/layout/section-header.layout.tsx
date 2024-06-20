@@ -31,7 +31,7 @@ const SectionHeaderLayout = ({
 
   return (
     <div
-      className="flex items-center w-full gap-x-4"
+      className="flex-shrink flex-grow-0 flex items-center w-full gap-x-4"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
