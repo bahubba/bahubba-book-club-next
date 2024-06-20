@@ -6,10 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ensureAuth } from '@/api/auth.api';
 import { ErrorFormState } from './state-interfaces';
-import {
-  createAdHocDiscussion,
-  replyToDiscussion
-} from '@/db/repositories/discussion.repository';
+import { createAdHocDiscussion, replyToDiscussion } from '@/db/repositories/discussion.repository';
 import { findBookClubRole } from '@/db/repositories/membership.repository';
 
 /**

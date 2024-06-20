@@ -1,9 +1,5 @@
 import { driver } from '@/db/connect-neo4j';
-import {
-  ProviderProfileProperties,
-  UserAndProviderProfile,
-  UserProperties
-} from '../models/nodes';
+import { ProviderProfileProperties, UserAndProviderProfile, UserProperties } from '../models/nodes';
 
 /**
  * Add a new user to Neo4j, including User and ProviderProfile nodes and a relationship between them

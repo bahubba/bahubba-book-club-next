@@ -3,10 +3,7 @@ import { getServerSession } from 'next-auth';
 import { Spinner } from '@nextui-org/spinner';
 
 import BookClubAdminMembersTable from '@/components/tables/book-club-admin-members.table';
-import {
-  getBookClubRole,
-  getBookClubMembers
-} from '@/api/fetchers/book-club.fetchers';
+import { getBookClubMembers, getBookClubRole } from '@/api/fetchers/book-club.fetchers';
 import { Role } from '@/db/models/nodes';
 
 // Page props
@@ -19,8 +16,8 @@ interface BookClubAdminMembersPageProps {
 /**
  * Async component for rendering the admin member's table after fetching data
  *
- * @prop {Object} props - The component props
- * @prop {string} props.bookClubSlug The slug of the book club
+ * @param {Object} props - The component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembersTableWrapper = async ({
   bookClubSlug
@@ -45,9 +42,9 @@ const BookClubAdminMembersTableWrapper = async ({
 /**
  * Page for managing members of a book club
  *
- * @prop {Object} props Component props
- * @prop {Object} props.params The parameters of the page
- * @prop {string} props.params.bookClubSlug The slug of the book club
+ * @param {Object} props Component props
+ * @param {Object} props.params The parameters of the page
+ * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembersPage = ({
   params: { bookClubSlug }

@@ -1,18 +1,11 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from '@nextui-org/table';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table';
 
 import MemberRoleForm from '../forms/member-role.form';
 import RemoveMemberButton from '../buttons/remove-member.button';
-import { UserAndMembership, Role } from '@/db/models/nodes';
+import { Role, UserAndMembership } from '@/db/models/nodes';
 
 // Component props
 interface BookClubAdminMembersTableProps {
@@ -25,10 +18,10 @@ interface BookClubAdminMembersTableProps {
 /**
  * Table displaying members in rows as editable forms
  *
- * @prop {Object} props Component props
- * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {Role} props.adminRole The role of the current user
- * @prop {UserAndMembership[]} props.members The members of the book club
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
+ * @param {Role} props.adminRole The role of the current user
+ * @param {UserAndMembership[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({
   bookClubSlug,

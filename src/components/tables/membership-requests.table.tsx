@@ -1,26 +1,16 @@
 'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from '@nextui-org/table';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table';
 
-import {
-  MembershipRequestStatus,
-  UserAndMembershipRequest
-} from '@/db/models/nodes';
+import { MembershipRequestStatus, UserAndMembershipRequest } from '@/db/models/nodes';
 import ReviewMembershipRequestButton from '../buttons/review-membership-request.button';
 
 /**
  * Table displaying membership requests in rows
  *
- * @prop {Object} props Component props
- * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {UserAndMembershipRequest[]} props.membershipRequests The membership requests
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
+ * @param {UserAndMembershipRequest[]} props.membershipRequests The membership requests
  */
 const MembershipRequestsTable = ({
   bookClubSlug,

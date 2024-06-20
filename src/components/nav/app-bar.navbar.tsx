@@ -1,11 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  Navbar as NUINavBar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem
-} from '@nextui-org/navbar';
+import { Navbar as NUINavBar, NavbarBrand, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 
 import AuthButton from '@/components/buttons/auth.button';
 import UserAvatar from '@/components/avatars/user.avatar';

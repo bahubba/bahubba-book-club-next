@@ -39,9 +39,9 @@ const PickOrderWrapper = async ({
 /**
  * Book club admin sub-page for displaying and managing the pick order
  *
- * @prop {Object} props Component props
- * @prop {Object} props.params The parameters of the page
- * @prop {string} props.params.bookClubSlug The slug of the book club
+ * @param {Object} props Component props
+ * @param {Object} props.params The parameters of the page
+ * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminPickOrderPage = ({
   params: { bookClubSlug }

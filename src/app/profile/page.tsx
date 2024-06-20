@@ -1,14 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from '@nextui-org/table';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table';
 
 /** The profile page, showing the user's profile information */
 const ProfilePage = () => {

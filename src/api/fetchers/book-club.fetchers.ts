@@ -2,19 +2,14 @@
 
 import { ensureAuth } from '@/api/auth.api';
 import {
-  findBookClubs,
   findBookClub,
-  findBookClubPublicity,
   findBookClubMembers,
-  findBookClubName
+  findBookClubName,
+  findBookClubPublicity,
+  findBookClubs
 } from '@/db/repositories/book-club.repository';
 import { findBookClubRole } from '@/db/repositories/membership.repository';
-import {
-  BookClubProperties,
-  Publicity,
-  Role,
-  UserAndMembership
-} from '@/db/models/nodes';
+import { BookClubProperties, Publicity, Role, UserAndMembership } from '@/db/models/nodes';
 import { toJSON } from '@/util/helpers';
 
 /**

@@ -22,12 +22,12 @@ interface MemberRoleFormProps {
 /**
  * Form for updating a member's role in a book club
  *
- * @prop {Object} props Component props
- * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {string} props.email The email of the current user
- * @prop {string} props.memberEmail The email of the member whose role is being updated
- * @prop {Role} props.adminRole The role of the current user
- * @prop {Role} props.role The current role of the user being updated
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
+ * @param {string} props.email The email of the current user
+ * @param {string} props.memberEmail The email of the member whose role is being updated
+ * @param {Role} props.adminRole The role of the current user
+ * @param {Role} props.role The current role of the user being updated
  */
 const MemberRoleForm = ({
   bookClubSlug,

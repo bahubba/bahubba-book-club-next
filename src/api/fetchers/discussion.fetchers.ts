@@ -1,19 +1,16 @@
-import { DiscussionProperties } from '@/db/models/nodes';
+import { DiscussionProperties, DiscussionPreview } from '@/db/models/nodes';
 import { ensureAuth } from '@/api/auth.api';
-import {
-  findAdHocDiscussions,
-  findDiscussion
-} from '@/db/repositories/discussion.repository';
+import { findAdHocDiscussions, findDiscussion } from '@/db/repositories/discussion.repository';
 
 /**
  * Get ad-hoc discussions for a book club
  *
  * @param {string} bookClubSlug - The slug of the book club
- * @return {Promise<DiscussionProperties[]>}
+ * @return {Promise<DiscussionPreview[]>}
  */
 export const getAdHocDiscussions = async (
   bookClubSlug: string
-): Promise<DiscussionProperties[]> => {
+): Promise<DiscussionPreview[]> => {
   // Ensure the user is authenticated and get their email
   const { email } = await ensureAuth();
 

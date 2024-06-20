@@ -1,10 +1,5 @@
 import { driver } from '@/db/connect-neo4j';
-import {
-  BookClubProperties,
-  MembershipProperties,
-  Publicity,
-  UserAndMembership
-} from '@/db/models/nodes';
+import { BookClubProperties, MembershipProperties, Publicity, UserAndMembership } from '@/db/models/nodes';
 
 /**
  * Add a book club node with the user as an owner

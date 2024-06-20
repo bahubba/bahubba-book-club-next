@@ -113,6 +113,16 @@ export interface UserAndMembershipRequest {
   request: MembershipRequestProperties;
 }
 
+// Discussion reply with user
+export interface ReplyWithUser extends ReplyProperties {
+  user: UserProperties;
+}
+
+// Discussion with replies
+export interface DiscussionPreview extends DiscussionProperties {
+  replies: ReplyWithUser[];
+}
+
 /** NODES */
 
 // OAuth2 provider profile node
@@ -143,4 +153,9 @@ export interface MembershipRequestNode extends Node {
 // Discussion node
 export interface DiscussionNode extends Node {
   properties: DiscussionProperties;
+}
+
+// Reply Node
+export interface ReplyNode extends Node {
+  properties: ReplyProperties;
 }

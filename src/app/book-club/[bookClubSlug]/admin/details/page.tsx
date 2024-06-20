@@ -14,8 +14,8 @@ interface BookClubAdminDetailsPageProps {
 /**
  * Async component for rendering the admin details form after fetching data
  *
- * @prop {Object} props - The component props
- * @prop {string} props.bookClubSlug The slug of the book club
+ * @param {Object} props - The component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
 const BookClubDetailsFormWrapper = async ({
   bookClubSlug
@@ -33,9 +33,9 @@ const BookClubDetailsFormWrapper = async ({
 /**
  * Book club details admin page
  *
- * @prop {Object} props - The page props
- * @prop {BookClubAdminDetailsPageProps} props.params - The page params
- * @prop {string} props.params.bookClubSlug - The book club slug from the URL path
+ * @param {Object} props - The page props
+ * @param {BookClubAdminDetailsPageProps} props.params - The page params
+ * @param {string} props.params.bookClubSlug - The book club slug from the URL path
  */
 const BookClubAdminDetailsPage = ({
   params: { bookClubSlug }
