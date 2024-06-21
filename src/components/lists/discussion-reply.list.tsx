@@ -1,69 +1,57 @@
-'use client';
-
-import { Fragment, useEffect, useState } from 'react';
-
-import { getDiscussionReplies } from '@/api/fetchers/discussion.fetchers';
-import { ReplyWithUser } from '@/db/models/nodes';
-import { User } from '@nextui-org/user';
+import { Fragment, Suspense } from 'react';
+import { redirect } from 'next/navigation';
 import { Divider } from '@nextui-org/divider';
-import { Button } from '@nextui-org/button';
+import { User } from '@nextui-org/user';
+
+import { getDiscussionReplies, getDiscussionReplyCount } from '@/api/fetchers/discussion.fetchers';
+import { Pagination } from '@nextui-org/pagination';
+import URLQueryPagination from '@/components/pagination/url-query.pagination';
+import ReplyButton from '@/components/buttons/reply.button';
+import { ScrollShadow } from '@nextui-org/scroll-shadow';
 
 // Component props
-// TODO - This is repeated; Create a single file for component props or reused props
 interface DiscussionReplyListProps {
   bookClubSlug: string;
   discussionID: string;
+  pageSize: number;
+  pageNum: number;
+}
+
+interface DiscussionRepliesProps {
+  bookClubSlug: string;
+  discussionID: string;
+  pageNum?: number;
+  pageSize?: number;
 }
 
 /**
- * Paginated display of discussion replies
+ * Async component for loading paginated replies
  *
  * @param {Object} props Component props
  * @param {string} props.bookClubSlug The slug of the book club
  * @param {string} props.discussionID The ID of the discussion
+ * @param {number} props.pageNum The page number
+ * @param {number} props.pageSize The number of replies per page
  */
-const DiscussionReplyList = ({
+const DiscussionReplies = async ({
   bookClubSlug,
-  discussionID
-}: DiscussionReplyListProps) => {
-  // Component state
-  const [replies, setReplies] = useState<ReplyWithUser[]>([]); // Loaded replies
-  const [pageNum, setPageNum] = useState(1); // Current page number
-  const [total, setTotal] = useState(-1); // Total number of replies
-  const [loadedPages, setLoadedPages] = useState<number[]>([]); // Loaded pages [1, 2, 3, ...
-
-  // On page number change, load replies
-  useEffect(() => {
-    // Async callback to load replies
-    const loadReplies = async () => {
-      // Fetch replies from API
-      const newReplies = await getDiscussionReplies(bookClubSlug, discussionID, pageNum - 1, 10);
-      console.log('newReplies:::', newReplies); // DELETEME
-
-      // Update replies
-      setReplies(prev => [...prev, ...newReplies.replies]);
-      setTotal(newReplies.total);
-      setLoadedPages(prev => [...prev, pageNum]);
-    };
-
-    if((total === -1 || (total > 0 && pageNum < Math.ceil(total / 10))) && !loadedPages.includes(pageNum)) loadReplies();
-  }, [bookClubSlug, discussionID, pageNum, total, loadedPages]);
-
-  // DELETEME
-  useEffect(() => {
-    console.log('loadedPages:::', loadedPages);
-  }, [loadedPages]);
-
-  // Handle clicking on the load more button
-  const handleLoadMore = () => setPageNum(prev => prev + 1);
+  discussionID,
+  pageNum = 1,
+  pageSize = 10
+}: DiscussionRepliesProps) => {
+  // Fetch the replies
+  const replies = await getDiscussionReplies(bookClubSlug, discussionID, pageSize, pageNum - 1);
 
   return (
-    <div className="flex flex-col">
+    <ScrollShadow
+      hideScrollBar
+      className="flex-1 h-1 overflow-auto"
+    >
       {
         replies.map((reply, idx) => (
           <Fragment key={reply.id}>
-            <div className="w-full flex-col space-y-0.5">
-              <div className="text-medium">{ reply.content }</div>
+            <div className="flex-col w-full space-y-1">
+              <div className="text-medium pt-2">{ reply.content }</div>
               <User
                 name={reply.user.preferredName}
                 avatarProps={{
@@ -77,7 +65,52 @@ const DiscussionReplyList = ({
           </Fragment>
         ))
       }
-      { pageNum < Math.ceil(total / 10) && <Button onClick={ handleLoadMore }>Load More...</Button> }
+    </ScrollShadow>
+  )
+}
+
+/**
+ * Paginated display of discussion replies
+ *
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
+ * @param {string} props.discussionID The ID of the discussion
+ * @param {number} props.total The total number of replies
+ */
+const DiscussionReplyList = async ({
+  bookClubSlug,
+  discussionID,
+  pageNum,
+  pageSize
+}: DiscussionReplyListProps) => {
+  // Get the total number of replies
+  const total = await getDiscussionReplyCount(bookClubSlug, discussionID);
+
+  return (
+    <div className="flex flex-col h-full">
+      <Suspense fallback={<></>}>
+        <DiscussionReplies
+          bookClubSlug={bookClubSlug}
+          discussionID={discussionID}
+          pageNum={pageNum}
+          pageSize={pageSize}
+        />
+      </Suspense>
+      <div className="flex justify-start">
+        <ReplyButton
+          bookClubSlug={bookClubSlug}
+          discussionID={discussionID}
+          nodeID={discussionID}
+          replyToText={'Reply'}
+          rootReply
+        />
+      </div>
+      <div className="flex justify-center">
+        <URLQueryPagination
+          url={`/book-club/${bookClubSlug}/discussions/${discussionID}`}
+          total={Math.ceil(total / pageSize)}
+        />
+      </div>
     </div>
   )
 }

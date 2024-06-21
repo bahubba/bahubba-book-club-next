@@ -1,7 +1,13 @@
 'use server';
 
 import { driver } from '@/db/connect-neo4j';
-import { DiscussionPreview, DiscussionProperties, RepliesAndTotalPage, ReplyProperties } from '@/db/models/nodes';
+import {
+  DiscussionPreview,
+  DiscussionProperties,
+  RepliesAndTotalPage,
+  ReplyProperties,
+  ReplyWithUser
+} from '@/db/models/nodes';
 import { int } from 'neo4j-driver';
 
 /**
@@ -62,7 +68,7 @@ export const findAdHocDiscussions = async (
     WHERE bc.publicity = 'PUBLIC' OR (
       EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
     )
-    OPTIONAL MATCH (d)-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+    OPTIONAL MATCH (d)-[:HAS_REPLY]->(r:Reply { isActive: TRUE })<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
     WITH d, r { .*, user: u { .* } }
     ORDER BY r.created DESC
     WITH d, COLLECT(r)[..2] AS latestReplies
@@ -128,16 +134,14 @@ export const findDiscussionReplies = async (
   email: string,
   pageSize: number,
   pageNum: number
-): Promise<RepliesAndTotalPage> => {
-  console.log('params:::', bookClubSlug, discussionID, email, pageSize, pageNum); // DELETEME
-
+): Promise<ReplyWithUser[]> => {
   // Connect to Neo4j
   const session = driver.session();
 
   // Get the replies and total
   const result = await session.run(
     `
-    MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+    MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply { isActive: TRUE })<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
     WHERE bc.publicity = 'PUBLIC' OR (
       EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
     )
@@ -145,20 +149,47 @@ export const findDiscussionReplies = async (
     ORDER BY r.created
     SKIP $skip
     LIMIT $limit
-    WITH collect(r) as replies
-    RETURN replies, size(replies) as total
+    RETURN collect(r) AS replies
     `,
     { bookClubSlug, discussionID, email, skip: int(pageSize * pageNum), limit: int(pageSize) }
   );
 
-  console.log('result.records:::', result.records[0].get('replies'), result.records[0].get('total')); // DELETEME
-
   // Close the session and return
   session.close();
-  return {
-    replies: result.records[0].get('replies'),
-    total: result.records[0].get('total').toNumber()
-  };
+  return result.records[0].get('replies');
+}
+
+/**
+ * Get the total number of replies for a discussion
+ *
+ * @param {string} bookClubSlug The slug of the book club
+ * @param {string} discussionID The ID of the discussion
+ * @param {string} email The user's email
+ * @return {Promise<number>} The total number of replies
+ */
+export const countDiscussionReplies = async (
+  bookClubSlug: string,
+  discussionID: string,
+  email: string
+): Promise<number> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Get the replies and total
+  const result = await session.run(
+    `
+    MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply { isActive: TRUE })<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+    WHERE bc.publicity = 'PUBLIC' OR (
+      EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
+    )
+    RETURN count(r) AS total
+    `,
+    { bookClubSlug, discussionID, email }
+  );
+
+  // Close the session and return the total
+  session.close();
+  return result.records[0].get('total').toNumber();
 }
 
 /**

@@ -1,6 +1,12 @@
-import { DiscussionProperties, DiscussionPreview, RepliesAndTotalPage } from '@/db/models/nodes';
+import { redirect } from 'next/navigation';
+import { DiscussionProperties, DiscussionPreview, ReplyWithUser } from '@/db/models/nodes';
 import { ensureAuth } from '@/api/auth.api';
-import { findAdHocDiscussions, findDiscussion, findDiscussionReplies } from '@/db/repositories/discussion.repository';
+import {
+  countDiscussionReplies,
+  findAdHocDiscussions,
+  findDiscussion,
+  findDiscussionReplies
+} from '@/db/repositories/discussion.repository';
 import { toJSON } from '@/util/helpers';
 
 /**
@@ -44,17 +50,35 @@ export const getDiscussion = async (
  * @param {string} discussionID The ID of the discussion
  * @param {number} pageSize The number of results to return in a page
  * @param {number} pageNum The page number
- * @return {Promise<RepliesAndTotalPage>} The replies and total
+ * @return {Promise<ReplyWithUser>[]} The replies and total
  */
 export const getDiscussionReplies = async (
   bookClubSlug: string,
   discussionID: string,
   pageSize: number,
   pageNum: number
-): Promise<RepliesAndTotalPage> => {
+): Promise<ReplyWithUser[]> => {
   // Ensure the user is authenticated and get their email
   const { email } = await ensureAuth();
 
   // Fetch and return a page of replies for the discussion
-  return toJSON(await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum)) as RepliesAndTotalPage;
+  return toJSON(await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum)) as ReplyWithUser[];
 }
+
+/** Get the total number of replies for a given discussion
+ *
+ * @param {string} bookClubSlug The slug of the book club
+ * @param {string} discussionID The ID of the discussion
+ * @return {Promise<number>} The total number of replies
+ */
+export const getDiscussionReplyCount = async (
+  bookClubSlug: string,
+  discussionID: string
+): Promise<number> => {
+  // Ensure the user is authenticated and get their email
+  const { email } = await ensureAuth();
+
+  // Fetch and return a page of replies for the discussion
+  return await countDiscussionReplies(bookClubSlug, discussionID, email);
+}
+

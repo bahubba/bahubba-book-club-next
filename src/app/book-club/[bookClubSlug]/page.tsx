@@ -124,7 +124,7 @@ const BookClubHomePage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubHomePageProps>) => {
   return (
-    <div className="flex-1 flex flex-col h-full pb-2">
+    <div className="flex flex-col h-full pb-2">
       <SectionHeaderLayout
         title={
           <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
