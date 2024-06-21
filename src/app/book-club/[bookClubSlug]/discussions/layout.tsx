@@ -24,8 +24,8 @@ const CreateDiscussionLayout = ({
     bookClubSlug={bookClubSlug}
     needsAdmin
   >
-    <div className="flex justify-center w-full max-h-fill-below-header">
-      <div className="flex flex-col min-w-[50vw] max-w-[75vw]">{children}</div>
+    <div className="flex h-full justify-center">
+      <div className="flex flex-col h-full w-[75]-vw pb-2">{children}</div>
     </div>
   </ProtectedRoute>
 );

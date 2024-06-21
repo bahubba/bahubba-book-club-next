@@ -118,9 +118,15 @@ export interface ReplyWithUser extends ReplyProperties {
   user: UserProperties;
 }
 
-// Discussion with replies
+// Discussion with latest 2 replies
 export interface DiscussionPreview extends DiscussionProperties {
   replies: ReplyWithUser[];
+}
+
+// Replies alongside a total number of replies for a discussion
+export interface RepliesAndTotalPage {
+  replies: ReplyWithUser[];
+  total: number;
 }
 
 /** NODES */

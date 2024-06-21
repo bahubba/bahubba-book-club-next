@@ -16,5 +16,5 @@ export const getBookClubPickList = async (
   const { email } = await ensureAuth();
 
   // Fetch and return the pick list, dropping the last entry (a duplicate of the first since the list is circular)
-  return toJSON((await findBookClubPickList(slug, email)).slice(0, -1));
+  return toJSON((await findBookClubPickList(slug, email)).slice(0, -1)) as UserAndMembership[];
 };

@@ -20,8 +20,8 @@ const DiscussionCard = ({
   <Link href={`/book-club/${bookClubSlug}/discussions/${discussion.id}`}>
     <Card className="w-full border-2 border-gray-200">
       <CardHeader className="flex-col items-start">
-        <h1 className="text-xl">{discussion.title}</h1>
-        <small>{discussion.description}</small>
+        <h3 className="text-lg font-bold">{discussion.title}</h3>
+        <small className="italic">{discussion.description}</small>
       </CardHeader>
       <Divider />
       <CardBody>
