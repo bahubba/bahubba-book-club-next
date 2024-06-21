@@ -1,22 +1,13 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { ensureAuth } from '@/api/auth.api';
-import {
-  requestMembership,
-  reviewMembershipRequest
-} from '@/db/repositories/membership-request.repository';
+import { ensureAuth } from '../auth.api';
+import { requestMembership, reviewMembershipRequest } from '@/db/repositories/membership-request.repository';
+import { addMember, checkMembership, findBookClubRole, reinstateMember } from '@/db/repositories/membership.repository';
+import { MembershipRequestStatus, Role } from '@/db/models/nodes';
 import { ErrorFormState } from './state-interfaces';
-import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
-import { findMemberRoleBySlug } from '@/db/repositories/book-club.repository';
-import { Role } from '@/db/models/book-club.models';
-import {
-  addMember,
-  checkMembership,
-  reinstateMembership
-} from '@/db/repositories/membership.repository';
-import { revalidatePath } from 'next/cache';
 
 /**
  * Handle submitting a membership request
@@ -37,11 +28,13 @@ export const handleSubmitMembershipRequest = async (
   if (!slug) return { error: 'Invalid book club' };
 
   // Request membership in the book club
-  await requestMembership(
-    slug,
-    email,
-    formData.get('requestMessage')?.toString().trim() ?? ''
-  );
+  await requestMembership(slug, email, {
+    status: MembershipRequestStatus.PENDING,
+    requested: new Date().toISOString(),
+    requestMessage:
+      formData.get('requestMessage')?.toString().trim() ??
+      'Please allow me to join your book club!'
+  });
 
   // Redirect to the book club page
   // TODO - toast
@@ -62,25 +55,27 @@ export const handleReviewMembershipRequest = async (
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 
-  // Pull out the form data and ensure it's valid
+  // Pull out the book club slug and ensure it is not empty
   const slug = formData.get('slug')?.toString().trim();
   if (!slug) return { error: 'Invalid book club' };
 
+  // Pull out the user's email and ensure it is not empty
   const userEmail = formData.get('userEmail')?.toString().trim();
   if (!userEmail) return { error: 'Invalid user' };
 
+  // Pull out the status and ensure it is approving or rejecting
   const status = formData.get('status')?.toString().trim();
   if (
     !status ||
     ![
-      BookClubMembershipRequestStatus.ACCEPTED,
-      BookClubMembershipRequestStatus.REJECTED
-    ].includes(status as BookClubMembershipRequestStatus)
+      MembershipRequestStatus.APPROVED,
+      MembershipRequestStatus.REJECTED
+    ].includes(status as MembershipRequestStatus)
   )
     return { error: 'Invalid status' };
 
   // Ensure the requesting user is an admin or owner of the book club
-  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
+  const adminRole = await findBookClubRole(slug, adminEmail);
   if (!adminRole || ![Role.OWNER, Role.ADMIN].includes(adminRole))
     return { error: 'Unauthorized' };
 
@@ -88,17 +83,24 @@ export const handleReviewMembershipRequest = async (
   await reviewMembershipRequest(
     slug,
     userEmail,
-    status as BookClubMembershipRequestStatus
+    adminEmail,
+    status as MembershipRequestStatus,
+    '' // TODO - Allow admins to leave a message
   );
 
   // If the approving the request, add  or reinstate the user as a member
-  if (status === BookClubMembershipRequestStatus.ACCEPTED) {
+  if (status === MembershipRequestStatus.APPROVED) {
     // Check to see if the user is a departed member
-    const departed = await checkMembership(slug, userEmail, true);
+    const departed = await checkMembership(slug, userEmail, false);
 
     // If the user is a departed member, reinstate them
-    if (departed) await reinstateMembership(slug, userEmail);
-    else await addMember(slug, userEmail);
+    if (departed) await reinstateMember(slug, userEmail, adminEmail);
+    else
+      await addMember(slug, userEmail, adminEmail, {
+        role: Role.READER,
+        joined: new Date().toISOString(),
+        isActive: true
+      });
   }
 
   // Return no error

@@ -14,8 +14,8 @@ interface BookClubAdminMembershipRequestsPageProps {
 /**
  * Async component for displaying membership requests table
  *
- * @prop {Object} props - Component props
- * @prop {string} props.bookClubSlug - Book club slug
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - Book club slug
  */
 const BookClubAdminMembershipRequestsTableWrapper = async ({
   bookClubSlug
@@ -34,9 +34,9 @@ const BookClubAdminMembershipRequestsTableWrapper = async ({
 /**
  * Page for managing membership requests for a book club
  *
- * @prop {Object} props Component props
- * @prop {Object} props.params The parameters of the page
- * @prop {string} props.params.bookClubSlug The slug of the book club
+ * @param {Object} props Component props
+ * @param {Object} props.params The parameters of the page
+ * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembershipRequestsPage = ({
   params: { bookClubSlug }

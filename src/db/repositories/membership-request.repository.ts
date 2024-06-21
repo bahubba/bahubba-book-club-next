@@ -1,56 +1,44 @@
-import { UpdateResult } from 'mongodb';
-
-import { connectCollection } from '@/db/connect-mongo';
-import { BookClubDoc, Role } from '@/db/models/book-club.models';
+import { driver } from '../connect-neo4j';
 import {
-  BookClubMembershipRequest,
-  BookClubMembershipRequestStatus
-} from '@/db/models/membership-request.models';
-import props from '@/util/properties';
+  MembershipRequestProperties,
+  MembershipRequestStatus,
+  UserAndMembershipRequest,
+  UserProperties
+} from '../models/nodes';
 
 /**
  * Request membership in a book club
  *
  * @param {string} slug The slug of the book club to request membership in
- * @param {string} userEmail The email of the user requesting membership
- * @param {string} message The message to send with the request
- * @return {Promise<UpdateResult<BookClubDoc>>}
+ * @param {string} email The email of the user requesting membership
+ * @param {MembershipRequestProperties} membershipRequest The properties for the membership request
+ * @return {Promise<void>}
  */
 export const requestMembership = async (
   slug: string,
-  userEmail: string,
-  message: string
-): Promise<UpdateResult<BookClubDoc>> => {
-  // Connect to the database and collection
-  const collection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  email: string,
+  membershipRequest: MembershipRequestProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the membership request
+  await session.run(
+    `
+    MATCH (u:User { email: $email, isActive: TRUE })
+    MATCH (b:BookClub { slug: $slug, isActive: TRUE })
+    MERGE (mr:MembershipRequest {
+      status: $membershipRequest.status,
+      requested: $membershipRequest.requested,
+      requestMessage: $membershipRequest.requestMessage
+    })
+    MERGE (u)-[:REQUESTED_MEMBERSHIP]->(mr)<-[:HAS_MEMBERSHIP_REQUEST]-(b)
+    `,
+    { slug, email, membershipRequest }
   );
 
-  // Update the book club in the database
-  return await collection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      membershipRequests: {
-        $not: {
-          $elemMatch: {
-            userEmail,
-            status: BookClubMembershipRequestStatus.PENDING
-          }
-        }
-      }
-    },
-    {
-      $push: {
-        membershipRequests: {
-          userEmail,
-          message,
-          requested: new Date(),
-          status: BookClubMembershipRequestStatus.PENDING
-        }
-      }
-    }
-  );
+  // Close the session
+  session.close();
 };
 
 /**
@@ -58,69 +46,62 @@ export const requestMembership = async (
  *
  * @param {string} slug The slug of the book club to approve or reject the request for
  * @param {string} userEmail The email of the user requesting membership
- * @param {BookClubMembershipRequestStatus} status The status to set the request to
- * @return {Promise<UpdateResult<BookClubDoc>>}
+ * @param {string} adminEmail The email of the admin approving or rejecting the request
+ * @param {string} status The status to set the request to
+ * @param {string} reviewMessage The approval or rejection message
+ * @return {Promise<void>}
  */
 export const reviewMembershipRequest = async (
   slug: string,
   userEmail: string,
-  status: BookClubMembershipRequestStatus
-): Promise<UpdateResult<BookClubDoc>> => {
-  // Connect to the database and collection
-  const collection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  adminEmail: string,
+  status: MembershipRequestStatus,
+  reviewMessage: string
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Approve or reject the membership request
+  await session.run(
+    `
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest { status: 'PENDING' })<-[:HAS_MEMBERSHIP_REQUEST]-(b:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(a:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    SET mr.status = $status, mr.reviewed = ${new Date().toISOString()}, mr.reviewMessage = $reviewMessage
+    MERGE (a)-[:REVIEWED_MEMBERSHIP_REQUEST]->(mr)
+    `,
+    { slug, userEmail, adminEmail, status, reviewMessage }
   );
 
-  // Update the book club in the database
-  return await collection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      membershipRequests: {
-        $elemMatch: {
-          userEmail,
-          status: BookClubMembershipRequestStatus.PENDING
-        }
-      }
-    },
-    {
-      $set: {
-        'membershipRequests.$.status': status
-      }
-    }
-  );
+  // Close the session
+  session.close();
 };
 
 /**
  * Check if a user has an open membership request for a given book club
  *
  * @param {string} slug The slug of the book club
- * @param {string} userEmail The email of the user
+ * @param {string} email The email of the user
  * @return {Promise<boolean>} Whether the user has an open membership request
  */
 export const hasOpenRequest = async (
   slug: string,
-  userEmail: string
+  email: string
 ): Promise<boolean> => {
-  // Connect to the database and collection
-  const collection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Check if the user has an open membership request
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest { status: 'PENDING' })<-[:HAS_MEMBERSHIP_REQUEST]-(b:BookClub { slug: $slug, isActive: TRUE })
+    RETURN COUNT(mr) > 0 AS hasOpenRequest
+    `,
+    { slug, email }
   );
 
-  // Find the book club in the database
-  const count = await collection.countDocuments({
-    slug,
-    disbanded: { $exists: false },
-    membershipRequests: {
-      $elemMatch: {
-        userEmail,
-        status: BookClubMembershipRequestStatus.PENDING
-      }
-    }
-  });
-
-  // Return whether there is an open request
-  return count > 0;
+  // Close the session and return whether there is an open request
+  session.close();
+  return result.records[0].get('hasOpenRequest');
 };
 
 // TODO - Paginate
@@ -128,43 +109,32 @@ export const hasOpenRequest = async (
  * Get the membership requests for a book club
  *
  * @param {string} slug The slug of the book club
- * @param {string} userEmail The email of the requesting user
- * @param {number} page The page of membership requests to get
- * @param {number} pageSize The number of membership requests to get
- * @return {Promise<BookClubMembershipRequest[]>} The membership requests
+ * @param {string} email The email of the requesting user
+ * @return {Promise<UserAndMembershipRequest[]>} The membership requests
  */
 export const findMembershipRequests = async (
   slug: string,
-  userEmail: string,
-  page: number = 0,
-  pageSize: number = 24
-): Promise<BookClubMembershipRequest[]> => {
-  // Connect to the database and collection
-  const collection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  email: string
+): Promise<UserAndMembershipRequest[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the membership requests for the book club
+  const result = await session.run(
+    `
+    MATCH (u:User { isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest)<-[:HAS_MEMBERSHIP_REQUEST]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $email, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    RETURN u, mr
+    `,
+    { slug, email }
   );
 
-  // Find the book club in the database
-  const result = await collection.findOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      members: {
-        $elemMatch: {
-          userEmail,
-          $or: [{ role: Role.OWNER }, { role: Role.ADMIN }]
-        }
-      }
-    },
-    {
-      projection: {
-        membershipRequests: 1
-      },
-      skip: page * pageSize,
-      limit: pageSize
-    }
-  );
+  // Close the session
+  session.close();
 
-  // Return the membership requests
-  return result.membershipRequests ?? [];
+  // Gather and return the user and membership request data
+  return result.records.map(record => ({
+    user: record.get('u').properties as UserProperties,
+    request: record.get('mr').properties as MembershipRequestProperties
+  }));
 };

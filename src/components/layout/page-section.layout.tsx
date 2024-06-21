@@ -1,11 +1,9 @@
 // Component props
 import { ScrollShadow } from '@nextui-org/scroll-shadow';
-import { Button } from '@nextui-org/button';
-import PlusIcon from '@/components/icons/plus.icon';
 import SectionHeaderLayout from '@/components/layout/section-header.layout';
 
 interface PageSectionLayoutProps {
-  header: string;
+  header: string | React.ReactNode;
   sectionHeaderChildren?: React.ReactNode;
   children?: React.ReactNode;
 }
@@ -23,7 +21,7 @@ const PageSectionLayout = ({
   sectionHeaderChildren,
   children
 }: Readonly<PageSectionLayoutProps>) => (
-  <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white">
+  <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white h-full p-2">
     <SectionHeaderLayout
       title={<h1 className="text-2xl font-bold">{header}</h1>}
     >
@@ -32,7 +30,7 @@ const PageSectionLayout = ({
     <ScrollShadow
       hideScrollBar
       size={100}
-      className="flex-1 overflow-y-auto max-h-screen"
+      className="flex-1 overflow-y-auto"
     >
       {children}
     </ScrollShadow>

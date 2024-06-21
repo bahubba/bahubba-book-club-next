@@ -11,10 +11,10 @@ interface BookClubLayoutProps {
 /**
  * Layout for the book club page; Protected route by user's membership in club
  *
- * @prop {Object} props Component props
- * @prop {React.ReactNode} props.children The children of the layout
- * @prop {params} props.params The parameters of the page
- * @prop {string} props.params.bookClubSlug The slug of the book club
+ * @param {Object} props Component props
+ * @param {React.ReactNode} props.children The children of the layout
+ * @param {params} props.params The parameters of the page
+ * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubLayout = ({
   children,

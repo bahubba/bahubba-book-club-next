@@ -3,13 +3,14 @@ import { Spinner } from '@nextui-org/spinner';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
-import { getBookClubsForUser } from '@/api/fetchers/book-club.fetchers';
-import CreateBookClubButton from '@/components/buttons/create-book-club.button';
-import BookClubSearchButton from '@/components/buttons/book-club-search.button';
+import { getBookClubs } from '@/api/fetchers/book-club.fetchers';
+import LinkButton from '@/components/buttons/link.button';
+import SearchIcon from '@/components/icons/search.icon';
+import PlusIcon from '@/components/icons/plus.icon';
 
 /** Async component for loading book clubs to display */
 const BookClubs = async () => {
-  const bookClubs = await getBookClubsForUser();
+  const bookClubs = await getBookClubs();
 
   // TODO - add key
   return <BookClubCardGridLayout bookClubs={bookClubs} />;
@@ -18,14 +19,24 @@ const BookClubs = async () => {
 /** The home page for the application, showing a user's clubs, books, and trending info */
 const HomePage = () => (
   <div className="flex-1 flex flex-col h-full pb-2">
-    <h1 className="flex-shrink ms-2 mb-2 text-3xl font-bold">Home</h1>
-    <div className="flex-1 flex w-full pb-2">
+    <h1 className="flex-shrink ms-2 my-2 text-3xl font-bold">Home</h1>
+    <div className="flex-1 flex w-full">
       <PageSectionLayout
         header="Clubs"
         sectionHeaderChildren={
           <div className="flex gap-0.5">
-            <CreateBookClubButton />
-            <BookClubSearchButton />
+            <LinkButton
+              uri="/book-club/create"
+              tooltip="Create a book club"
+            >
+              <PlusIcon />
+            </LinkButton>
+            <LinkButton
+              uri="/book-club/search"
+              tooltip="Search for book clubs"
+            >
+              <SearchIcon />
+            </LinkButton>
           </div>
         }
       >

@@ -1,85 +1,152 @@
-import { Collection, InsertOneResult, UpdateResult } from 'mongodb';
-
-import {
-  UserDoc,
-  noMembershipsUserProjection,
-  rawUserProjection
-} from '@/db/models/user.models';
-import { connectCollection } from '@/db/connect-mongo';
-import props from '@/util/properties';
+import { driver } from '@/db/connect-neo4j';
+import { ProviderProfileProperties, UserAndProviderProfile, UserProperties } from '../models/nodes';
 
 /**
- * Adds a user document to MongoDB
+ * Add a new user to Neo4j, including User and ProviderProfile nodes and a relationship between them
  *
- * @param {UserDoc} user The user document to add
- * @return {Promise<InsertOneResult<UserDoc>>} The result of the insert operation
+ * @param {UserProperties} user The properties for the User node
+ * @param {ProviderProfileProperties} providerProfile The properties for the ProviderProfile node
+ * @return {Promise<void>} A promise that resolves when the user is added
  */
 export const addUser = async (
-  user: UserDoc
-): Promise<InsertOneResult<UserDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
+  user: UserProperties,
+  providerProfile: ProviderProfileProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the user and provider profile
+  await session.run(
+    `
+      CREATE (u:User $userProps)
+      CREATE (p:ProviderProfile $providerProfileProps)
+      CREATE (u)-[:HAS_PROFILE]->(p)
+      `,
+    { userProps: user, providerProfileProps: providerProfile }
   );
 
-  // Add the user to the database
-  return await collection.insertOne(user);
+  // Close the session
+  session.close();
 };
 
 /**
- * Updates a user document in MongoDB
+ * Adds a provider profile to a user in Neo4j
  *
- * @param {UserDoc} user The user document to update
- * @return {Promise<UpdateResult<UserDoc>>} The result of the update operation
+ * @param {string} email The user's email address
+ * @param {ProviderProfileProperties} providerProfile The properties for the ProviderProfile node
  */
-export const updateUser = async (
-  user: UserDoc
-): Promise<UpdateResult<UserDoc>> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
+export const addProviderProfile = async (
+  email: string,
+  providerProfile: ProviderProfileProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the provider profile with a relationship from the user
+  await session.run(
+    `
+      MATCH (u:User { email: $email, isActive: TRUE })
+      CREATE (p:ProviderProfile $providerProfileProps)
+      CREATE (u)-[:HAS_PROFILE]->(p)
+      `,
+    { email, providerProfileProps: providerProfile }
   );
 
-  // TODO - Throw error if user._id is undefined
-  // Update the user in the database
-  return await collection.updateOne({ email: user.email }, { $set: user });
+  // Close the session
+  session.close();
 };
 
 /**
- * Finds a user document by email
+ * Updates a provider profile for a user in Neo4j
  *
- * @param {string} email The email address to search for
- * @return {UserDoc | null} The user document if found, null otherwise
+ * @param {string} email - The user's email address
+ * @param {ProviderProfileProperties} providerProfile - The properties for the ProviderProfile node
  */
-export const findFullUserByEmail = async (
+export const updateProviderProfile = async (
+  email: string,
+  providerProfile: ProviderProfileProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Pull out the provider and user ID to ensure we get only the correct profile
+  const { provider, userId } = providerProfile;
+
+  // Update the provider profile
+  await session.run(
+    `
+      MATCH (p:ProviderProfile { isActive: TRUE, provider: $provider, userId: $userId })<-[:HAS_PROFILE]-(:User { email: $email, isActive: TRUE })
+      SET p = $providerProfile
+      `,
+    { email, provider, userId, providerProfile }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Find a user by email
+ *
+ * @param {string} email The user's email address
+ * @return {Promise<UserProperties | null>} The user node properties if found, null otherwise
+ */
+export const findUser = async (
   email: string
-): Promise<UserDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
+): Promise<UserProperties | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user
+  const result = await session.run(
+    `
+      MATCH (u:User { email: $email, isActive: TRUE })
+      RETURN u
+      `,
+    { email }
   );
 
-  // Find the user in the database
-  return await collection.findOne(
-    { email },
-    { projection: noMembershipsUserProjection }
-  );
+  // Close the session and return the user
+  session.close();
+  return result.records.length
+    ? (result.records[0].get('u').properties as UserProperties)
+    : null;
 };
 
 /**
- * Finds a user document by email, without memberships or provider profiles
+ * Find a user and provider profile by email and provider
  *
- * @param {string} email The email address to search for
- * @return {UserDoc | null} The user document if found, null otherwise
+ * @param {string} email The user's email address
+ * @param {string} provider The provider name
+ * @param {string} userId The user's ID from the provider profile
+ * @return {Promise<UserAndProviderProfile>} The user and provider profile nodes
  */
-export const findUserByEmail = async (
-  email: string
-): Promise<UserDoc | null> => {
-  // Connect to the database and collection
-  const collection: Collection<UserDoc> = await connectCollection(
-    props.DB.ATLAS_USER_COLLECTION
+export const findUserAndProviderProfile = async (
+  email: string,
+  provider: string,
+  userId: string
+): Promise<UserAndProviderProfile> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user and provider profile
+  const result = await session.run(
+    `
+      MATCH (u:User { email: $email, isActive: TRUE })
+      OPTIONAL MATCH (u)-[:HAS_PROFILE]->(p:ProviderProfile { isActive: TRUE, provider: $provider, userId: $userId })
+      RETURN u, p
+      `,
+    { email, provider, userId }
   );
 
-  // Find the user in the database
-  return await collection.findOne({ email }, { projection: rawUserProjection });
+  // Close the session
+  session.close();
+
+  // Pull the user and provider profile properties from the result
+  return result.records.length
+    ? {
+        user: result.records[0].get('u')?.properties ?? null,
+        profile: result.records[0].get('p')?.properties ?? null
+      }
+    : { user: null, profile: null };
 };

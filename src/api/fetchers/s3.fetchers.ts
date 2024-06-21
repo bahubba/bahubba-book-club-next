@@ -1,9 +1,10 @@
 'use server';
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { ensureAuth } from '../auth.api';
 import { s3Client } from '@/util/s3.config';
 import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+
+import { ensureAuth } from '../auth.api';
 import props from '@/util/properties';
 
 /** Retrieve a pre-signed URL for a given image name */

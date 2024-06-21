@@ -9,8 +9,8 @@ import { handleSubmitMembershipRequest } from '@/api/form-handlers/membership-re
 /**
  * Form for requesting membership in a book club
  *
- * @prop {Object} props Component props
- * @prop {string} props.bookClubSlug The slug of the book club
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
 const RequestMembershipForm = ({
   bookClubSlug

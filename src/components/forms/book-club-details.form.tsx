@@ -9,12 +9,9 @@ import { Radio, RadioGroup } from '@nextui-org/radio';
 import BookClubImagePickerModal from '@/components/modals/book-club-image-picker.modal';
 import SubmitButton from '@/components/buttons/submit.button';
 import BookClubCard from '@/components/cards/book-club.card';
-import {
-  handleCreateBookClub,
-  handleUpdateBookClub
-} from '@/api/form-handlers/book-club-form.handlers';
-import { BookClubDoc, Publicity } from '@/db/models/book-club.models';
+import { handleCreateBookClub, handleUpdateBookClub } from '@/api/form-handlers/book-club-form.handlers';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
+import { BookClubProperties, Publicity } from '@/db/models/nodes';
 
 // Interface for form values
 interface FormValues {
@@ -27,12 +24,12 @@ interface FormValues {
 /**
  * Form for creating or updating a book club's details
  *
- * @prop {Object} props - The component props
- * @prop {BookClubDoc} props.bookClub - The book club to edit
+ * @param {Object} props - The component props
+ * @param {BookClubProperties} props.bookClub - The book club to edit
  */
 const BookClubDetailsForm = ({
   bookClub
-}: Readonly<{ bookClub?: BookClubDoc }>) => {
+}: Readonly<{ bookClub?: BookClubProperties }>) => {
   // Form state
   const [formState, formAction] = useFormState(
     !!bookClub ? handleUpdateBookClub : handleCreateBookClub,
@@ -98,6 +95,7 @@ const BookClubDetailsForm = ({
           label="Name"
           name="name"
           required
+          isRequired
           value={formData.name}
           onChange={handleInputChange}
         />
@@ -106,6 +104,7 @@ const BookClubDetailsForm = ({
           label="Description"
           name="description"
           required
+          isRequired
           value={formData.description}
           onChange={handleInputChange}
         />
@@ -116,6 +115,7 @@ const BookClubDetailsForm = ({
           name="image"
           value={formData.imageName}
           required
+          isRequired
         />
         <BookClubImagePickerModal
           selectedImage={formData.imageName}
@@ -145,7 +145,9 @@ const BookClubDetailsForm = ({
             name: formData.name,
             description: formData.description,
             image: formData.imageName,
-            publicity: formData.publicity
+            publicity: formData.publicity,
+            isActive: true,
+            created: new Date()
           }}
         />
       </div>

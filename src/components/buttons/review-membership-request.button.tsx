@@ -4,7 +4,7 @@ import { Tooltip } from '@nextui-org/tooltip';
 
 import SubmitButton from './submit.button';
 import { handleReviewMembershipRequest } from '@/api/form-handlers/membership-request-form.handlers';
-import { BookClubMembershipRequestStatus } from '@/db/models/membership-request.models';
+import { MembershipRequestStatus } from '@/db/models/nodes';
 import RejectIcon from '../icons/reject.icon';
 import ApproveIcon from '../icons/approve.icon';
 
@@ -56,8 +56,8 @@ const ReviewMembershipRequestButton = ({
           name="status"
           value={
             isRejecting
-              ? BookClubMembershipRequestStatus.REJECTED
-              : BookClubMembershipRequestStatus.ACCEPTED
+              ? MembershipRequestStatus.REJECTED
+              : MembershipRequestStatus.APPROVED
           }
         />
         <SubmitButton

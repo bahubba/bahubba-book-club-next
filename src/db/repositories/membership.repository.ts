@@ -1,14 +1,174 @@
-import { UpdateResult } from 'mongodb';
-import { connectCollection } from '../connect-mongo';
+import { driver } from '@/db/connect-neo4j';
 
-import { BookClubDoc, Role } from '../models/book-club.models';
-import props from '@/util/properties';
+import { MembershipProperties, Role, UserAndMembership } from '../models/nodes';
 
-// Interface for updates to both the book club and user collections
-export interface MembershipUpdate {
-  bcUpdate: UpdateResult<BookClubDoc>;
-  uUpdate: UpdateResult<BookClubDoc>;
-}
+/**
+ * Add a member to a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} memberEmail The new member's email
+ * @param {string} adminEmail The requesting admin's email
+ * @param {IsMemberOfProperties} membershipProps The properties for the membership relationship
+ * @return {Promise<void>}
+ */
+export const addMember = async (
+  slug: string,
+  memberEmail: string,
+  adminEmail: string,
+  membershipProps: MembershipProperties
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Add the member to the club
+  await session.run(
+    `
+    MATCH (u:User { email: $memberEmail, isActive: TRUE })
+    MATCH (:User { email: $adminEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(b:BookClub { slug: $slug, isActive: TRUE })
+    WHERE m.role IN ['ADMIN', 'OWNER']
+    MERGE (u)-[:HAS_MEMBERSHIP]->(:Membership {
+      role: $membershipProps.role,
+      joined: $membershipProps.joined,
+      isActive: $membershipProps.isActive
+    })<-[:HAS_MEMBER]-(b)
+    `,
+    { slug, memberEmail, adminEmail, membershipProps }
+  );
+
+  // Add the member as the last picker
+  await session.run(
+    `
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[h:HAS_CURRENT_PICKER]->(c:Membership { isActive: TRUE })<-[p:PICKS_BEFORE]-(l:Membership { isActive: TRUE })
+    DELETE p
+    MERGE (l)-[:PICKS_BEFORE]->(m)-[:PICKS_BEFORE]->(c)
+    `,
+    { slug, memberEmail }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Update a member's role in a club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} memberEmail The member's email
+ * @param {string} adminEmail The requesting admin's email
+ * @param {Role} newRole The member's new role
+ * @return {Promise<void>}
+ */
+export const updateMemberRole = async (
+  slug: string,
+  memberEmail: string,
+  adminEmail: string,
+  newRole: Role
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Update the member's role
+  await session.run(
+    `
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    SET m.role = $newRole
+    `,
+    { slug, memberEmail, adminEmail, newRole }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Remove a member from a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} memberEmail The member's email
+ * @param {string} adminEmail The requesting admin's email
+ * @return {Promise<void>}
+ */
+export const removeMember = async (
+  slug: string,
+  memberEmail: string,
+  adminEmail: string
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Remove the member from the club
+  await session.run(
+    `
+    MATCH (:User { email: $memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    SET m.isActive = FALSE, m.departed = ${new Date().toISOString()}
+    `,
+    { slug, memberEmail, adminEmail }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Reinstate a user's membership in a book club
+ *
+ * @param {string} slug The club's slug
+ * @param {string} memberEmail The user's email
+ * @param {string} adminEmail The requesting admin's email
+ * @return {Promise<void>}
+ */
+export const reinstateMember = async (
+  slug: string,
+  memberEmail: string,
+  adminEmail: string
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Reinstate the user's membership
+  await session.run(
+    `
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: FALSE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { email: $adminEmail, isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    SET m.isActive = TRUE
+    REMOVE m.departed
+    `,
+    { slug, userEmail: memberEmail, adminEmail }
+  );
+
+  // Close the session
+  session.close();
+};
+
+/**
+ * Find a user's role in a book club by slug
+ *
+ * @param {string} slug The slug of the book club
+ * @param {string} email The email of the user to search for
+ * @return {Promise<Role | null>} The user's role in the book club, or null if they are not a member
+ */
+export const findBookClubRole = async (
+  slug: string,
+  email: string
+): Promise<Role | null> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Find the user's role in the book club
+  const result = await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN m.role AS role
+    `,
+    { slug, email }
+  );
+
+  // Close the session and return the user's role
+  session.close();
+  return result.records[0]?.get('role') ?? null;
+};
 
 /**
  * Check a user's [previous] membership in a book club
@@ -21,287 +181,133 @@ export interface MembershipUpdate {
 export const checkMembership = async (
   slug: string,
   userEmail: string,
-  departed = false
+  isActive = true
 ): Promise<boolean> => {
-  // Connect to the database and collection
-  const collection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
+  // Connect to Neo4j
+  const session = driver.session();
 
   // Check the user's membership
-  const count = await collection.countDocuments({
-    slug,
-    disbanded: { $exists: false },
-    members: {
-      $elemMatch: {
-        userEmail,
-        departed: { $exists: departed }
-      }
-    }
-  });
+  const result = await session.run(
+    `
+    MATCH (:User { email: $userEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: $isActive })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })
+    RETURN COUNT(m) > 0 AS isMember
+    `,
+    { slug, userEmail, isActive }
+  );
 
-  return count > 0;
+  // Close the session and return whether the user is a member
+  session.close();
+  return result.records[0].get('isMember');
 };
 
 /**
- * Update a member's role in a club
- * ADMIN/OWNER REPO FUNCTION
+ * Retrieve the pick list for a book club
  *
  * @param {string} slug The club's slug
- * @param {string} userEmail The member's email
- * @param {Role} newRole The member's new role
+ * @param {string} email The requesting user's email
+ * @return {Promise<UserAndMembership[]>} The pick list
  */
-export const updateMemberRole = async (
+export const findBookClubPickList = async (
   slug: string,
-  userEmail: string,
-  newRole: Role
-): Promise<MembershipUpdate> => {
-  // Connect to the database and collection
-  const bcCollection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  email: string
+): Promise<UserAndMembership[]> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Retrieve the pick list
+  const result = await session.run(
+    `
+    MATCH (:User { isActive: TRUE, email: $email })-[:HAS_MEMBERSHIP]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(:BookClub { slug: $slug, isActive: TRUE })-[:HAS_CURRENT_PICKER]->(m:Membership { isActive: TRUE })
+    MATCH path = (m)-[:PICKS_BEFORE*0..]->(nextM:Membership {isActive: TRUE})
+    MATCH (nextM)<-[:HAS_MEMBERSHIP]-(u:User)
+    RETURN nextM, u
+    ORDER BY length(path)
+    `,
+    { email, slug }
   );
 
-  // Update the book club in the database
-  const bcUpdate = await bcCollection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      members: {
-        $elemMatch: {
-          userEmail,
-          role: { $ne: newRole },
-          departed: { $exists: false }
-        }
-      }
-    },
-    {
-      $set: {
-        'members.$.role': newRole
-      }
-    }
-  );
+  // Close the session
+  session.close();
 
-  // Connect to the user collection
-  const uCollection = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
-
-  // Update the user's memberships
-  const uUpdate = await uCollection.updateOne(
-    {
-      email: userEmail,
-      departed: { $exists: false },
-      memberships: {
-        $elemMatch: {
-          slug,
-          departed: { $exists: false },
-          role: { $ne: newRole }
-        }
-      }
-    },
-    {
-      $set: {
-        'memberships.$.role': newRole
-      }
-    }
-  );
-
-  return { bcUpdate, uUpdate };
+  // Gather the user and membership properties and return the pick list
+  return result.records.map(record => ({
+    user: record.get('u').properties,
+    membership: record.get('nextM').properties
+  }));
 };
 
 /**
- * Add a member to a book club
- * ADMIN/OWNER REPO FUNCTION
+ * Advance the current picker in a book club
  *
  * @param {string} slug The club's slug
- * @param {string} userEmail The new member's email
- * @return {Promise<MembershipUpdate>}
+ * @param {string} email The requesting user's email
+ * @return {Promise<void>}
  */
-export const addMember = async (
+export const advancePicker = async (
   slug: string,
-  userEmail: string
-): Promise<MembershipUpdate> => {
-  // Connect to the book club collection
-  const bcCollection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  email: string
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Advance the picker
+  await session.run(
+    `
+    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc:BookClub { slug: $slug, isActive: TRUE })-[pr:HAS_CURRENT_PICKER]->(:Membership { isActive: TRUE })-[:PICKS_BEFORE]->(np:Membership { isActive: TRUE })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    DELETE pr
+    MERGE (bc)-[:HAS_CURRENT_PICKER]->(np)
+    `,
+    { email, slug }
   );
 
-  // Add the member to the book club
-  const bcUpdate = await bcCollection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      members: {
-        $not: {
-          $elemMatch: {
-            userEmail
-          }
-        }
-      }
-    },
-    {
-      $push: {
-        members: {
-          userEmail,
-          joined: new Date(),
-          role: Role.READER
-        }
-      }
-    }
-  );
-
-  // Connect to the user collection
-  const uCollection = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
-
-  // Add the club to the user's memberships
-  const uUpdate = await uCollection.updateOne(
-    {
-      email: userEmail,
-      departed: { $exists: false },
-      memberships: {
-        $not: {
-          $elemMatch: {
-            clubSlug: slug
-          }
-        }
-      }
-    },
-    {
-      $push: {
-        memberships: {
-          clubSlug: slug,
-          joined: new Date(),
-          role: Role.READER
-        }
-      }
-    }
-  );
-
-  return { bcUpdate, uUpdate };
+  // Close the session
+  session.close();
 };
 
 /**
- * Reinstate a user's membership in a club
- * ADMIN/OWNER REPO FUNCTION
+ * Adjust the pick order of a book club
  *
  * @param {string} slug The club's slug
- * @param {string} userEmail The user's email
- * @return {Promise<MembershipUpdate>}
+ * @param {string} adminEmail The requesting user's email
+ * @param {string[]} pickerEmails The emails of the pickers in the new order
+ * @return {Promise<void>}
  */
-export const reinstateMembership = async (
+export const adjustPickOrder = async (
   slug: string,
-  userEmail: string
-): Promise<MembershipUpdate> => {
-  // Connect to the book club collection
-  const bcCollection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
+  adminEmail: string,
+  pickerEmails: string[]
+): Promise<void> => {
+  // Connect to Neo4j
+  const session = driver.session();
+
+  // Delete the existing pick order
+  await session.run(
+    `
+    MATCH (bc:BookClub { isActive: TRUE, slug: $slug })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { isActive: TRUE, email: $adminEmail })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    MATCH (bc)-[:HAS_MEMBER]->()-[p:PICKS_BEFORE]->()
+    DELETE p
+    `,
+    { slug, adminEmail }
   );
 
-  // Reinstate the user's membership
-  const bcUpdate = await bcCollection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      members: {
-        $elemMatch: {
-          userEmail,
-          departed: { $exists: true }
-        }
-      }
-    },
-    {
-      $set: {
-        'members.$.role': Role.READER
-      },
-      $unset: {
-        'members.$.departed': 1
-      }
-    }
+  // Create the new pick order
+  await session.run(
+    `
+    MATCH (bc:BookClub { isActive: TRUE, slug: $slug })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(:User { isActive: TRUE, email: $adminEmail })
+    WHERE am.role IN ['ADMIN', 'OWNER']
+    UNWIND $pickerEmails AS memberEmail
+    MATCH (u:User { email: memberEmail, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc)
+    WITH COLLECT(m) AS members
+    UNWIND RANGE(0, SIZE(members) - 2) AS i
+    WITH members[i] AS n1, members[i+1] AS n2, members[SIZE(members) - 1] AS l, members[0] AS f
+    MERGE (n1)-[:PICKS_BEFORE]-(n2)
+    MERGE (l)-[:PICKS_BEFORE]->(f)
+    `,
+    { slug, adminEmail, pickerEmails }
   );
 
-  // Connect to the user collection
-  const uCollection = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
-
-  // Reinstate the user's membership
-  const uUpdate = await uCollection.updateOne(
-    {
-      email: userEmail,
-      departed: { $exists: false },
-      memberships: {
-        $elemMatch: {
-          clubSlug: slug,
-          departed: { $exists: true }
-        }
-      }
-    },
-    {
-      $set: {
-        'memberships.$.role': Role.READER
-      },
-      $unset: {
-        'memberships.$.departed': 1
-      }
-    }
-  );
-
-  return { bcUpdate, uUpdate };
-};
-
-/**
- * Remove a member from a book club
- * ADMIN/OWNER REPO FUNCTION (or self)
- *
- * @param {string} slug The club's slug
- * @param {string} userEmail The member's email
- * @return {Promise<MembershipUpdate>}
- */
-export const removeMember = async (
-  slug: string,
-  userEmail: string
-): Promise<MembershipUpdate> => {
-  // Connect to the book club collection
-  const bcCollection = await connectCollection(
-    props.DB.ATLAS_BOOK_CLUB_COLLECTION
-  );
-
-  // Remove the member from the book club
-  const bcUpdate = await bcCollection.updateOne(
-    {
-      slug,
-      disbanded: { $exists: false },
-      members: {
-        $elemMatch: {
-          userEmail,
-          departed: { $exists: false }
-        }
-      }
-    },
-    {
-      $set: {
-        'members.$.departed': new Date()
-      }
-    }
-  );
-
-  // Connect to the user collection
-  const uCollection = await connectCollection(props.DB.ATLAS_USER_COLLECTION);
-
-  // Remove the club from the user's memberships
-  const uUpdate = await uCollection.updateOne(
-    {
-      email: userEmail,
-      departed: { $exists: false },
-      memberships: {
-        $elemMatch: {
-          clubSlug: slug,
-          departed: { $exists: false }
-        }
-      }
-    },
-    {
-      $set: {
-        'memberships.$.departed': new Date()
-      }
-    }
-  );
-
-  return { bcUpdate, uUpdate };
+  // Close the session
+  session.close();
 };

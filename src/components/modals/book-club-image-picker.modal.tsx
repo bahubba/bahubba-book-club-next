@@ -2,14 +2,7 @@
 
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  useDisclosure
-} from '@nextui-org/modal';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@nextui-org/modal';
 
 import BookClubImagePicker from '@/components/pickers/book-club-image.picker';
 
@@ -30,6 +23,7 @@ const BookClubImagePickerModal = ({
   selectedImage,
   setSelectedImage
 }: Readonly<BookClubImagePickerModalProps>) => {
+  // Modal state
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
@@ -73,6 +67,7 @@ const BookClubImagePickerModal = ({
                   color={selectedImage === '' ? 'default' : 'success'}
                   onClick={onClose}
                   disabled={selectedImage === ''}
+                  isDisabled={selectedImage === ''}
                 >
                   Confirm
                 </Button>

@@ -31,7 +31,7 @@ const SectionHeaderLayout = ({
 
   return (
     <div
-      className="flex items-center w-full gap-x-4 p-2 pb-0"
+      className="flex items-center w-full gap-x-4"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

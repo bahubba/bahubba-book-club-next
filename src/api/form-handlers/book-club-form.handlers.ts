@@ -4,82 +4,80 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import slugify from 'slugify';
 
-import { Publicity, Role } from '@/db/models/book-club.models';
+import { ensureAuth } from '@/api/auth.api';
 import {
   addBookClub,
-  findBookClubBySlugForAdmin,
-  findByName,
-  findMemberRoleBySlug,
+  bookClubExists,
+  findBookClubForAdmin,
+  findBookClubsBySearch,
   updateBookClub
 } from '@/db/repositories/book-club.repository';
-import { updateUser } from '@/db/repositories/user.repository';
-import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
-import { ensureAuth } from '@/api/auth.api';
+import { ErrorFormState, SearchFormState } from '@/api/form-handlers/state-interfaces';
+import { Publicity, Role } from '@/db/models/nodes';
 import props from '@/util/properties';
-import { updateMemberRole } from '@/db/repositories/membership.repository';
+import { advancePicker, findBookClubRole } from '@/db/repositories/membership.repository';
 
 /**
  * Handle submitting a new book club
  *
  * @param {ErrorFormState} _ Form state from the previous render; Unused
  * @param {FormData} formData The book club form's data, matching the Book Club interface
- * @return {ErrorFormState} The new form state; Used for passing back error messages
+ * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
 export const handleCreateBookClub = async (
   _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const user = await ensureAuth();
+  const { email } = await ensureAuth();
 
-  // Pull out the club's name and ensure that it is not a reserved word
+  // Pull out the form data
   const name = formData.get('name')?.toString().trim() ?? '';
-  if (props.APP.RESERVED_CLUB_NAMES.includes(name))
+  const description =
+    formData.get('description')?.toString().trim() ||
+    'A book club for reading books';
+  const image = formData.get('image')?.toString() ?? '';
+  let publicity =
+    (formData.get('publicity')?.toString().trim().toUpperCase() as Publicity) ??
+    Publicity.PRIVATE;
+
+  // Slugify the name
+  const slug = slugify(name, {
+    lower: true,
+    remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
+  });
+
+  // Ensure the slug is not empty or a reserved word
+  if (props.APP.RESERVED_CLUB_NAMES.includes(slug))
     return { error: 'Invalid name' };
 
-  // Ensure there isn't an existing book club with the same name
-  const existing = await findByName(name);
+  // Ensure there isn't an existing book club with the same slug
+  const existing = await bookClubExists(slug);
   if (existing) return { error: 'Name already in use' };
 
-  // Ensure publicity is a valid value
-  let publicity =
-    formData.get('publicity')?.toString().trim().toUpperCase() ||
-    Publicity.PRIVATE;
+  // Ensure publicity is a valid value; default to PRIVATE if not
   if (!(publicity in Publicity)) publicity = Publicity.PRIVATE;
 
-  // Create a slug for the book club from the name
-  const slug = slugify(name, { lower: true });
-
-  // Create the new club
-  await addBookClub({
-    name,
-    slug,
-    description:
-      formData.get('description')?.toString().trim() ||
-      'A book club for reading books',
-    image: formData.get('image')?.toString() ?? '',
-    publicity: publicity as Publicity,
-    members: [
+  // Create the new book club (with the user as the owner)
+  // TODO - Error handling
+  try {
+    await addBookClub(
+      email,
       {
-        userEmail: user.email,
-        joined: new Date(),
-        role: Role.OWNER
-      }
-    ]
-  });
-
-  // Add membership in the club to the user
-  await updateUser({
-    ...user,
-    memberships: [
-      ...user.memberships,
-      {
-        clubSlug: slug,
-        joined: new Date(),
-        role: Role.OWNER
-      }
-    ]
-  });
+        name,
+        slug,
+        description,
+        image,
+        publicity,
+        isActive: true,
+        created: new Date().toISOString()
+      },
+      { role: Role.OWNER, joined: new Date().toISOString(), isActive: true }
+    );
+  } catch (e) {
+    console.log('error adding book club', e);
+    return { error: 'Failed to create book club' };
+  }
 
   // On success, redirect to the home page
   revalidatePath('/home');
@@ -98,116 +96,99 @@ export const handleUpdateBookClub = async (
   formData: FormData
 ): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
-  const user = await ensureAuth();
+  const { email } = await ensureAuth();
 
-  // Ensure all form fields are present and valid
-  if (
-    !formData.get('previousSlug') ||
-    !formData.get('description') ||
-    !formData.get('image') ||
-    !formData.get('publicity')
-  )
-    return { error: 'Incomplete form data' };
-
-  // Pull out the club's name and ensure that it is not a reserved word
+  // Pull out the form data and ensure it's valid
+  const previousSlug = formData.get('previousSlug')?.toString().trim() || '';
   const name = formData.get('name')?.toString().trim() ?? '';
-  if (
-    !name ||
-    props.APP.RESERVED_CLUB_NAMES.includes(name) ||
-    name.includes('/')
-  )
+  const slug = slugify(name, {
+    lower: true,
+    remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
+  });
+  const description =
+    formData.get('description')?.toString().trim() ||
+    'A book club for reading books';
+  const image = formData.get('image')?.toString() || 'default.jpg';
+  let publicity =
+    (formData.get('publicity')?.toString().trim().toUpperCase() as Publicity) ??
+    Publicity.PRIVATE;
+  if (!slug || props.APP.RESERVED_CLUB_NAMES.includes(slug))
     return { error: 'Invalid name' };
 
-  // Slugify the name
-  const slug = slugify(formData.get('name')?.toString().trim() || '', {
-    lower: true
-  });
-
   // Get the existing club, ensuring it exists and the user is an admin
-  const existing = await findBookClubBySlugForAdmin(
-    formData.get('previousSlug')?.toString() || '',
-    user.email
-  );
-  if (!existing || !existing.slug) return { error: 'Book club not found' };
+  const existing = await findBookClubForAdmin(previousSlug, email);
+  if (!existing) return { error: 'Book club not found' };
 
-  // Ensure publicity is a valid value
-  let publicity =
-    formData.get('publicity')?.toString().trim().toUpperCase() ||
-    Publicity.PRIVATE;
-  if (!(publicity in Publicity)) publicity = existing.publicity;
-
-  // Create a book club doc out of the form data
-  const updated = {
+  // Update the club node
+  await updateBookClub(previousSlug, email, {
     name,
     slug,
-    description:
-      formData.get('description')?.toString().trim() ||
-      (props.APP.DEFAULT_CLUB_DESCRIPTION as string),
-    image: formData.get('image')?.toString() || '',
-    publicity: publicity as Publicity
-  };
+    description,
+    image,
+    publicity,
+    isActive: true,
+    created: existing.created
+  });
 
-  // Ensure there are actual changes
-  if (JSON.stringify(updated) === JSON.stringify(existing))
-    return { error: 'No changes' };
-
-  // Update the club
-  await updateBookClub(existing.slug, updated);
-
-  // On success, redirect to the home page
-  revalidatePath('/home');
-  redirect(`/book-club/${slug}/admin/details`);
+  // On success, return no error
+  revalidatePath('/book-club/[slug]/admin/details');
+  return { error: '' };
 };
 
 /**
- * Handle updating a member's role in a book club
+ * Search for book clubs by name or description
  *
- * @param {ErrorFormState} _ Form state from the previous render
- * @param {FormData} formData The form data, containing the club slug, the member's email, and the new role
- * @return {ErrorFormState} The new form state; Used for passing back error messages
+ * @param {SearchFormState} _ Form state from the previous render; Unused
+ * @param {FormData} formData The search form's data, containing the search term
+ * @return {Promise<SearchFormState>} The new form state; Used for passing back search results or error messages
  */
-export const handleUpdateMemberRole = async (
+export const handleBookClubSearch = async (
+  _: SearchFormState,
+  formData: FormData
+): Promise<SearchFormState> => {
+  // Get the user and ensure that they're authenticated
+  const { email } = await ensureAuth();
+
+  // Pull out the search term
+  const search = formData.get('search')?.toString().trim() || '';
+
+  // Ensure the search term is not empty
+  if (!search) return { error: 'Invalid search term', bookClubs: [] };
+
+  // Fetch and return the book clubs
+  return { error: '', bookClubs: await findBookClubsBySearch(email, search) };
+};
+
+/**
+ * Handle advancing the current picker of the book club
+ *
+ * @param {ErrorFormState} _ Form state from the previous render; Unused
+ * @param {FormData} formData The form data, containing the book club slug
+ * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
+ */
+export const handleAdvancePicker = async (
   _: ErrorFormState,
   formData: FormData
 ): Promise<ErrorFormState> => {
-  // Ensure the user is authenticated and pull out their email
-  const { email: adminEmail } = await ensureAuth();
+  // Get the user and ensure that they're authenticated
+  const { email } = await ensureAuth();
 
   // Pull out the form data
   const slug = formData.get('slug')?.toString().trim() || '';
-  const memberEmail = formData.get('email')?.toString().trim() || '';
-  const newRole = formData.get('role')?.toString().trim().toUpperCase() || '';
+  const pageRoute = formData.get('pageRoute')?.toString().trim() || '';
 
-  // Ensure all form fields are present and valid
-  if (slug === '' || memberEmail === '' || newRole === '' || !(newRole in Role))
-    return { error: 'Incomplete form data' };
+  // Ensure the slug is not empty
+  if (!slug || !pageRoute) return { error: 'Invalid form data' };
 
-  // Ensure the user is not trying to change their own role
-  if (formData.get('email')?.toString() === adminEmail)
-    return { error: 'Cannot change own role' };
-
-  // Ensure the requesting user is an admin (or owner) of the club and they aren't an admin trying to change ownership of the club
-  const adminRole = await findMemberRoleBySlug(slug, adminEmail);
-  if (
-    !adminRole ||
-    ![Role.ADMIN, Role.OWNER].includes(adminRole) ||
-    (adminRole !== Role.OWNER && newRole === Role.OWNER)
-  )
+  // Get the user's role in the book club
+  const role = await findBookClubRole(slug, email);
+  if (!role || ![Role.ADMIN, Role.OWNER].includes(role))
     return { error: 'Unauthorized' };
 
-  // Ensure the member exists in the club and they are getting a new role
-  const existingRole = await findMemberRoleBySlug(slug, memberEmail);
-  if (!existingRole || existingRole === newRole || existingRole === Role.OWNER)
-    return { error: 'Invalid role change' };
+  // Advance the picker
+  await advancePicker(slug, email);
 
-  // Update the member's role
-  await updateMemberRole(slug, memberEmail, newRole as Role);
-
-  // If the new role is OWNER, demote the requesting user to admin
-  if (newRole === Role.OWNER)
-    await updateMemberRole(slug, adminEmail, Role.ADMIN);
-
-  // On success, revalidate the admin page
-  revalidatePath(`/book-club/${slug}/admin`);
-  return { error: '' };
+  // Revalidate the path and redirect back to it to refresh
+  revalidatePath(pageRoute);
+  redirect(pageRoute);
 };

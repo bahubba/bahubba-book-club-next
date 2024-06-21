@@ -1,9 +1,10 @@
-import { ensureAuth } from '@/api/auth.api';
+import { ensureAuth } from '../auth.api';
 import {
-  hasOpenRequest as fetchHasOpenRequest,
-  findMembershipRequests
+  findMembershipRequests,
+  hasOpenRequest as fetchHasOpenRequest
 } from '@/db/repositories/membership-request.repository';
-import { BookClubMembershipRequest } from '@/db/models/membership-request.models';
+import { UserAndMembershipRequest } from '@/db/models/nodes';
+import { toJSON } from '@/util/helpers';
 
 /**
  * Find whether a user has an open membership request for a given book club
@@ -24,14 +25,14 @@ export const hasOpenRequest = async (slug: string): Promise<boolean> => {
  * Finds membership requests for a book club
  *
  * @param {string} slug The slug of the book club
- * @return {Promise<BookClubMembershipRequest[]>} The membership requests
+ * @return {Promise<UserAndMembershipRequest[]>} The membership requests
  */
 export const getMembershipRequests = async (
   slug: string
-): Promise<BookClubMembershipRequest[]> => {
+): Promise<UserAndMembershipRequest[]> => {
   // Ensure that the user is authenticated and get their email
   const { email } = await ensureAuth();
 
   // Fetch the membership requests
-  return await findMembershipRequests(slug, email);
+  return toJSON(await findMembershipRequests(slug, email)) as UserAndMembershipRequest[];
 };

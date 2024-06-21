@@ -3,10 +3,13 @@ import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 
 import {
+  addProviderProfile,
   addUser,
-  findFullUserByEmail,
-  updateUser
+  findUser,
+  findUserAndProviderProfile,
+  updateProviderProfile
 } from '@/db/repositories/user.repository';
+import { ProviderProfileProperties, UserAndProviderProfile } from '@/db/models/nodes';
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -21,7 +24,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user: authUser, account, profile }) {
       // Can't sign in without an email address
       if (!profile?.email || !account) {
         return false;
@@ -31,37 +34,47 @@ export const authOptions: NextAuthOptions = {
       const { email } = profile;
 
       // Check if the user exists in the database
-      const userDoc = await findFullUserByEmail(email);
+      const user = await findUser(email);
 
-      // If the user doesn't exist, add them to the database
-      if (!userDoc) {
-        await addUser({
-          email,
-          preferredName: user.name ?? profile.name ?? 'Anonymous User',
-          providerProfiles: {
-            [account.provider]: {
-              userId: account.userId ?? user.id,
-              providerAccountId: account.providerAccountId,
-              name: user.name ?? profile.name ?? 'Anonymous User',
-              sub: profile.sub,
-              image: profile.image ?? user.image
-            }
+      // Format the provider
+      const provider = account.provider.toUpperCase();
+
+      // Collect the provider profile properties
+      const providerProfile: ProviderProfileProperties = {
+        provider,
+        userId: account.userId ?? authUser.id,
+        providerAccountId: account.providerAccountId,
+        name: authUser.name ?? profile.name ?? 'Anonymous User',
+        sub: profile.sub,
+        image: profile.image ?? authUser.image,
+        isActive: true
+      };
+
+      // TODO - Catch error
+      // Check if the user exists in Neo4j
+      const neo4jUser: UserAndProviderProfile =
+        await findUserAndProviderProfile(email, provider, account.userId ?? authUser.id);
+
+      // Update user info in Neo4j if necessary
+      if (!neo4jUser.user) {
+        // Create a new user with the provider profile
+        // TODO - Catch error
+        await addUser(
+          {
+            email,
+            preferredName: authUser.name ?? profile.name ?? 'Anonymous User',
+            preferredImage: profile.image ?? authUser.image ?? undefined,
+            joined: new Date().toISOString(),
+            isActive: true
           },
-          memberships: [],
-          joined: new Date()
-        });
+          providerProfile
+        );
+      } else if (!neo4jUser.profile) {
+        // Create a new provider profile for the user
+        await addProviderProfile(email, providerProfile);
       } else {
-        // If the user exists, update their profile with the current provider info
-        userDoc.providerProfiles[account.provider] = {
-          userId: account.userId ?? user.id,
-          providerAccountId: account.providerAccountId,
-          name: user.name ?? profile.name ?? 'Anonymous User',
-          sub: profile.sub,
-          image: profile.image ?? user.image
-        };
-
-        // Update the user in MongoDB
-        await updateUser(userDoc);
+        // Update the provider profile for the user
+        await updateProviderProfile(email, providerProfile);
       }
 
       return true;

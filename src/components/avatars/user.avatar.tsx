@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { Avatar } from '@nextui-org/avatar';
+import { User } from '@nextui-org/user';
 
 /** An avatar for the current user, which links to their profile page */
 const UserAvatar = () => {
@@ -13,12 +13,13 @@ const UserAvatar = () => {
     <></>
   ) : (
     <Link href="/profile">
-      <Avatar
-        src={session.data?.user?.image || undefined}
-        name={
-          (!session.data?.user?.image && session.data?.user?.name) ||
-          'Anonymous user'
-        }
+      <User
+        name={session.data?.user?.name ?? 'Anonymous user'}
+        description={session.data?.user?.email ?? 'No email'}
+        avatarProps={{
+          src: session.data?.user?.image || undefined,
+          alt: session.data?.user?.name || 'Anonymous user avatar'
+        }}
       />
     </Link>
   );

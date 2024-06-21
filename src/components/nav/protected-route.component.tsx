@@ -1,11 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 
-import {
-  getBookClubRole,
-  getBookClubPublicity
-} from '@/api/fetchers/book-club.fetchers';
-import { Publicity, Role } from '@/db/models/book-club.models';
+import { getBookClubPublicity, getBookClubRole } from '@/api/fetchers/book-club.fetchers';
+import { Publicity, Role } from '@/db/models/nodes';
 
 // Component props
 interface ProtectedRouteProps {

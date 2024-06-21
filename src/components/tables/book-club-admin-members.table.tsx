@@ -1,34 +1,27 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow
-} from '@nextui-org/table';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/table';
 
-import { BookClubMemberProjection, Role } from '@/db/models/book-club.models';
 import MemberRoleForm from '../forms/member-role.form';
 import RemoveMemberButton from '../buttons/remove-member.button';
+import { Role, UserAndMembership } from '@/db/models/nodes';
 
 // Component props
 interface BookClubAdminMembersTableProps {
   bookClubSlug: string;
   adminEmail: string;
   adminRole: Role;
-  members: BookClubMemberProjection[];
+  members: UserAndMembership[];
 }
 
 /**
  * Table displaying members in rows as editable forms
  *
- * @prop {Object} props Component props
- * @prop {string} props.bookClubSlug The slug of the book club
- * @prop {Role} props.adminRole The role of the current user
- * @prop {BookClubMemberProjection[]} props.members The members of the book club
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
+ * @param {Role} props.adminRole The role of the current user
+ * @param {UserAndMembership[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({
   bookClubSlug,
@@ -59,32 +52,34 @@ const BookClubAdminMembersTable = ({
       </TableHeader>
       <TableBody>
         {members.map(member => (
-          <TableRow key={member.email}>
-            <TableCell>{member.preferredName}</TableCell>
-            <TableCell>{member.email}</TableCell>
+          <TableRow key={member.user.email}>
+            <TableCell>{member.user.preferredName}</TableCell>
+            <TableCell>{member.user.email}</TableCell>
             <TableCell>
               <MemberRoleForm
                 bookClubSlug={bookClubSlug}
                 email={data?.user?.email ?? ''}
-                memberEmail={member.email}
+                memberEmail={member.user.email}
                 adminRole={adminRole}
-                role={member.role}
+                role={member.membership.role}
               />
             </TableCell>
             <TableCell>
-              {new Intl.DateTimeFormat('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              }).format(member.joined)}
+              {typeof member.membership.joined === 'string'
+                ? member.membership.joined
+                : new Intl.DateTimeFormat('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }).format(member.membership.joined)}
             </TableCell>
             <TableCell>
               <RemoveMemberButton
                 bookClubSlug={bookClubSlug}
                 adminEmail={adminEmail}
                 adminRole={adminRole}
-                userEmail={member.email}
-                memberRole={member.role}
+                userEmail={member.user.email}
+                memberRole={member.membership.role}
               />
             </TableCell>
           </TableRow>

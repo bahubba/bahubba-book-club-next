@@ -1,14 +1,19 @@
 import { Suspense } from 'react';
+import { Spinner } from '@nextui-org/react';
 
 import PageSectionLayout from '@/components/layout/page-section.layout';
 import SectionHeaderLayout from '@/components/layout/section-header.layout';
 import RequestMembershipButton from '@/components/buttons/request-membership.button';
-import BookClubAdminButton from '@/components/buttons/book-club-admin.button';
-import {
-  getBookClubName,
-  getBookClubRole
-} from '@/api/fetchers/book-club.fetchers';
-import { Role } from '@/db/models/book-club.models';
+import DiscussionCard from '@/components/cards/discussion.card';
+import LinkButton from '@/components/buttons/link.button';
+import AdminIcon from '@/components/icons/admin.icon';
+import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
+import { getBookClubName, getBookClubRole } from '@/api/fetchers/book-club.fetchers';
+import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
+import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
+import { Role } from '@/db/models/nodes';
+import PlusIcon from '@/components/icons/plus.icon';
+import Link from 'next/link';
 
 // Component props
 interface BookClubHomePageProps {
@@ -16,6 +21,53 @@ interface BookClubHomePageProps {
     bookClubSlug: string;
   };
 }
+
+/**
+ * Async component for fetching and displaying ad-hoc discussions
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ */
+const AdHocDiscussions = async ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  // Fetch the ad-hoc discussions
+  const discussions = await getAdHocDiscussions(bookClubSlug);
+
+  return (
+    <div className="flex flex-col gap-y-2 p-2">
+      {discussions.map(discussion => (
+        <DiscussionCard
+          key={discussion.title}
+          discussion={discussion}
+          bookClubSlug={bookClubSlug}
+        />
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Async component for fetching and displaying the pick order
+ *
+ * @param {Object} props - Component props
+ * @param {string} props.bookClubSlug - The slug of the book club
+ */
+const PickOrderWrapper = async ({
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  // Fetch the pick order and user's role
+  const pickOrder = await getBookClubPickList(bookClubSlug);
+  const memberRole = await getBookClubRole(bookClubSlug);
+
+  return (
+    <BookClubPickOrderList
+      pickOrder={pickOrder}
+      bookClubSlug={bookClubSlug}
+      memberRole={memberRole as Role}
+    />
+  );
+};
 
 /**
  * Async component for displaying the book club admin button or the request membership button
@@ -33,7 +85,12 @@ const BookClubButtons = async ({
   return (
     <div className="flex-1 justify-start">
       {!!role && [Role.ADMIN, Role.OWNER].includes(role) ? (
-        <BookClubAdminButton bookClubSlug={bookClubSlug} />
+        <LinkButton
+          uri={`/book-club/${bookClubSlug}/admin/details`}
+          tooltip="Book Club Admin"
+        >
+          <AdminIcon />
+        </LinkButton>
       ) : (
         <>{!role && <RequestMembershipButton bookClubSlug={bookClubSlug} />}</>
       )}
@@ -53,11 +110,7 @@ const BookClubPageHeader = async ({
   // Fetch the book club name
   const bookClubName = await getBookClubName(bookClubSlug);
 
-  return (
-    <div className="flex-shrink">
-      <h1 className="text-3xl font-bold">{bookClubName}</h1>
-    </div>
-  );
+  return <>{bookClubName}</>;
 };
 
 /**
@@ -71,31 +124,60 @@ const BookClubHomePage = ({
   params: { bookClubSlug }
 }: Readonly<BookClubHomePageProps>) => {
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex-shrink ms-2 mb-2">
-        <div className="flex items-center">
-          <SectionHeaderLayout
-            title={
-              <Suspense fallback={<></>}>
-                <BookClubPageHeader bookClubSlug={bookClubSlug} />
-              </Suspense>
-            }
-          >
+    <div className="flex-1 flex flex-col h-full pb-2">
+      <SectionHeaderLayout
+        title={
+          <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
             <Suspense fallback={<></>}>
-              <BookClubButtons bookClubSlug={bookClubSlug} />
+              <BookClubPageHeader bookClubSlug={bookClubSlug} />
             </Suspense>
-          </SectionHeaderLayout>
-        </div>
-      </div>
+          </h1>
+        }
+      >
+        <Suspense fallback={<></>}>
+          <BookClubButtons bookClubSlug={bookClubSlug} />
+        </Suspense>
+      </SectionHeaderLayout>
       <div className="flex flex-1 w-full">
         <PageSectionLayout header="Members">
-          <span>Members go here</span>
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center w-full h-36">
+                <Spinner />
+              </div>
+            }
+          >
+            <PickOrderWrapper bookClubSlug={bookClubSlug} />
+          </Suspense>
         </PageSectionLayout>
         <PageSectionLayout header="Books">
           <div>Some long text string that will take up some width</div>
         </PageSectionLayout>
-        <PageSectionLayout header="Discussions">
-          <div>Some long text string that will take up some width</div>
+        <PageSectionLayout
+          header={
+            <Link href={`/book-club/${bookClubSlug}/discussions`}>
+              Discussions
+            </Link>
+          }
+          sectionHeaderChildren={
+            <LinkButton
+              uri={`/book-club/${bookClubSlug}/discussions/create`}
+              tooltip="Create a discussion"
+            >
+              <PlusIcon />
+            </LinkButton>
+          }
+        >
+          <Suspense
+            fallback={
+              <div className="flex justify-center items-center w-full h-36">
+                <Spinner />
+              </div>
+            }
+          >
+            <AdHocDiscussions bookClubSlug={bookClubSlug} />
+          </Suspense>
+          <span>Link to add discussion goes here</span>
         </PageSectionLayout>
       </div>
     </div>
