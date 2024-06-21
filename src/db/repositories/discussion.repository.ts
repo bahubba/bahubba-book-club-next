@@ -127,32 +127,42 @@ export const findDiscussionReplies = async (
   pageSize: number,
   pageNum: number
 ): Promise<RepliesAndTotalPage> => {
+  console.log('params:::', bookClubSlug, discussionID, email, pageSize, pageNum); // DELETEME
+
   // Connect to Neo4j
   const session = driver.session();
 
-  // Get the replies and total
-  const result = await session.run(
-    `
-    MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
-    WHERE bc.publicity = 'PUBLIC' OR (
-      EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
-    )
-    WITH r { .*, user: u { .* } }
-    ORDER BY r.created
-    SKIP $skip
-    LIMIT $limit
-    WITH collect(r) as replies
-    RETURN replies, size(replies) as total
-    `,
-    { bookClubSlug, discussionID, email, skip: int(pageSize * pageNum), limit: int(pageSize) }
-  );
+  try {
+    // Get the replies and total
+    const result = await session.run(
+      `
+      MATCH (bc:BookClub { slug: $bookClubSlug, isActive: TRUE })-[:HAS_DISCUSSION]->(d:Discussion { isActive: TRUE, id: $discussionID })-[:HAS_REPLY]->(r:Reply)<-[:REPLIED]-(:Membership)<-[:HAS_MEMBERSHIP]-(u:User)
+      WHERE bc.publicity = 'PUBLIC' OR (
+        EXISTS((:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc))
+      )
+      WITH r { .*, user: u { .* } }
+      ORDER BY r.created
+      SKIP $skip
+      LIMIT $limit
+      WITH collect(r) as replies
+      RETURN replies, size(replies) as total
+      `,
+      { bookClubSlug, discussionID, email, skip: int(pageSize * pageNum), limit: int(pageSize) }
+    );
+  } catch(e) {
+    console.log('e', e);
+  } finally {
+    session.close();
+  }
+
+  return {replies: [], total: 0};
 
   // Close the session and return
-  session.close();
-  return {
-    replies: result.records[0].get('replies'),
-    total: result.records[0].get('total')
-  };
+  // session.close();
+  // return {
+  //   replies: result.records[0].get('replies'),
+  //   total: result.records[0].get('total')
+  // };
 }
 
 /**

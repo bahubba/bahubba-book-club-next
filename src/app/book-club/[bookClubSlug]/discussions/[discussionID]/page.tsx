@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { getDiscussion } from '@/api/fetchers/discussion.fetchers';
 import ReplyButton from '@/components/buttons/reply.button';
+import DiscussionReplyList from '@/components/lists/discussion-reply.list';
 
 // Component props
 interface Slugs {
@@ -61,6 +62,10 @@ const BookClubDiscussionPage = ({
           bookClubSlug={bookClubSlug}
           discussionID={discussionID}
         />
+        <DiscussionReplyList
+           bookClubSlug={bookClubSlug}
+           discussionID={discussionID}
+         />
       </Suspense>
     </>
   );
