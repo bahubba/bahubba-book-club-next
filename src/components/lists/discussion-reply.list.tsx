@@ -37,7 +37,8 @@ const DiscussionReplyList = ({
     // Async callback to load replies
     const loadReplies = async () => {
       // Fetch replies from API
-      const newReplies = await getDiscussionReplies(bookClubSlug, discussionID, pageNum, 10);
+      const newReplies = await getDiscussionReplies(bookClubSlug, discussionID, pageNum - 1, 10);
+      console.log('newReplies:::', newReplies); // DELETEME
 
       // Update replies
       setReplies(prev => [...prev, ...newReplies.replies]);
@@ -47,6 +48,11 @@ const DiscussionReplyList = ({
 
     if((total === -1 || (total > 0 && pageNum < Math.ceil(total / 10))) && !loadedPages.includes(pageNum)) loadReplies();
   }, [bookClubSlug, discussionID, pageNum, total, loadedPages]);
+
+  // DELETEME
+  useEffect(() => {
+    console.log('loadedPages:::', loadedPages);
+  }, [loadedPages]);
 
   // Handle clicking on the load more button
   const handleLoadMore = () => setPageNum(prev => prev + 1);

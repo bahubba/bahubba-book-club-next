@@ -1,6 +1,7 @@
 import { DiscussionProperties, DiscussionPreview, RepliesAndTotalPage } from '@/db/models/nodes';
 import { ensureAuth } from '@/api/auth.api';
 import { findAdHocDiscussions, findDiscussion, findDiscussionReplies } from '@/db/repositories/discussion.repository';
+import { toJSON } from '@/util/helpers';
 
 /**
  * Get ad-hoc discussions for a book club
@@ -55,5 +56,5 @@ export const getDiscussionReplies = async (
   const { email } = await ensureAuth();
 
   // Fetch and return a page of replies for the discussion
-  return await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum);
+  return toJSON(await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum)) as RepliesAndTotalPage;
 }
