@@ -66,10 +66,10 @@ export const reviewMembershipRequest = async (
     `
     MATCH (:User { email: $userEmail, isActive: TRUE })-[:REQUESTED_MEMBERSHIP]->(mr:MembershipRequest { status: 'PENDING' })<-[:HAS_MEMBERSHIP_REQUEST]-(b:BookClub { slug: $slug, isActive: TRUE })-[:HAS_MEMBER]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBERSHIP]-(a:User { email: $adminEmail, isActive: TRUE })
     WHERE am.role IN ['ADMIN', 'OWNER']
-    SET mr.status = $status, mr.reviewed = ${new Date().toISOString()}, mr.reviewMessage = $reviewMessage
+    SET mr.status = $status, mr.reviewed = $dateReviewed, mr.reviewMessage = $reviewMessage
     MERGE (a)-[:REVIEWED_MEMBERSHIP_REQUEST]->(mr)
     `,
-    { slug, userEmail, adminEmail, status, reviewMessage }
+    { slug, userEmail, adminEmail, status, dateReviewed: new Date().toISOString(), reviewMessage }
   );
 
   // Close the session
