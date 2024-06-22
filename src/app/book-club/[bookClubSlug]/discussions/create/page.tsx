@@ -1,4 +1,5 @@
 import DiscussionForm from '@/components/forms/discussion.form';
+import BookClubBackButton from '@/components/buttons/book-club-back.button';
 
 /**
  * Page for creating a new discussion
@@ -10,12 +11,15 @@ import DiscussionForm from '@/components/forms/discussion.form';
 const CreateDiscussionPage = ({
   params: { bookClubSlug }
 }: Readonly<{ params: { bookClubSlug: string } }>) => (
-  <>
-    <h1 className="flex-shrink text-2xl font-bold">
-      Start New Book Club Discussion
-    </h1>
+  <div className="min-w-[50vw]">
+    <div className="flex justify-between items-center">
+      <h1 className="flex-shrink text-2xl font-bold">
+        Start New Book Club Discussion
+      </h1>
+      <BookClubBackButton bookClubSlug={bookClubSlug} />
+    </div>
     <DiscussionForm bookClubSlug={bookClubSlug} />
-  </>
+  </div>
 );
 
 export default CreateDiscussionPage;

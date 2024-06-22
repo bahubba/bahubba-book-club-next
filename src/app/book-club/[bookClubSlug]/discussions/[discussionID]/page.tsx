@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { getDiscussion } from '@/api/fetchers/discussion.fetchers';
 import DiscussionReplyList from '@/components/lists/discussion-reply.list';
 import { Spinner } from '@nextui-org/spinner';
+import BookClubBackButton from '@/components/buttons/book-club-back.button';
 
 // Component props
 interface BookClubDiscussionPageProps {
@@ -39,8 +40,13 @@ const BookClubDiscussionPage = async ({
   return (
     <>
       <div className="flex-shrink flex-grow-0">
-        <h1 className="text-2xl font-bold my-2">{discussion.title}</h1>
-        <p className="text-gray-500">{discussion.description}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold my-2">{discussion.title}</h1>
+            <p className="text-gray-500">{discussion.description}</p>
+          </div>
+          <BookClubBackButton bookClubSlug={bookClubSlug} />
+        </div>
       </div>
       <div className="flex flex-1 flex-col w-full h-1">
         <Suspense
