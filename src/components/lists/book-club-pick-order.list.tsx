@@ -8,7 +8,6 @@ import { ReactSortable } from 'react-sortablejs';
 import { Role, UserAndMembership } from '@/db/models/nodes';
 import AdvancePickerButton from '@/components/buttons/advance-picker.button';
 import AdjustPickOrderButton from '@/components/buttons/adjust-pick-order.button';
-import { Button } from '@nextui-org/button';
 import LinkButton from '@/components/buttons/link.button';
 
 // Component props

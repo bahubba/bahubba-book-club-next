@@ -1,5 +1,4 @@
 // Component props
-import BookClubSearchForm from '@/components/forms/book-club-search.form';
 import { Divider } from '@nextui-org/divider';
 
 interface PickBookPageProps {
