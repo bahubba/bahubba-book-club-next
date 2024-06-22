@@ -18,8 +18,7 @@ const BookClubSearchForm = () => {
   });
 
   return (
-    <div className="flex flex-col gap-y-2 min-w-[50vw] max-w-[75vw] max-h-fill-below-header">
-      <h1 className="flex-shrink text-2xl font-bold">Book Club Search</h1>
+    <>
       <form action={formAction}>
         <div className="flex-shrink flex items-center gap-x-1">
           <Input
@@ -53,7 +52,7 @@ const BookClubSearchForm = () => {
           />
         )}
       </ScrollShadow>
-    </div>
+    </>
   );
 };
 
