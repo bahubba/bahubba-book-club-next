@@ -34,7 +34,7 @@ const ReplyButton = (props: Readonly<ReplyComponentProps>) => {
   const forceFormReset = useCallback(() => {
     onClose();
     setRefreshKey(prev => prev + 1)
-  }, []);
+  }, [onClose]);
 
   return (
     <>

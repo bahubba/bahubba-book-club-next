@@ -1,8 +1,7 @@
 'use client';
 
-import { useRouter }  from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Pagination } from '@nextui-org/pagination';
-import Link from 'next/link';
 
 // Component props
 interface PaginationProps {

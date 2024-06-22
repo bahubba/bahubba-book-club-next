@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import { DiscussionProperties, DiscussionPreview, ReplyWithUser } from '@/db/models/nodes';
+import { DiscussionPreview, DiscussionProperties, ReplyWithUser } from '@/db/models/nodes';
 import { ensureAuth } from '@/api/auth.api';
 import {
   countDiscussionReplies,
