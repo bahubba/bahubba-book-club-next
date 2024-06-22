@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ReactSortable } from 'react-sortablejs';
 import { User } from '@nextui-org/user';
+import { useSession } from 'next-auth/react';
+import { ReactSortable } from 'react-sortablejs';
 
 import { Role, UserAndMembership } from '@/db/models/nodes';
 import AdvancePickerButton from '@/components/buttons/advance-picker.button';
 import AdjustPickOrderButton from '@/components/buttons/adjust-pick-order.button';
+import { Button } from '@nextui-org/button';
 
 // Component props
 interface BookClubPickOrderListProps {
@@ -33,6 +35,9 @@ const BookClubPickOrderList = ({
 }: Readonly<BookClubPickOrderListProps>) => {
   // Static boolean for whether the list is sortable
   const sortable = [Role.ADMIN, Role.OWNER].includes(memberRole);
+
+  // Session, including the user info, used to see if the current user is the current picker
+  const session = useSession();
 
   // State for the pick order
   const [order, setOrder] = useState(
@@ -64,12 +69,22 @@ const BookClubPickOrderList = ({
         setList={setOrder}
         sort={sortable}
       >
-        {order.map(picker => (
+        {order.map((picker, idx) => (
           <div
             key={picker.user.email}
-            className={`m-2 p-2 ${
-              sortable ? 'cursor-move' : ''
-            } border-medium border-gray-200 rounded-lg shadow-lg`}
+            className={`
+              flex
+              justify-between
+              items-center
+              m-2
+              p-2
+              ${sortable ? 'cursor-move' : ''}
+              border-medium
+              border-gray-200
+              rounded-lg
+              shadow-lg
+              ${idx === 0 && session?.data?.user?.email === picker.user.email && 'border-secondary'}
+            `}
           >
             <User
               name={picker.user.preferredName}
@@ -79,6 +94,10 @@ const BookClubPickOrderList = ({
                 alt: picker.user.preferredName
               }}
             />
+            {
+              idx === 0 && session.data?.user?.email === picker.user.email &&
+              <Button color="secondary">PICK</Button>
+            }
           </div>
         ))}
       </ReactSortable>
