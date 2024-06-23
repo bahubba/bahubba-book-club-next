@@ -1,3 +1,8 @@
+import { Fragment } from 'react';
+import { Divider } from '@nextui-org/divider';
+
+import BookListItem from '@/components/lists/list-items/book.list-item';
+
 import { searchForBooks } from '@/api/fetchers/book.fetchers';
 
 // Component props
@@ -23,9 +28,20 @@ const BookListDataFetcher = async ({
   // Search for books
   const books = await searchForBooks(query, pageNum, pageSize);
 
-  console.log('books:::', books.map(book => book.title)); // DELETEME
+  console.log('books:::', books.map(book => book.thumbnail)); // DELETEME
 
-  return !books.length ? [] : <span>{`Found ${books.length} books`}</span>
+  return !books.length ? <></> : (
+    <div className="flex flex-col w-full h-full gap-y-2">
+      {
+        books.map((book, idx) => (
+          <Fragment key={book.id ?? idx} >
+            <BookListItem book={book} />
+            { idx < books.length - 1 && <Divider />}
+          </Fragment>
+        ))
+      }
+    </div>
+  )
 };
 
 export default BookListDataFetcher;

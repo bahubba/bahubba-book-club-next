@@ -11,7 +11,8 @@ export interface GoogleAPIBook {
   title?: string,
   authors?: string[],
   description?: string,
-  thumbnail?: string
+  thumbnail?: string,
+  identifiers?: Array<{identifier?: string; type?: string}>
 }
 
 /**
@@ -52,6 +53,7 @@ export const searchForBooks = async (
     title: item.volumeInfo?.title,
     authors: item.volumeInfo?.authors,
     description: item.volumeInfo?.description,
-    thumbnail: item.volumeInfo?.imageLinks?.thumbnail
+    thumbnail: item.volumeInfo?.imageLinks?.thumbnail,
+    identifiers: item.volumeInfo?.industryIdentifiers
   })) || [];
 }

@@ -4,6 +4,7 @@ import { Divider } from '@nextui-org/divider';
 import BookClubHeader from '@/components/data-fetchers/book-club-name.data-fetcher';
 import BookSearchForm from '@/components/forms/book-search.form';
 import BookListDataFetcher from '@/components/data-fetchers/book-list.data-fetcher';
+import { Spinner } from '@nextui-org/spinner';
 
 // Component props
 interface PickBookPageProps {
@@ -49,16 +50,31 @@ const PickBookPage = async ({
       <BookSearchForm urlPath={`/book-club/${bookClubSlug}/pick-book`} />
     </div>
     <Divider className="flex-shrink flex-grow-0 my-2" />
-    {
-      query.length > 0 &&
-      <Suspense fallback={<span>loading...</span>}>
-        <BookListDataFetcher
-          query={query}
-          pageNum={parseInt(pageNum)}
-          pageSize={parseInt(pageSize)}
-        />
-      </Suspense>
-    }
+    <div className="flex-1 flex w-full h-full justify-center">
+      <div className="flex-1 flex-col h-1 max-w-[75vw]">
+        {
+          query.length === 0 ? (
+            <div className="flex justify-center items-center w-full h-full">
+              <span className="italic">Search for a book...</span>
+            </div>
+          ) : (
+            <Suspense
+              fallback={
+                <div className="flex justify-center items-center w-full h-full">
+                  <Spinner />
+                </div>
+              }
+            >
+              <BookListDataFetcher
+                query={query}
+                pageNum={parseInt(pageNum)}
+                pageSize={parseInt(pageSize)}
+              />
+            </Suspense>
+          )
+        }
+      </div>
+    </div>
   </div>
 );
 
