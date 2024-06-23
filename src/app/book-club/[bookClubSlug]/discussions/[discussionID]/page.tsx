@@ -14,7 +14,7 @@ interface BookClubDiscussionPageProps {
   searchParams?: {
     pageNum?: string;
     pageSize?: string;
-  }
+  };
 }
 
 /**
