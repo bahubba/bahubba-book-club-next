@@ -1,15 +1,17 @@
+import { Suspense } from 'react';
 import { Divider } from '@nextui-org/divider';
 
 import BookClubHeader from '@/components/data-fetchers/book-club-name.data-fetcher';
 import BookSearchForm from '@/components/forms/book-search.form';
+import BookListDataFetcher from '@/components/data-fetchers/book-list.data-fetcher';
 
 // Component props
 interface PickBookPageProps {
   params: {
     bookClubSlug: string;
   };
-  searchParams?: {
-    query: string;
+  searchParams: {
+    query?: string;
     pageNum?: string;
     pageSize?: string;
   };
@@ -29,13 +31,9 @@ interface PickBookPageProps {
 const PickBookPage = async ({
   params: { bookClubSlug },
   searchParams: {
-    query,
+    query = '',
     pageNum = '1',
     pageSize = '25'
-  } = {
-    query: '',
-    pageNum: '1',
-    pageSize: '25'
   }
 }: PickBookPageProps) => (
   <div className="flex flex-col h-full pb-2">
@@ -51,6 +49,16 @@ const PickBookPage = async ({
       <BookSearchForm urlPath={`/book-club/${bookClubSlug}/pick-book`} />
     </div>
     <Divider className="flex-shrink flex-grow-0 my-2" />
+    {
+      query.length > 0 &&
+      <Suspense fallback={<span>loading...</span>}>
+        <BookListDataFetcher
+          query={query}
+          pageNum={parseInt(pageNum)}
+          pageSize={parseInt(pageSize)}
+        />
+      </Suspense>
+    }
   </div>
 );
 

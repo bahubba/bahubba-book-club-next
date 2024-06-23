@@ -1,3 +1,5 @@
+import { searchForBooks } from '@/api/fetchers/book.fetchers';
+
 // Component props
 interface BookListDataFetcherProps {
   query: string;
@@ -18,5 +20,12 @@ const BookListDataFetcher = async ({
   pageNum = 1,
   pageSize = 25
 }: BookListDataFetcherProps) => {
-  // Fetch the results
-}
+  // Search for books
+  const books = await searchForBooks(query, pageNum, pageSize);
+
+  console.log('books:::', books.map(book => book.title)); // DELETEME
+
+  return !books.length ? [] : <span>{`Found ${books.length} books`}</span>
+};
+
+export default BookListDataFetcher;

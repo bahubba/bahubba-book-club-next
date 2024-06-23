@@ -20,7 +20,7 @@ const BookSearchForm = ({ urlPath }: { urlPath: string }) => {
     e.preventDefault();
 
     // If there is a query,
-    if(query.length) router.push(`${urlPath}?query=${query}`);
+    if(query.length > 0) router.push(`${urlPath}?query=${query}`);
   }
 
   return (
