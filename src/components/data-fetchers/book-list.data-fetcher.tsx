@@ -13,6 +13,8 @@ interface BookListDataFetcherProps {
   pageNum?: number;
   pageSize?: number;
   path: string;
+  pickable?: boolean;
+  bookClubSlug?: string;
 }
 
 /**
@@ -22,12 +24,16 @@ interface BookListDataFetcherProps {
  * @param {string} props.query The search string
  * @param {number} props.pageNum The page number for results
  * @param {pageSize} props.pageSize The number of results per page
+ * @param {boolean} props.pickable Whether a book in the list can be picked
+ * @param {string} props.bookClubSlug If pickable, the slug of the book club being picked for
  */
 const BookListDataFetcher = async ({
   query,
   pageNum = 1,
   pageSize = 25,
-  path
+  path,
+  pickable = false,
+  bookClubSlug
 }: BookListDataFetcherProps) => {
   // Search for books
   const bookResults = await searchForBooks(query, pageNum, pageSize);
@@ -41,7 +47,11 @@ const BookListDataFetcher = async ({
         {
           bookResults.books.map((book, idx) => (
             <Fragment key={book.id ?? idx} >
-              <BookListItem book={book} />
+              <BookListItem
+                book={book}
+                pickable={pickable}
+                bookClubSlug={bookClubSlug}
+              />
               { idx < bookResults.books.length - 1 && <Divider />}
             </Fragment>
           ))

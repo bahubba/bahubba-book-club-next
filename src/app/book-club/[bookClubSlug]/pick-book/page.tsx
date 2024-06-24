@@ -68,6 +68,8 @@ const PickBookPage = async ({
             pageNum={parseInt(pageNum)}
             pageSize={parseInt(pageSize)}
             path={`/book-club/${bookClubSlug}/pick-book`}
+            pickable
+            bookClubSlug={bookClubSlug}
           />
         </Suspense>
       )
