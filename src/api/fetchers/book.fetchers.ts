@@ -15,8 +15,15 @@ export interface GoogleAPIBook {
   identifiers?: Array<{identifier?: string; type?: string}>
 }
 
+// Interface for the return value, to include the books and the total number of results
+export interface BookSearchResults {
+  books: GoogleAPIBook[];
+  total: number;
+}
+
 /**
  * Search for books in the Google Books API
+ * TODO - The API returns a different total with different start indices
  *
  * @param {string} query The search string
  * @param {number} pageNum The page number for the results
@@ -27,12 +34,12 @@ export const searchForBooks = async (
   query: string,
   pageNum: number,
   pageSize: number
-): Promise<GoogleAPIBook[]> => {
+): Promise<BookSearchResults> => {
   // Ensure the user is authenticated
   await ensureAuth();
 
   // If the query is empty, return nothing
-  if(query.length === 0) return [];
+  if(query.length === 0) return { books: [], total: 0 };
 
   // Create a new client
   const googleBooksClient = books({
@@ -44,16 +51,21 @@ export const searchForBooks = async (
   const rsp = await googleBooksClient.volumes.list({
     q: query,
     startIndex: pageNum * pageSize,
-    maxResults: pageSize
+    maxResults: pageSize,
+    orderBy: 'relevance'
   });
 
   // Pull out the results, if any
-  return rsp.data.items?.map(item => ({
-    id: item.id,
-    title: item.volumeInfo?.title,
-    authors: item.volumeInfo?.authors,
-    description: item.volumeInfo?.description,
-    thumbnail: item.volumeInfo?.imageLinks?.thumbnail,
-    identifiers: item.volumeInfo?.industryIdentifiers
-  })) || [];
+  return {
+    books: rsp.data.items?.map(item => ({
+      id: item.id,
+      title: item.volumeInfo?.title,
+      authors: item.volumeInfo?.authors,
+      description: item.volumeInfo?.description,
+      thumbnail: item.volumeInfo?.imageLinks?.thumbnail,
+      identifiers: item.volumeInfo?.industryIdentifiers,
+      publishDate: item.volumeInfo?.publishedDate
+    })) || [],
+    total: rsp.data.totalItems || 0
+  };
 }

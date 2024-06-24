@@ -18,7 +18,7 @@ const BookListItem = ({ book }: Readonly<{ book: GoogleAPIBook }>) => (
     </div>
     <div className="flex-1 flex flex-col gap-y-2">
       <h3>{book.title}</h3>
-      <small>{book.description}</small>
+      <small className="overflow-hidden line-clamp-5">{book.description}</small>
     </div>
   </div>
 );

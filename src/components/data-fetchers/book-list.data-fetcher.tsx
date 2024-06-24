@@ -1,7 +1,9 @@
 import { Fragment } from 'react';
 import { Divider } from '@nextui-org/divider';
+import { ScrollShadow } from '@nextui-org/scroll-shadow';
 
 import BookListItem from '@/components/lists/list-items/book.list-item';
+import URLQueryPagination from '@/components/pagination/url-query.pagination';
 
 import { searchForBooks } from '@/api/fetchers/book.fetchers';
 
@@ -10,6 +12,7 @@ interface BookListDataFetcherProps {
   query: string;
   pageNum?: number;
   pageSize?: number;
+  path: string;
 }
 
 /**
@@ -23,24 +26,36 @@ interface BookListDataFetcherProps {
 const BookListDataFetcher = async ({
   query,
   pageNum = 1,
-  pageSize = 25
+  pageSize = 25,
+  path
 }: BookListDataFetcherProps) => {
   // Search for books
-  const books = await searchForBooks(query, pageNum, pageSize);
+  const bookResults = await searchForBooks(query, pageNum, pageSize);
 
-  console.log('books:::', books.map(book => book.thumbnail)); // DELETEME
-
-  return !books.length ? <></> : (
-    <div className="flex flex-col w-full h-full gap-y-2">
-      {
-        books.map((book, idx) => (
-          <Fragment key={book.id ?? idx} >
-            <BookListItem book={book} />
-            { idx < books.length - 1 && <Divider />}
-          </Fragment>
-        ))
-      }
-    </div>
+  return !bookResults.books.length ? <></> : (
+    <>
+      <ScrollShadow
+        className="flex-1 flex flex-col h-1 w-full gap-y-2"
+        hideScrollBar
+      >
+        {
+          bookResults.books.map((book, idx) => (
+            <Fragment key={book.id ?? idx} >
+              <BookListItem book={book} />
+              { idx < bookResults.books.length - 1 && <Divider />}
+            </Fragment>
+          ))
+        }
+      </ScrollShadow>
+      <div className="flex-shrink flex-grow-0 flex justify-center items-center w-full">
+        <URLQueryPagination
+          urlPrefix={`${path}?query=${query}&`}
+          pageNum={pageNum}
+          pageSize={pageSize}
+          total={Math.ceil(bookResults.total / pageSize)}
+        />
+      </div>
+    </>
   )
 };
 

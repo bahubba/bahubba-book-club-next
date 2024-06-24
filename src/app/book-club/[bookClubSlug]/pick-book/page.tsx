@@ -50,31 +50,28 @@ const PickBookPage = async ({
       <BookSearchForm urlPath={`/book-club/${bookClubSlug}/pick-book`} />
     </div>
     <Divider className="flex-shrink flex-grow-0 my-2" />
-    <div className="flex-1 flex w-full h-full justify-center">
-      <div className="flex-1 flex-col h-1 max-w-[75vw]">
-        {
-          query.length === 0 ? (
+    {
+      query.length === 0 ? (
+        <div className="flex justify-center items-center w-full h-full">
+          <span className="italic">Search for a book...</span>
+        </div>
+      ) : (
+        <Suspense
+          fallback={
             <div className="flex justify-center items-center w-full h-full">
-              <span className="italic">Search for a book...</span>
+              <Spinner/>
             </div>
-          ) : (
-            <Suspense
-              fallback={
-                <div className="flex justify-center items-center w-full h-full">
-                  <Spinner />
-                </div>
-              }
-            >
-              <BookListDataFetcher
-                query={query}
-                pageNum={parseInt(pageNum)}
-                pageSize={parseInt(pageSize)}
-              />
-            </Suspense>
-          )
-        }
-      </div>
-    </div>
+          }
+        >
+          <BookListDataFetcher
+            query={query}
+            pageNum={parseInt(pageNum)}
+            pageSize={parseInt(pageSize)}
+            path={`/book-club/${bookClubSlug}/pick-book`}
+          />
+        </Suspense>
+      )
+    }
   </div>
 );
 
