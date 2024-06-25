@@ -237,35 +237,6 @@ export const findBookClubPickList = async (
 };
 
 /**
- * Advance the current picker in a book club
- *
- * @param {string} slug The club's slug
- * @param {string} email The requesting user's email
- * @return {Promise<void>}
- */
-export const advancePicker = async (
-  slug: string,
-  email: string
-): Promise<void> => {
-  // Connect to Neo4j
-  const session = driver.session();
-
-  // Advance the picker
-  await session.run(
-    `
-    MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(am:Membership { isActive: TRUE })<-[:HAS_MEMBER]-(bc:BookClub { slug: $slug, isActive: TRUE })-[pr:HAS_CURRENT_PICKER]->(:Membership { isActive: TRUE })-[:PICKS_BEFORE]->(np:Membership { isActive: TRUE })
-    WHERE am.role IN ['ADMIN', 'OWNER']
-    DELETE pr
-    MERGE (bc)-[:HAS_CURRENT_PICKER]->(np)
-    `,
-    { email, slug }
-  );
-
-  // Close the session
-  session.close();
-};
-
-/**
  * Adjust the pick order of a book club
  *
  * @param {string} slug The club's slug

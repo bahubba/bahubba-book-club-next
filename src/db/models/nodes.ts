@@ -65,6 +65,18 @@ export interface MembershipProperties {
   departed?: Date | string;
 }
 
+// Book node properties
+export interface BookProperties {
+  id: string,
+  googleBooksID: string | null,
+  title: string,
+  authors: string[],
+  description?: string,
+  thumbnail?: string,
+  identifiers?: Array<{identifier?: string; type?: string}>
+  isActive: boolean;
+}
+
 // Membership request node properties
 export interface MembershipRequestProperties {
   status: MembershipRequestStatus;
@@ -72,6 +84,15 @@ export interface MembershipRequestProperties {
   requestMessage: string;
   reviewed?: Date | string;
   reviewMessage?: string;
+}
+
+// Book pick properties
+export interface PickProperties {
+  id: string;
+  pickedOn: Date | string;
+  targetCompletion?: Date | string;
+  completed?: Date | string;
+  isActive: boolean;
 }
 
 // Discussion node properties
