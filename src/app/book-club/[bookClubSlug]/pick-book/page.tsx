@@ -4,7 +4,7 @@ import { Divider } from '@nextui-org/divider';
 interface PickBookPageProps {
   params: {
     bookClubSlug: string;
-  }
+  };
 }
 
 /**

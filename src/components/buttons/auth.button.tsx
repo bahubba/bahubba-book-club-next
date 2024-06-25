@@ -29,10 +29,10 @@ const AuthButton = ({ color = 'default' }: AuthButtonProps) => {
   return (
     <Button
       variant="light"
-      color={color}
-      onClick={session ? handleSignOut : handleSignIn}
+      color={ color }
+      onClick={ session ? handleSignOut : handleSignIn }
     >
-      {`Sign ${session ? 'Out' : 'In'}`}
+      { `Sign ${ session ? 'Out' : 'In' }` }
     </Button>
   );
 };

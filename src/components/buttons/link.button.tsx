@@ -22,17 +22,17 @@ interface LinkButtonProps extends ButtonProps {
 const LinkButton = ({ uri, tooltip, children, ...buttonProps }: Readonly<LinkButtonProps>) => (
   <Tooltip
     className="bg-opacity-75 bg-black text-white"
-    content={tooltip}
+    content={ tooltip }
   >
-    <Link href={uri}>
+    <Link href={ uri }>
       <Button
         isIconOnly
         size="sm"
         color="secondary"
-        aria-label={`${uri} button`}
-        {...buttonProps}
+        aria-label={ `${ uri } button` }
+        { ...buttonProps }
       >
-        {children}
+        { children }
       </Button>
     </Link>
   </Tooltip>

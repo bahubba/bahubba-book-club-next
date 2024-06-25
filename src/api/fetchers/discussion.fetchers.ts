@@ -62,7 +62,7 @@ export const getDiscussionReplies = async (
 
   // Fetch and return a page of replies for the discussion
   return toJSON(await findDiscussionReplies(bookClubSlug, discussionID, email, pageSize, pageNum)) as ReplyWithUser[];
-}
+};
 
 /** Get the total number of replies for a given discussion
  *
@@ -79,5 +79,5 @@ export const getDiscussionReplyCount = async (
 
   // Fetch and return a page of replies for the discussion
   return await countDiscussionReplies(bookClubSlug, discussionID, email);
-}
+};
 

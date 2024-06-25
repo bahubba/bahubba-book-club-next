@@ -15,7 +15,7 @@ const BookClubAdminTabs = () => {
 
   // Handle selecting a tab
   const handleSelect = (key: string | number) => {
-    router.push(`${pathPrefix}/${key}`);
+    router.push(`${ pathPrefix }/${ key }`);
   };
 
   return (
@@ -23,8 +23,8 @@ const BookClubAdminTabs = () => {
       aria-label="Book club admin tabs"
       variant="bordered"
       color="secondary"
-      selectedKey={adminPath}
-      onSelectionChange={handleSelect}
+      selectedKey={ adminPath }
+      onSelectionChange={ handleSelect }
       fullWidth
     >
       <Tab

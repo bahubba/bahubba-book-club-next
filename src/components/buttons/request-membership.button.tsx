@@ -12,25 +12,25 @@ import { hasOpenRequest } from '@/api/fetchers/membership-request.fetchers';
  * @param {string} props.bookClubSlug - The slug of the book club
  */
 const FilteredRequestMembershipButton = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+                                                 bookClubSlug
+                                               }: Readonly<{ bookClubSlug: string }>) => {
   // Check if the user has an open request
   const hasRequest = await hasOpenRequest(bookClubSlug);
 
   return (
     <Tooltip
       className="bg-opacity-75 bg-black text-white"
-      content={hasRequest ? 'Membeship requested' : 'Request membership'}
+      content={ hasRequest ? 'Membeship requested' : 'Request membership' }
     >
-      <Link href={`/book-club/${bookClubSlug}/request-membership`}>
+      <Link href={ `/book-club/${ bookClubSlug }/request-membership` }>
         <Button
           isIconOnly
           size="sm"
-          color={hasRequest ? 'primary' : 'secondary'}
-          aria-label={`Request membership to ${bookClubSlug}`}
-          disabled={hasRequest}
+          color={ hasRequest ? 'primary' : 'secondary' }
+          aria-label={ `Request membership to ${ bookClubSlug }` }
+          disabled={ hasRequest }
         >
-          <AddMemberIcon color={hasRequest ? 'secondary' : 'primary'} />
+          <AddMemberIcon color={ hasRequest ? 'secondary' : 'primary' } />
         </Button>
       </Link>
     </Tooltip>
@@ -45,10 +45,10 @@ const FilteredRequestMembershipButton = async ({
  * @param {boolean} props.isMember - Whether the user is a member of the book club
  */
 const RequestMembershipButton = ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => (
-  <Suspense fallback={<></>}>
-    <FilteredRequestMembershipButton bookClubSlug={bookClubSlug} />
+                                   bookClubSlug
+                                 }: Readonly<{ bookClubSlug: string }>) => (
+  <Suspense fallback={ <></> }>
+    <FilteredRequestMembershipButton bookClubSlug={ bookClubSlug } />
   </Suspense>
 );
 

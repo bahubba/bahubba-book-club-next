@@ -1,13 +1,13 @@
 import IconProps from '@/components/icons/icon-props';
 
 const ChatIcon = ({
-  fill = 'currentColor',
-  size,
-  height,
-  width,
-  label,
-  ...props
-}: IconProps): React.ReactNode => (
+                    fill = 'currentColor',
+                    size,
+                    height,
+                    width,
+                    label,
+                    ...props
+                  }: IconProps): React.ReactNode => (
   <svg
     height={ size || height || 24 }
     width={ size || width || 24 }

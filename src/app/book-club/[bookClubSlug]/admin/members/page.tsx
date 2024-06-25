@@ -20,8 +20,8 @@ interface BookClubAdminMembersPageProps {
  * @param {string} props.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembersTableWrapper = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+                                                  bookClubSlug
+                                                }: Readonly<{ bookClubSlug: string }>) => {
   // Get the session and the admin's email
   const session = await getServerSession();
 
@@ -31,10 +31,10 @@ const BookClubAdminMembersTableWrapper = async ({
 
   return (
     <BookClubAdminMembersTable
-      bookClubSlug={bookClubSlug}
-      adminEmail={session?.user?.email ?? ''}
-      adminRole={adminRole as Role}
-      members={members}
+      bookClubSlug={ bookClubSlug }
+      adminEmail={ session?.user?.email ?? '' }
+      adminRole={ adminRole as Role }
+      members={ members }
     />
   );
 };
@@ -47,8 +47,8 @@ const BookClubAdminMembersTableWrapper = async ({
  * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembersPage = ({
-  params: { bookClubSlug }
-}: Readonly<BookClubAdminMembersPageProps>) => (
+                                    params: { bookClubSlug }
+                                  }: Readonly<BookClubAdminMembersPageProps>) => (
   <Suspense
     fallback={
       <div className="flex justify-center items-center w-full h-36">
@@ -56,7 +56,7 @@ const BookClubAdminMembersPage = ({
       </div>
     }
   >
-    <BookClubAdminMembersTableWrapper bookClubSlug={bookClubSlug} />
+    <BookClubAdminMembersTableWrapper bookClubSlug={ bookClubSlug } />
   </Suspense>
 );
 

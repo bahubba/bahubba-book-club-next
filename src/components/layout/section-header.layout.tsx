@@ -18,12 +18,12 @@ interface SectionHeaderLayoutProps {
  * @param {React.ReactNode} props.children - The content to display in the hidden hover div of the header
  */
 const SectionHeaderLayout = ({
-  title,
-  hiddenContentJustify = 'end',
-  children
-}: Readonly<SectionHeaderLayoutProps>) => {
+                               title,
+                               hiddenContentJustify = 'end',
+                               children
+                             }: Readonly<SectionHeaderLayoutProps>) => {
   // State vars
-  const [hover, setHover] = useState(false);
+  const [ hover, setHover ] = useState(false);
 
   // Event handlers
   const handleMouseEnter = () => setHover(true);
@@ -32,12 +32,12 @@ const SectionHeaderLayout = ({
   return (
     <div
       className="flex-shrink flex-grow-0 flex items-center w-full gap-x-4"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={ handleMouseEnter }
+      onMouseLeave={ handleMouseLeave }
     >
-      <div className="flex-shrink mb-0.5">{title}</div>
-      <div className={`flex flex-1 justify-${hiddenContentJustify}`}>
-        {hover && children}
+      <div className="flex-shrink mb-0.5">{ title }</div>
+      <div className={ `flex flex-1 justify-${ hiddenContentJustify }` }>
+        { hover && children }
       </div>
     </div>
   );

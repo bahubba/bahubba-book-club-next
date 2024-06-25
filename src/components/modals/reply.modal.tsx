@@ -29,91 +29,91 @@ interface ReplyModalProps extends ReplyComponentProps {
  * @param {function} props.onSuccess - Callback for force resetting the form (and closing the modal)
  */
 const ReplyModal = ({
-  bookClubSlug,
-  discussionID,
-  nodeID,
-  replyToText,
-  rootReply = false,
-  isOpen,
-  onClose,
-  onSuccess
-}: Readonly<ReplyModalProps>) => {
+                      bookClubSlug,
+                      discussionID,
+                      nodeID,
+                      replyToText,
+                      rootReply = false,
+                      isOpen,
+                      onClose,
+                      onSuccess
+                    }: Readonly<ReplyModalProps>) => {
   // Form state
-  const [formState, formAction] = useFormState(handleReplyToDiscussion, {
+  const [ formState, formAction ] = useFormState(handleReplyToDiscussion, {
     error: '',
     succeeded: false
   });
 
   // Reply text state
-  const [replyText, setReplyText] = useState('');
+  const [ replyText, setReplyText ] = useState('');
 
   // Handle text input
   const handleReplyTextInput = ({
-    target: { value }
-  }: ChangeEvent<HTMLInputElement>) => setReplyText(value);
+                                  target: { value }
+                                }: ChangeEvent<HTMLInputElement>) => setReplyText(value);
 
   // Listen for form submission success and trigger a hard reset
   useEffect(() => {
-    if(formState.succeeded) onSuccess();
-  }, [formState.succeeded]);
+    if (formState.succeeded) onSuccess();
+  }, [ formState.succeeded ]);
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={onClose}
+      isOpen={ isOpen }
+      onClose={ onClose }
       scrollBehavior="inside"
       hideCloseButton
       backdrop="blur"
     >
       <ModalContent>
-        {onClose => (
-          <form action={formAction}>
-            <ModalHeader>{replyToText}</ModalHeader>
+        { onClose => (
+          <form action={ formAction }>
+            <ModalHeader>{ replyToText }</ModalHeader>
             <Input
               className="hidden"
               name="slug"
-              value={bookClubSlug}
+              value={ bookClubSlug }
             />
             <Input
               className="hidden"
               name="discussionID"
-              value={discussionID}
+              value={ discussionID }
             />
             <Input
               className="hidden"
               name="nodeID"
-              value={nodeID}
+              value={ nodeID }
             />
             <Input
               className="hidden"
               name="rootReply"
-              value={rootReply.toString()}
+              value={ rootReply.toString() }
             />
             <ModalBody>
               <Textarea
                 placeholder="Reply..."
-                rows={5}
+                rows={ 5 }
                 name="content"
-                onChange={handleReplyTextInput}
+                onChange={ handleReplyTextInput }
               />
             </ModalBody>
             <ModalFooter>
               <Button
                 size="sm"
                 variant="light"
-                onClick={onClose}
+                onClick={ onClose }
               >
                 Cancel
               </Button>
               <SubmitButton
                 size="sm"
-                color={replyText.trim() === '' ? 'default' : 'success'}
-                disabled={replyText.trim() === ''}
+                color={ replyText.trim() === '' ? 'default' : 'success' }
+                disabled={ replyText.trim() === '' }
                 buttonText="Reply"
               />
             </ModalFooter>
           </form>
-        )}
+        ) }
       </ModalContent>
     </Modal>
   );

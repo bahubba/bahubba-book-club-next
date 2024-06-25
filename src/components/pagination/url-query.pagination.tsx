@@ -25,22 +25,22 @@ const URLQueryPagination = ({ url, total, pageNum = 1, pageSize = 10 }: Readonly
 
   // Redirect to the new URL with the updated page number
   const handlePageChange = (newPageNum: number) => {
-    router.push(`${url}?pageNum=${newPageNum}&pageSize=${pageSize}`);
-  }
+    router.push(`${ url }?pageNum=${ newPageNum }&pageSize=${ pageSize }`);
+  };
 
-    return (
-      <>
-        <Pagination
-          variant="faded"
-          size="sm"
-          color="secondary"
-          showControls
-          total={total}
-          page={pageNum}
-          onChange={handlePageChange}
-        />
-      </>
-    );
+  return (
+    <>
+      <Pagination
+        variant="faded"
+        size="sm"
+        color="secondary"
+        showControls
+        total={ total }
+        page={ pageNum }
+        onChange={ handlePageChange }
+      />
+    </>
+  );
 };
 
 export default URLQueryPagination;

@@ -38,7 +38,7 @@ export const handleSubmitMembershipRequest = async (
 
   // Redirect to the book club page
   // TODO - toast
-  redirect(`/book-club/${slug}`);
+  redirect(`/book-club/${ slug }`);
 };
 
 /**
@@ -76,7 +76,7 @@ export const handleReviewMembershipRequest = async (
 
   // Ensure the requesting user is an admin or owner of the book club
   const adminRole = await findBookClubRole(slug, adminEmail);
-  if (!adminRole || ![Role.OWNER, Role.ADMIN].includes(adminRole))
+  if (!adminRole || ![ Role.OWNER, Role.ADMIN ].includes(adminRole))
     return { error: 'Unauthorized' };
 
   // Approve or reject the membership request
@@ -104,6 +104,6 @@ export const handleReviewMembershipRequest = async (
   }
 
   // Return no error
-  revalidatePath(`/book-club/${slug}/admin`);
+  revalidatePath(`/book-club/${ slug }/admin`);
   return { error: '' };
 };

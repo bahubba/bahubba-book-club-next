@@ -20,17 +20,17 @@ interface BookClubAdminPickOrderPageProps {
  * @param {string} props.bookClubSlug - The slug of the book club
  */
 const PickOrderWrapper = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+                                  bookClubSlug
+                                }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the pick order
   const pickOrder = await getBookClubPickList(bookClubSlug);
   const memberRole = await getBookClubRole(bookClubSlug);
 
   return (
     <BookClubPickOrderList
-      pickOrder={pickOrder}
-      bookClubSlug={bookClubSlug}
-      memberRole={memberRole as Role}
+      pickOrder={ pickOrder }
+      bookClubSlug={ bookClubSlug }
+      memberRole={ memberRole as Role }
       inAdminPage
     />
   );
@@ -44,8 +44,8 @@ const PickOrderWrapper = async ({
  * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminPickOrderPage = ({
-  params: { bookClubSlug }
-}: Readonly<BookClubAdminPickOrderPageProps>) => (
+                                      params: { bookClubSlug }
+                                    }: Readonly<BookClubAdminPickOrderPageProps>) => (
   <Suspense
     fallback={
       <div className="flex justify-center items-center w-full h-36">
@@ -53,7 +53,7 @@ const BookClubAdminPickOrderPage = ({
       </div>
     }
   >
-    <PickOrderWrapper bookClubSlug={bookClubSlug} />
+    <PickOrderWrapper bookClubSlug={ bookClubSlug } />
   </Suspense>
 );
 

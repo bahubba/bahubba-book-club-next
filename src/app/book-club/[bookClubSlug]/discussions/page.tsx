@@ -17,15 +17,15 @@ const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
 
   return (
     <>
-      {discussions.map(discussion => (
+      { discussions.map(discussion => (
         <>
           <DiscussionCard
-            key={discussion.title}
-            discussion={discussion}
-            bookClubSlug={bookClubSlug}
+            key={ discussion.title }
+            discussion={ discussion }
+            bookClubSlug={ bookClubSlug }
           />
         </>
-      ))}
+      )) }
     </>
   );
 };
@@ -38,20 +38,20 @@ const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const BookClubDiscussionsPage = ({
-  params: { bookClubSlug }
-}: Readonly<{ params: { bookClubSlug: string } }>) => (
+                                   params: { bookClubSlug }
+                                 }: Readonly<{ params: { bookClubSlug: string } }>) => (
   <>
     <div className="flex justify-between items-center pe-2">
       <h1 className="flex-shrink text-2xl font-bold my-2">Discussions</h1>
-      <BookClubBackButton bookClubSlug={bookClubSlug} />
+      <BookClubBackButton bookClubSlug={ bookClubSlug } />
     </div>
     <ScrollShadow
-      size={100}
+      size={ 100 }
       className="flex-1 overflow-y-auto space-y-2 p-1 rounded-lg"
       hideScrollBar
     >
-      <Suspense fallback={<></>}>
-        <DiscussionCards bookClubSlug={bookClubSlug} />
+      <Suspense fallback={ <></> }>
+        <DiscussionCards bookClubSlug={ bookClubSlug } />
       </Suspense>
     </ScrollShadow>
   </>

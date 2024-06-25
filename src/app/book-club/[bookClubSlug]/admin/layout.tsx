@@ -19,23 +19,23 @@ interface BookClubLayoutProps {
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const BookClubAdminLayout = ({
-  children,
-  params: { bookClubSlug }
-}: Readonly<BookClubLayoutProps>) => (
+                               children,
+                               params: { bookClubSlug }
+                             }: Readonly<BookClubLayoutProps>) => (
   <ProtectedRoute
-    bookClubSlug={bookClubSlug}
+    bookClubSlug={ bookClubSlug }
     needsAdmin
   >
     <div className="flex justify-center w-full max-h-fill-below-header">
       <div className="flex flex-col min-w-[50vw] max-w-[75vw] gap-y-2">
         <div className="flex justify-between items-center pe-2">
           <h1 className="text-2xl font-bold">Book Club Admin</h1>
-          <BookClubBackButton bookClubSlug={bookClubSlug} />
+          <BookClubBackButton bookClubSlug={ bookClubSlug } />
         </div>
         <div className="flex justify-center w-full">
           <BookClubAdminTabs />
         </div>
-        {children}
+        { children }
       </div>
     </div>
   </ProtectedRoute>

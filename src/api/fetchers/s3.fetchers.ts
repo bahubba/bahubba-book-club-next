@@ -19,7 +19,7 @@ export const getPreSignedBookClubImageURL = async (
     s3Client,
     new GetObjectCommand({
       Bucket: process.env.BBCM_AWS_S3_BUCKET,
-      Key: `${process.env.BBCM_AWS_S3_BOOK_CLUB_IMAGE_PATH}${imageName}`
+      Key: `${ process.env.BBCM_AWS_S3_BOOK_CLUB_IMAGE_PATH }${ imageName }`
     }),
     { expiresIn: props.AWS.S3_PRE_SIGNED_URL_EXPIRATION as number }
   );
@@ -43,7 +43,7 @@ export const getStockBookClubImageNames = async (): Promise<string[]> => {
   // Return a list of stock book club image names
   return imageList
     ? imageList
-        .filter(image => image.Size && image.Size > 0)
-        .map(image => image.Key?.split('/').pop() as string)
+      .filter(image => image.Size && image.Size > 0)
+      .map(image => image.Key?.split('/').pop() as string)
     : [];
 };

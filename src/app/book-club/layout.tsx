@@ -7,9 +7,9 @@ import ProtectedRoute from '@/components/nav/protected-route.component';
  * @param {React.ReactNode} props.children The children of the layout
  */
 const BookClubPageLayout = ({
-  children
-}: Readonly<{ children: React.ReactNode }>) => (
-  <ProtectedRoute>{children}</ProtectedRoute>
+                              children
+                            }: Readonly<{ children: React.ReactNode }>) => (
+  <ProtectedRoute>{ children }</ProtectedRoute>
 );
 
 export default BookClubPageLayout;

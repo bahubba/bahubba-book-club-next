@@ -24,14 +24,14 @@ interface RemoveMemberButtonProps {
  * @param {userEmail} props.email - The email of the user requesting membership
  */
 const RemoveMemberButton = ({
-  bookClubSlug,
-  adminEmail,
-  adminRole,
-  userEmail,
-  memberRole
-}: Readonly<RemoveMemberButtonProps>) => {
+                              bookClubSlug,
+                              adminEmail,
+                              adminRole,
+                              userEmail,
+                              memberRole
+                            }: Readonly<RemoveMemberButtonProps>) => {
   // Form state
-  const [formState, formAction] = useFormState(handleRemoveMember, {
+  const [ formState, formAction ] = useFormState(handleRemoveMember, {
     error: ''
   });
 
@@ -47,21 +47,21 @@ const RemoveMemberButton = ({
       className="bg-opacity-75 bg-black text-white"
       content="Remove member"
     >
-      <form action={formAction}>
+      <form action={ formAction }>
         <Input
           className="hidden"
           name="slug"
-          value={bookClubSlug}
+          value={ bookClubSlug }
         />
         <Input
           className="hidden"
           name="userEmail"
-          value={userEmail}
+          value={ userEmail }
         />
         <SubmitButton
-          color={isDisabled ? 'default' : 'danger'}
-          buttonIcon={<RejectIcon color={isDisabled ? 'black' : 'secondary'} />}
-          disabled={isDisabled}
+          color={ isDisabled ? 'default' : 'danger' }
+          buttonIcon={ <RejectIcon color={ isDisabled ? 'black' : 'secondary' } /> }
+          disabled={ isDisabled }
         />
       </form>
     </Tooltip>

@@ -88,7 +88,7 @@ export const getBookClubMembers = async (
 
   // Fetch the user's membership in the club and ensure they're an admin or owner
   const role = await findBookClubRole(slug, email);
-  if (!role || ![Role.ADMIN, Role.OWNER].includes(role)) {
+  if (!role || ![ Role.ADMIN, Role.OWNER ].includes(role)) {
     // TODO - Handle this error more gracefully
     throw new Error('You are not authorized to perform this action');
   }

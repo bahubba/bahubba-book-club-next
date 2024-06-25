@@ -21,7 +21,7 @@ const AppBar = () => (
           height="30"
           width="30"
         />
-        <h1 className="ps-2 text-3xl font-bold">{props.APP.NAME}</h1>
+        <h1 className="ps-2 text-3xl font-bold">{ props.APP.NAME }</h1>
       </NavbarBrand>
     </Link>
     <NavbarContent justify="end">

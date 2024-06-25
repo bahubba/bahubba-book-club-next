@@ -13,31 +13,31 @@ import SubmitButton from './submit.button';
  * @param {boolean} props.inAdminPage - Whether the button is in the admin page
  */
 const AdvancePickerButton = ({
-  bookClubSlug,
-  inAdminPage = false
-}: Readonly<{
+                               bookClubSlug,
+                               inAdminPage = false
+                             }: Readonly<{
   bookClubSlug: string;
   inAdminPage?: boolean;
 }>) => {
   // Form state
-  const [formState, formAction] = useFormState(handleAdvancePicker, {
+  const [ formState, formAction ] = useFormState(handleAdvancePicker, {
     error: ''
   });
 
   return (
-    <form action={formAction}>
+    <form action={ formAction }>
       <Input
         className="hidden"
         name="slug"
-        value={bookClubSlug}
+        value={ bookClubSlug }
       />
       <Input
         className="hidden"
         name="pageRoute"
         value={
           inAdminPage
-            ? `/book-club/${bookClubSlug}/admin/pick-order`
-            : `/book-club/${bookClubSlug}`
+            ? `/book-club/${ bookClubSlug }/admin/pick-order`
+            : `/book-club/${ bookClubSlug }`
         }
       />
       <SubmitButton buttonText="Advance Picker" />

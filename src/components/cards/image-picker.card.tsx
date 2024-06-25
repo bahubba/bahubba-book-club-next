@@ -22,11 +22,11 @@ interface BookClubImagePickerCardProps {
  * @param {Function} props.setSelectedImage - Function to set the selected image
  */
 const BookClubImagePickerCard = ({
-  imageName,
-  selected,
-  setSelectedImage
-}: Readonly<BookClubImagePickerCardProps>) => {
-  const [url, setURL] = useState<string>('');
+                                   imageName,
+                                   selected,
+                                   setSelectedImage
+                                 }: Readonly<BookClubImagePickerCardProps>) => {
+  const [ url, setURL ] = useState<string>('');
 
   // Handler for image selection
   const handleClick = () => setSelectedImage(imageName);
@@ -41,26 +41,26 @@ const BookClubImagePickerCard = ({
 
     if (!imageName || imageName === 'default') setURL('/images/books.jpg');
     else getBookClubImage();
-  }, [imageName]);
+  }, [ imageName ]);
 
   return (
     <Card
       radius="sm"
-      className={`cursor-pointer ${
+      className={ `cursor-pointer ${
         selected ? 'border-5 border-green-700 p-1' : 'border-none'
-      }`}
-      onClick={handleClick}
+      }` }
+      onClick={ handleClick }
     >
-      {url && (
+      { url && (
         <Image
-          src={url}
-          alt={imageName}
+          src={ url }
+          alt={ imageName }
           className="w-full h-auto"
           width="250"
           height="250"
-          onClick={handleClick}
+          onClick={ handleClick }
         />
-      )}
+      ) }
     </Card>
   );
 };

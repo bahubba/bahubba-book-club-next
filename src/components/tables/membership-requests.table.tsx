@@ -13,9 +13,9 @@ import ReviewMembershipRequestButton from '../buttons/review-membership-request.
  * @param {UserAndMembershipRequest[]} props.membershipRequests The membership requests
  */
 const MembershipRequestsTable = ({
-  bookClubSlug,
-  membershipRequests
-}: Readonly<{
+                                   bookClubSlug,
+                                   membershipRequests
+                                 }: Readonly<{
   bookClubSlug: string;
   membershipRequests: UserAndMembershipRequest[];
 }>) => (
@@ -41,43 +41,43 @@ const MembershipRequestsTable = ({
       </TableColumn>
     </TableHeader>
     <TableBody>
-      {membershipRequests.map(membershipRequest => (
+      { membershipRequests.map(membershipRequest => (
         <TableRow
-          key={`${membershipRequest.user.email}-${membershipRequest.request.requested}`}
+          key={ `${ membershipRequest.user.email }-${ membershipRequest.request.requested }` }
           className={
             membershipRequest.request.status ===
             MembershipRequestStatus.APPROVED
               ? 'bg-green-200'
               : membershipRequest.request.status ===
-                MembershipRequestStatus.REJECTED
-              ? 'bg-red-200'
-              : ''
+              MembershipRequestStatus.REJECTED
+                ? 'bg-red-200'
+                : ''
           }
         >
-          <TableCell>{membershipRequest.user.email}</TableCell>
-          <TableCell>{membershipRequest.request.requestMessage}</TableCell>
-          <TableCell>{membershipRequest.request.requested as string}</TableCell>
+          <TableCell>{ membershipRequest.user.email }</TableCell>
+          <TableCell>{ membershipRequest.request.requestMessage }</TableCell>
+          <TableCell>{ membershipRequest.request.requested as string }</TableCell>
           <TableCell>
-            {membershipRequest.request.status ===
+            { membershipRequest.request.status ===
               MembershipRequestStatus.PENDING && (
-              <ReviewMembershipRequestButton
-                bookClubSlug={bookClubSlug}
-                userEmail={membershipRequest.user.email}
-              />
-            )}
+                <ReviewMembershipRequestButton
+                  bookClubSlug={ bookClubSlug }
+                  userEmail={ membershipRequest.user.email }
+                />
+              ) }
           </TableCell>
           <TableCell>
-            {membershipRequest.request.status ===
+            { membershipRequest.request.status ===
               MembershipRequestStatus.PENDING && (
-              <ReviewMembershipRequestButton
-                bookClubSlug={bookClubSlug}
-                userEmail={membershipRequest.user.email}
-                isRejecting
-              />
-            )}
+                <ReviewMembershipRequestButton
+                  bookClubSlug={ bookClubSlug }
+                  userEmail={ membershipRequest.user.email }
+                  isRejecting
+                />
+              ) }
           </TableCell>
         </TableRow>
-      ))}
+      )) }
     </TableBody>
   </Table>
 );

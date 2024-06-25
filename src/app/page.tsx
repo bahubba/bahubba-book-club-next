@@ -17,7 +17,7 @@ const RootPage = async () => {
     <div className="flex h-full justify-center text-center">
       <div className="flex flex-col h-full justify-around">
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold">{`Welcome to ${props.APP.NAME}`}</h1>
+          <h1 className="text-2xl font-bold">{ `Welcome to ${ props.APP.NAME }` }</h1>
           <AuthButton color="primary" />
         </div>
         <Image

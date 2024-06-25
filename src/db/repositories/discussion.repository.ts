@@ -157,7 +157,7 @@ export const findDiscussionReplies = async (
   // Close the session and return
   session.close();
   return result.records[0].get('replies');
-}
+};
 
 /**
  * Get the total number of replies for a discussion
@@ -190,7 +190,7 @@ export const countDiscussionReplies = async (
   // Close the session and return the total
   session.close();
   return result.records[0].get('total').toNumber();
-}
+};
 
 /**
  * Check existence of a discussion slug within a book club

@@ -20,33 +20,33 @@ interface AdjustPickOrderButtonProps {
  * @param {boolean} props.inAdminPage - Whether the button is in the admin page
  */
 const AdjustPickOrderButton = ({
-  bookClubSlug,
-  pickOrder,
-  inAdminPage = false
-}: Readonly<AdjustPickOrderButtonProps>) => {
-  const [formState, formAction] = useFormState(handleAdjustPickOrder, {
+                                 bookClubSlug,
+                                 pickOrder,
+                                 inAdminPage = false
+                               }: Readonly<AdjustPickOrderButtonProps>) => {
+  const [ formState, formAction ] = useFormState(handleAdjustPickOrder, {
     error: ''
   });
 
   return (
-    <form action={formAction}>
+    <form action={ formAction }>
       <Input
         className="hidden"
         name="slug"
-        value={bookClubSlug}
+        value={ bookClubSlug }
       />
       <Input
         className="hidden"
         name="order"
-        value={JSON.stringify(pickOrder)}
+        value={ JSON.stringify(pickOrder) }
       />
       <Input
         className="hidden"
         name="pageRoute"
         value={
           inAdminPage
-            ? `/book-club/${bookClubSlug}/admin/pick-order`
-            : `/book-club/${bookClubSlug}`
+            ? `/book-club/${ bookClubSlug }/admin/pick-order`
+            : `/book-club/${ bookClubSlug }`
         }
       />
       <SubmitButton buttonText="Adjust Pick Order" />

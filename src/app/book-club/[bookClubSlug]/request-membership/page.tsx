@@ -17,15 +17,15 @@ interface BookClubAdminMembersPageProps {
  * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const RequestMembershipPage = ({
-  params: { bookClubSlug }
-}: Readonly<BookClubAdminMembersPageProps>) => (
+                                 params: { bookClubSlug }
+                               }: Readonly<BookClubAdminMembersPageProps>) => (
   <div className="flex flex-col gap-2 min-w-[50%] max-w-[75%] h-screen">
     <div className="flex justify-between items-center">
       <h1 className="text-2xl font-bold">Create Book Club</h1>
-      <BookClubBackButton bookClubSlug={bookClubSlug} />
+      <BookClubBackButton bookClubSlug={ bookClubSlug } />
     </div>
-    <RequestMembershipForm bookClubSlug={ bookClubSlug }/>
+    <RequestMembershipForm bookClubSlug={ bookClubSlug } />
   </div>
 );
 
-    export default RequestMembershipPage;
+export default RequestMembershipPage;
