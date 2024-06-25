@@ -27,16 +27,16 @@ interface BookClubGridLayoutProps {
  * @param { BookClubProperties[] } props.bookClubs - Book clubs to display
  */
 const BookClubCardGridLayout = ({
-                                  cols = '3',
-                                  bookClubs
-                                }: Readonly<BookClubGridLayoutProps>) => (
-  <div className={ `grid grid-cols-${ cols } gap-1 p-2` }>
-    { bookClubs.map(bookClub => (
+  cols = '3',
+  bookClubs
+}: Readonly<BookClubGridLayoutProps>) => (
+  <div className={`grid grid-cols-${cols} gap-1 p-2`}>
+    {bookClubs.map(bookClub => (
       <BookClubCard
-        key={ bookClub.slug }
-        bookClub={ bookClub }
+        key={bookClub.slug}
+        bookClub={bookClub}
       />
-    )) }
+    ))}
   </div>
 );
 

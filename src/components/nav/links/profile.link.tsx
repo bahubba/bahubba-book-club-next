@@ -13,7 +13,7 @@ const ProfileLink = () => {
       href="/profile"
       className="italic"
     >
-      Welcome, { session?.user?.name }
+      Welcome, {session?.user?.name}
     </Link>
   ) : (
     <></>

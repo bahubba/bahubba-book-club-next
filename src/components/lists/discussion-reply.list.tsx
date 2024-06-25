@@ -25,11 +25,11 @@ interface DiscussionReplyListProps {
  * @param {number} props.total The total number of replies
  */
 const DiscussionReplyList = async ({
-                                     bookClubSlug,
-                                     discussionID,
-                                     pageNum,
-                                     pageSize
-                                   }: DiscussionReplyListProps) => {
+  bookClubSlug,
+  discussionID,
+  pageNum,
+  pageSize
+}: DiscussionReplyListProps) => {
   // Get the total number of replies
   const total = await getDiscussionReplyCount(bookClubSlug, discussionID);
 
@@ -63,7 +63,7 @@ const DiscussionReplyList = async ({
                     } }
                   />
                 </div>
-                { idx < replies.length - 1 && <Divider /> }
+                { idx < replies.length - 1 && <Divider/> }
               </Fragment>
             ))
           }
@@ -79,13 +79,13 @@ const DiscussionReplyList = async ({
         </ScrollShadow>
         <div className="flex justify-center">
           <URLQueryPagination
-            url={ `/book-club/${ bookClubSlug }/discussions/${ discussionID }` }
-            total={ Math.ceil(total / pageSize) }
+            url={`/book-club/${bookClubSlug}/discussions/${discussionID}`}
+            total={Math.ceil(total / pageSize)}
           />
         </div>
       </Suspense>
     </div>
-  );
-};
+  )
+}
 
 export default DiscussionReplyList;

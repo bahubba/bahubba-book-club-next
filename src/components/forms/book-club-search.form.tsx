@@ -12,14 +12,14 @@ import { handleBookClubSearch } from '@/api/form-handlers/book-club-form.handler
 /** Form for searching for book clubs */
 const BookClubSearchForm = () => {
   // Form state
-  const [ formState, formAction ] = useFormState(handleBookClubSearch, {
+  const [formState, formAction] = useFormState(handleBookClubSearch, {
     error: '',
     bookClubs: []
   });
 
   return (
     <>
-      <form action={ formAction }>
+      <form action={formAction}>
         <div className="flex-shrink flex items-center gap-x-1">
           <Input
             className="flex-1"
@@ -42,15 +42,15 @@ const BookClubSearchForm = () => {
       <Divider />
       <ScrollShadow
         hideScrollBar
-        size={ 100 }
+        size={100}
         className="flex-1 pb-2 overflow-y-auto max-h-fill-below-header"
       >
-        { formState.bookClubs.length > 0 && (
+        {formState.bookClubs.length > 0 && (
           <BookClubCardGridLayout
             cols="6"
-            bookClubs={ formState.bookClubs }
+            bookClubs={formState.bookClubs}
           />
-        ) }
+        )}
       </ScrollShadow>
     </>
   );

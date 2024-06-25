@@ -37,7 +37,7 @@ export const handleAddMember = async (
 
   // Ensure the requesting user is an admin (or owner) of the club
   const adminRole = await findBookClubRole(slug, adminEmail);
-  if (!adminRole || ![ Role.ADMIN, Role.OWNER ].includes(adminRole))
+  if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
     return { error: 'Unauthorized' };
 
   // Add the member to the club
@@ -48,7 +48,7 @@ export const handleAddMember = async (
   });
 
   // On success, revalidate the admin page
-  revalidatePath(`/book-club/${ slug }/admin`);
+  revalidatePath(`/book-club/${slug}/admin`);
   return { error: '' };
 };
 
@@ -81,7 +81,7 @@ export const handleUpdateMemberRole = async (
   const adminRole = await findBookClubRole(slug, adminEmail);
   if (
     !adminRole ||
-    ![ Role.ADMIN, Role.OWNER ].includes(adminRole) ||
+    ![Role.ADMIN, Role.OWNER].includes(adminRole) ||
     (adminRole !== Role.OWNER && newRole === Role.OWNER)
   )
     return { error: 'Unauthorized' };
@@ -99,7 +99,7 @@ export const handleUpdateMemberRole = async (
     await updateMemberRole(slug, adminEmail, adminEmail, Role.ADMIN);
 
   // On success, revalidate the admin page
-  revalidatePath(`/book-club/${ slug }/admin`);
+  revalidatePath(`/book-club/${slug}/admin`);
   return { error: '' };
 };
 
@@ -129,7 +129,7 @@ export const handleRemoveMember = async (
   const adminRole = await findBookClubRole(slug, adminEmail);
   if (
     !adminRole ||
-    ![ Role.ADMIN, Role.OWNER ].includes(adminRole) ||
+    ![Role.ADMIN, Role.OWNER].includes(adminRole) ||
     (adminRole === Role.OWNER && adminEmail === memberEmail)
   )
     return { error: 'Unauthorized' };
@@ -144,7 +144,7 @@ export const handleRemoveMember = async (
   }
 
   // On success, revalidate the admin page
-  revalidatePath(`/book-club/${ slug }/admin`);
+  revalidatePath(`/book-club/${slug}/admin`);
   return { error: '' };
 };
 
@@ -173,7 +173,7 @@ export const handleAdjustPickOrder = async (
 
   // Ensure the requesting user is an admin (or owner) of the club
   const adminRole = await findBookClubRole(slug, adminEmail);
-  if (!adminRole || ![ Role.ADMIN, Role.OWNER ].includes(adminRole))
+  if (!adminRole || ![Role.ADMIN, Role.OWNER].includes(adminRole))
     return { error: 'Unauthorized' };
 
   // Update the pick order

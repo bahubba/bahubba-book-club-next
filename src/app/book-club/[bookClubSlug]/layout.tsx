@@ -17,10 +17,10 @@ interface BookClubLayoutProps {
  * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubLayout = ({
-                          children,
-                          params: { bookClubSlug }
-                        }: Readonly<BookClubLayoutProps>) => (
-  <ProtectedRoute bookClubSlug={ bookClubSlug }>{ children }</ProtectedRoute>
+  children,
+  params: { bookClubSlug }
+}: Readonly<BookClubLayoutProps>) => (
+  <ProtectedRoute bookClubSlug={bookClubSlug}>{children}</ProtectedRoute>
 );
 
 export default BookClubLayout;

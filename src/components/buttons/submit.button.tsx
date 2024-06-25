@@ -29,26 +29,26 @@ interface SubmitButtonProps {
  * @param {React.ReactNode} props.buttonIcon - The icon to display on the button
  */
 const SubmitButton = ({
-                        buttonText = 'Submit',
-                        size = 'md',
-                        color = 'secondary',
-                        buttonIcon,
-                        disabled = false
-                      }: Readonly<SubmitButtonProps>) => {
+  buttonText = 'Submit',
+  size = 'md',
+  color = 'secondary',
+  buttonIcon,
+  disabled = false
+}: Readonly<SubmitButtonProps>) => {
   const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
-      size={ size }
-      color={ disabled ? 'default' : color }
-      isIconOnly={ !!buttonIcon }
-      disabled={ disabled || pending }
+      size={size}
+      color={disabled ? 'default' : color}
+      isIconOnly={!!buttonIcon}
+      disabled={disabled || pending}
     >
-      { pending ? (
-        <Spinner color={ color === 'primary' ? 'secondary' : 'primary' } />
+      {pending ? (
+        <Spinner color={color === 'primary' ? 'secondary' : 'primary'} />
       ) : (
         buttonIcon ?? buttonText
-      ) }
+      )}
     </Button>
   );
 };

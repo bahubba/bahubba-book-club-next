@@ -17,22 +17,22 @@ interface PageSectionLayoutProps {
  * @param {React.ReactNode} props.children - The content to display in the section
  */
 const PageSectionLayout = ({
-                             header,
-                             sectionHeaderChildren,
-                             children
-                           }: Readonly<PageSectionLayoutProps>) => (
+  header,
+  sectionHeaderChildren,
+  children
+}: Readonly<PageSectionLayoutProps>) => (
   <div className="flex flex-col mx-2 flex-1 rounded-xl shadow-xl bg-white p-2">
     <SectionHeaderLayout
-      title={ <h1 className="text-2xl font-bold">{ header }</h1> }
+      title={<h1 className="text-2xl font-bold">{header}</h1>}
     >
-      { sectionHeaderChildren }
+      {sectionHeaderChildren}
     </SectionHeaderLayout>
     <ScrollShadow
       hideScrollBar
-      size={ 25 }
+      size={25}
       className="flex-1 overflow-y-auto"
     >
-      { children }
+      {children}
     </ScrollShadow>
   </div>
 );

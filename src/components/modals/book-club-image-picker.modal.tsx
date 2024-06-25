@@ -20,9 +20,9 @@ interface BookClubImagePickerModalProps {
  * @param {Function} props.setSelectedImage - Function to set the selected image
  */
 const BookClubImagePickerModal = ({
-                                    selectedImage,
-                                    setSelectedImage
-                                  }: Readonly<BookClubImagePickerModalProps>) => {
+  selectedImage,
+  setSelectedImage
+}: Readonly<BookClubImagePickerModalProps>) => {
   // Modal state
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -32,48 +32,48 @@ const BookClubImagePickerModal = ({
         className="cursor-pointer"
         variant="bordered"
         name="image"
-        onClick={ onOpen }
+        onClick={onOpen}
         startContent={
           <Button
             size="sm"
-            onClick={ onOpen }
+            onClick={onOpen}
           >
             Select Image
           </Button>
         }
         disabled
-        value={ selectedImage }
+        value={selectedImage}
       />
       <Modal
-        isOpen={ isOpen }
-        onOpenChange={ onOpenChange }
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
         scrollBehavior="inside"
-        isDismissable={ false }
+        isDismissable={false}
         hideCloseButton
         backdrop="blur"
       >
         <ModalContent>
-          { onClose => (
+          {onClose => (
             <>
               <ModalHeader>Select Image</ModalHeader>
               <ModalBody>
                 <BookClubImagePicker
-                  selectedImage={ selectedImage }
-                  setSelectedImage={ setSelectedImage }
+                  selectedImage={selectedImage}
+                  setSelectedImage={setSelectedImage}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button
-                  color={ selectedImage === '' ? 'default' : 'success' }
-                  onClick={ onClose }
-                  disabled={ selectedImage === '' }
-                  isDisabled={ selectedImage === '' }
+                  color={selectedImage === '' ? 'default' : 'success'}
+                  onClick={onClose}
+                  disabled={selectedImage === ''}
+                  isDisabled={selectedImage === ''}
                 >
                   Confirm
                 </Button>
               </ModalFooter>
             </>
-          ) }
+          )}
         </ModalContent>
       </Modal>
     </>

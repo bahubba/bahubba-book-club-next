@@ -9,16 +9,16 @@ import BookClubBackButton from '@/components/buttons/book-club-back.button';
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const CreateDiscussionPage = ({
-                                params: { bookClubSlug }
-                              }: Readonly<{ params: { bookClubSlug: string } }>) => (
+  params: { bookClubSlug }
+}: Readonly<{ params: { bookClubSlug: string } }>) => (
   <div className="min-w-[50vw]">
     <div className="flex justify-between items-center">
       <h1 className="flex-shrink text-2xl font-bold">
         Start New Book Club Discussion
       </h1>
-      <BookClubBackButton bookClubSlug={ bookClubSlug } />
+      <BookClubBackButton bookClubSlug={bookClubSlug} />
     </div>
-    <DiscussionForm bookClubSlug={ bookClubSlug } />
+    <DiscussionForm bookClubSlug={bookClubSlug} />
   </div>
 );
 

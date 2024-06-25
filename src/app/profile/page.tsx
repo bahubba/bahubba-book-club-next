@@ -21,11 +21,11 @@ const ProfilePage = () => {
         <TableBody>
           <TableRow key="1">
             <TableCell>Name</TableCell>
-            <TableCell>{ session.data?.user?.name }</TableCell>
+            <TableCell>{session.data?.user?.name}</TableCell>
           </TableRow>
           <TableRow key="2">
             <TableCell>Email</TableCell>
-            <TableCell>{ session.data?.user?.email }</TableCell>
+            <TableCell>{session.data?.user?.email}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

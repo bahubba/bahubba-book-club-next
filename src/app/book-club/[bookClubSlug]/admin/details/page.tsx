@@ -18,12 +18,12 @@ interface BookClubAdminDetailsPageProps {
  * @param {string} props.bookClubSlug The slug of the book club
  */
 const BookClubDetailsFormWrapper = async ({
-                                            bookClubSlug
-                                          }: Readonly<{ bookClubSlug: string }>) => {
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
   const bookClub = await getBookClub(bookClubSlug);
 
   return bookClub ? (
-    <BookClubDetailsForm bookClub={ bookClub } />
+    <BookClubDetailsForm bookClub={bookClub} />
   ) : (
     // TODO - Add a 404 page
     <span>No book club found</span>
@@ -38,8 +38,8 @@ const BookClubDetailsFormWrapper = async ({
  * @param {string} props.params.bookClubSlug - The book club slug from the URL path
  */
 const BookClubAdminDetailsPage = ({
-                                    params: { bookClubSlug }
-                                  }: Readonly<BookClubAdminDetailsPageProps>) => {
+  params: { bookClubSlug }
+}: Readonly<BookClubAdminDetailsPageProps>) => {
   return (
     <Suspense
       fallback={
@@ -48,7 +48,7 @@ const BookClubAdminDetailsPage = ({
         </div>
       }
     >
-      <BookClubDetailsFormWrapper bookClubSlug={ bookClubSlug } />
+      <BookClubDetailsFormWrapper bookClubSlug={bookClubSlug} />
     </Suspense>
   );
 };

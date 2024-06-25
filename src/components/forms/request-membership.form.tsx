@@ -13,21 +13,21 @@ import { handleSubmitMembershipRequest } from '@/api/form-handlers/membership-re
  * @param {string} props.bookClubSlug The slug of the book club
  */
 const RequestMembershipForm = ({
-                                 bookClubSlug
-                               }: Readonly<{ bookClubSlug: string }>) => {
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
   // Form state
-  const [ formState, formAction ] = useFormState(handleSubmitMembershipRequest, {
+  const [formState, formAction] = useFormState(handleSubmitMembershipRequest, {
     error: ''
   });
 
   return (
-    <form action={ formAction }>
+    <form action={formAction}>
       <div className="space-y-2">
-        { formState.error && <p className="text-red-500">{ formState.error }</p> }
+        {formState.error && <p className="text-red-500">{formState.error}</p>}
         <Input
           className="hidden"
           name="slug"
-          value={ bookClubSlug }
+          value={bookClubSlug}
         />
         <Input
           variant="bordered"

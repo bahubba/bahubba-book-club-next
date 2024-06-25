@@ -18,15 +18,15 @@ interface BookClubAdminMembershipRequestsPageProps {
  * @param {string} props.bookClubSlug - Book club slug
  */
 const BookClubAdminMembershipRequestsTableWrapper = async ({
-                                                             bookClubSlug
-                                                           }: Readonly<{ bookClubSlug: string }>) => {
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the membership requests
   const membershipRequests = await getMembershipRequests(bookClubSlug);
 
   return (
     <MembershipRequestsTable
-      bookClubSlug={ bookClubSlug }
-      membershipRequests={ membershipRequests }
+      bookClubSlug={bookClubSlug}
+      membershipRequests={membershipRequests}
     />
   );
 };
@@ -39,8 +39,8 @@ const BookClubAdminMembershipRequestsTableWrapper = async ({
  * @param {string} props.params.bookClubSlug The slug of the book club
  */
 const BookClubAdminMembershipRequestsPage = ({
-                                               params: { bookClubSlug }
-                                             }: Readonly<BookClubAdminMembershipRequestsPageProps>) => (
+  params: { bookClubSlug }
+}: Readonly<BookClubAdminMembershipRequestsPageProps>) => (
   <Suspense
     fallback={
       <div className="flex justify-center items-center w-full h-36">
@@ -48,7 +48,7 @@ const BookClubAdminMembershipRequestsPage = ({
       </div>
     }
   >
-    <BookClubAdminMembershipRequestsTableWrapper bookClubSlug={ bookClubSlug } />
+    <BookClubAdminMembershipRequestsTableWrapper bookClubSlug={bookClubSlug} />
   </Suspense>
 );
 

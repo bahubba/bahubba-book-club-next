@@ -14,7 +14,7 @@ interface BookClubDiscussionPageProps {
   searchParams?: {
     pageNum?: string;
     pageSize?: string;
-  };
+  }
 }
 
 /**
@@ -25,15 +25,15 @@ interface BookClubDiscussionPageProps {
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const BookClubDiscussionPage = async ({
-                                        params: { bookClubSlug, discussionID },
-                                        searchParams: {
-                                          pageNum = '1',
-                                          pageSize = '10'
-                                        } = {
-                                          pageNum: '1',
-                                          pageSize: '10'
-                                        }
-                                      }: Readonly<BookClubDiscussionPageProps>) => {
+  params: { bookClubSlug, discussionID },
+  searchParams: {
+    pageNum = '1',
+    pageSize = '10'
+  } = {
+    pageNum: '1',
+    pageSize: '10'
+  }
+}: Readonly<BookClubDiscussionPageProps>) => {
   // Load the discussion
   const discussion = await getDiscussion(bookClubSlug, discussionID);
 
@@ -42,25 +42,25 @@ const BookClubDiscussionPage = async ({
       <div className="flex-shrink flex-grow-0">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold my-2">{ discussion.title }</h1>
-            <p className="text-gray-500">{ discussion.description }</p>
+            <h1 className="text-2xl font-bold my-2">{discussion.title}</h1>
+            <p className="text-gray-500">{discussion.description}</p>
           </div>
-          <BookClubBackButton bookClubSlug={ bookClubSlug } />
+          <BookClubBackButton bookClubSlug={bookClubSlug} />
         </div>
       </div>
       <div className="flex flex-1 flex-col w-full h-1">
         <Suspense
           fallback={
             <div className="flex justify-center items-center w-full h-full">
-              <Spinner />
+              <Spinner/>
             </div>
           }
         >
           <DiscussionReplyList
-            bookClubSlug={ bookClubSlug }
-            discussionID={ discussionID }
-            pageNum={ parseInt(pageNum) }
-            pageSize={ parseInt(pageSize) }
+            bookClubSlug={bookClubSlug}
+            discussionID={discussionID}
+            pageNum={parseInt(pageNum)}
+            pageSize={parseInt(pageSize)}
           />
         </Suspense>
       </div>

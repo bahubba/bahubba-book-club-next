@@ -145,8 +145,8 @@ export const findUserAndProviderProfile = async (
   // Pull the user and provider profile properties from the result
   return result.records.length
     ? {
-      user: result.records[0].get('u')?.properties ?? null,
-      profile: result.records[0].get('p')?.properties ?? null
-    }
+        user: result.records[0].get('u')?.properties ?? null,
+        profile: result.records[0].get('p')?.properties ?? null
+      }
     : { user: null, profile: null };
 };

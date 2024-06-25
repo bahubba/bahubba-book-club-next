@@ -12,7 +12,7 @@ interface BookClubBackButtonProps {
  * @param {Object} props.bookClubSlug The unique slug for the book club
  */
 const BookClubBackButton = ({ bookClubSlug }: BookClubBackButtonProps) => (
-  <Link href={ `/book-club/${ bookClubSlug }` }>
+  <Link href={`/book-club/${bookClubSlug}`}>
     <span className="underline font-bold text-primary-700">&lt;&lt; Back</span>
   </Link>
 );

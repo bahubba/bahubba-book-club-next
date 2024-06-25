@@ -182,7 +182,7 @@ export const handleAdvancePicker = async (
 
   // Get the user's role in the book club
   const role = await findBookClubRole(slug, email);
-  if (!role || ![ Role.ADMIN, Role.OWNER ].includes(role))
+  if (!role || ![Role.ADMIN, Role.OWNER].includes(role))
     return { error: 'Unauthorized' };
 
   // Advance the picker

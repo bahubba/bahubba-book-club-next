@@ -50,7 +50,7 @@ export const handleCreateAdHocDiscussion = async (
   });
 
   // On success, navigate to the new discussion page
-  redirect(`/book-club/${ bookClubSlug }/discussions/${ id }`);
+  redirect(`/book-club/${bookClubSlug}/discussions/${id}`);
 };
 
 /**
@@ -91,6 +91,6 @@ export const handleReplyToDiscussion = async (
   });
 
   // On success, revalidate the discussion page and return a success status
-  revalidatePath(`/book-club/${ bookClubSlug }/discussions/${ discussionID }`);
+  revalidatePath(`/book-club/${bookClubSlug}/discussions/${discussionID}`);
   return { error: '', succeeded: true };
 };

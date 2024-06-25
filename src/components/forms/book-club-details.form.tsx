@@ -28,10 +28,10 @@ interface FormValues {
  * @param {BookClubProperties} props.bookClub - The book club to edit
  */
 const BookClubDetailsForm = ({
-                               bookClub
-                             }: Readonly<{ bookClub?: BookClubProperties }>) => {
+  bookClub
+}: Readonly<{ bookClub?: BookClubProperties }>) => {
   // Form state
-  const [ formState, formAction ] = useFormState(
+  const [formState, formAction] = useFormState(
     !!bookClub ? handleUpdateBookClub : handleCreateBookClub,
     {
       error: ''
@@ -39,26 +39,26 @@ const BookClubDetailsForm = ({
   );
 
   // State for input fields
-  const [ formData, setFormData ] = useState<FormValues>(
+  const [formData, setFormData] = useState<FormValues>(
     bookClub
       ? {
-        name: bookClub.name,
-        description: bookClub.description,
-        imageName: bookClub.image,
-        publicity: bookClub.publicity
-      }
+          name: bookClub.name,
+          description: bookClub.description,
+          imageName: bookClub.image,
+          publicity: bookClub.publicity
+        }
       : {
-        name: '',
-        description: '',
-        imageName: 'default',
-        publicity: Publicity.PRIVATE
-      }
+          name: '',
+          description: '',
+          imageName: 'default',
+          publicity: Publicity.PRIVATE
+        }
   );
 
   // Handler for form data changes
   const handleInputChange = ({
-                               target: { name, value }
-                             }: React.ChangeEvent<HTMLInputElement>) =>
+    target: { name, value }
+  }: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [name]: value });
 
   // Handler for image selection
@@ -79,16 +79,16 @@ const BookClubDetailsForm = ({
       formData.publicity !== bookClub.publicity);
 
   return (
-    <form action={ formAction }>
+    <form action={formAction}>
       <div className="space-y-2">
-        { formState.error && <p className="text-red-500">* { formState.error }</p> }
-        { formData.name.includes('/') && (
+        {formState.error && <p className="text-red-500">* {formState.error}</p>}
+        {formData.name.includes('/') && (
           <p className="text-red-500">* Name cannot include a slash</p>
-        ) }
+        )}
         <Input
           className="hidden"
           name="previousSlug"
-          value={ bookClub?.slug }
+          value={bookClub?.slug}
         />
         <Input
           variant="bordered"
@@ -96,8 +96,8 @@ const BookClubDetailsForm = ({
           name="name"
           required
           isRequired
-          value={ formData.name }
-          onChange={ handleInputChange }
+          value={formData.name}
+          onChange={handleInputChange}
         />
         <Input
           variant="bordered"
@@ -105,50 +105,50 @@ const BookClubDetailsForm = ({
           name="description"
           required
           isRequired
-          value={ formData.description }
-          onChange={ handleInputChange }
+          value={formData.description}
+          onChange={handleInputChange}
         />
         <Input
           className="hidden"
           variant="bordered"
           label="Image"
           name="image"
-          value={ formData.imageName }
+          value={formData.imageName}
           required
           isRequired
         />
         <BookClubImagePickerModal
-          selectedImage={ formData.imageName }
-          setSelectedImage={ setSelectedImage }
+          selectedImage={formData.imageName}
+          setSelectedImage={setSelectedImage}
         />
         <RadioGroup
           label="Publicity"
           orientation="horizontal"
-          defaultValue={ Publicity.PRIVATE }
+          defaultValue={Publicity.PRIVATE}
           name="publicity"
-          value={ formData.publicity }
-          onChange={ handleInputChange }
+          value={formData.publicity}
+          onChange={handleInputChange}
         >
-          <Radio value={ Publicity.PUBLIC }>Public</Radio>
-          <Radio value={ Publicity.PRIVATE }>Private</Radio>
+          <Radio value={Publicity.PUBLIC}>Public</Radio>
+          <Radio value={Publicity.PRIVATE}>Private</Radio>
         </RadioGroup>
         <SubmitButton
-          buttonText={ bookClub ? 'Update' : 'Create' }
-          disabled={ !canSubmit() }
+          buttonText={bookClub ? 'Update' : 'Create'}
+          disabled={!canSubmit()}
         />
       </div>
       <Divider className="my-2" />
       <h1 className="text-large">Preview</h1>
       <div className="flex justify-center">
         <BookClubCard
-          bookClub={ {
+          bookClub={{
             name: formData.name,
             description: formData.description,
             image: formData.imageName,
             publicity: formData.publicity,
             isActive: true,
             created: new Date()
-          } }
+          }}
         />
       </div>
     </form>

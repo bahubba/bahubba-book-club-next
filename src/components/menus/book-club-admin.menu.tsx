@@ -20,22 +20,22 @@ const BookClubAdminMenu = () => {
     >
       <ListboxItem
         key="details"
-        className={ adminPath === 'details' ? 'bg-gray-400' : '' }
-        startContent={ <PlusIcon /> }
+        className={adminPath === 'details' ? 'bg-gray-400' : ''}
+        startContent={<PlusIcon />}
       >
         Details
       </ListboxItem>
       <ListboxItem
         key="members"
-        className={ adminPath === 'members' ? 'bg-gray-400' : '' }
-        startContent={ <PlusIcon /> }
+        className={adminPath === 'members' ? 'bg-gray-400' : ''}
+        startContent={<PlusIcon />}
       >
         Members
       </ListboxItem>
       <ListboxItem
         key="membership-requests"
-        className={ adminPath === 'membership-requests' ? 'bg-gray-400' : '' }
-        startContent={ <PlusIcon /> }
+        className={adminPath === 'membership-requests' ? 'bg-gray-400' : ''}
+        startContent={<PlusIcon />}
       >
         Membership Requests
       </ListboxItem>

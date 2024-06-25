@@ -24,11 +24,11 @@ interface BookClubAdminMembersTableProps {
  * @param {UserAndMembership[]} props.members The members of the book club
  */
 const BookClubAdminMembersTable = ({
-                                     bookClubSlug,
-                                     adminEmail,
-                                     adminRole,
-                                     members
-                                   }: Readonly<BookClubAdminMembersTableProps>) => {
+  bookClubSlug,
+  adminEmail,
+  adminRole,
+  members
+}: Readonly<BookClubAdminMembersTableProps>) => {
   // Get the current session and the user's email
   const { data } = useSession();
 
@@ -51,39 +51,39 @@ const BookClubAdminMembersTable = ({
         </TableColumn>
       </TableHeader>
       <TableBody>
-        { members.map(member => (
-          <TableRow key={ member.user.email }>
-            <TableCell>{ member.user.preferredName }</TableCell>
-            <TableCell>{ member.user.email }</TableCell>
+        {members.map(member => (
+          <TableRow key={member.user.email}>
+            <TableCell>{member.user.preferredName}</TableCell>
+            <TableCell>{member.user.email}</TableCell>
             <TableCell>
               <MemberRoleForm
-                bookClubSlug={ bookClubSlug }
-                email={ data?.user?.email ?? '' }
-                memberEmail={ member.user.email }
-                adminRole={ adminRole }
-                role={ member.membership.role }
+                bookClubSlug={bookClubSlug}
+                email={data?.user?.email ?? ''}
+                memberEmail={member.user.email}
+                adminRole={adminRole}
+                role={member.membership.role}
               />
             </TableCell>
             <TableCell>
-              { typeof member.membership.joined === 'string'
+              {typeof member.membership.joined === 'string'
                 ? member.membership.joined
                 : new Intl.DateTimeFormat('en-GB', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric'
-                }).format(member.membership.joined) }
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }).format(member.membership.joined)}
             </TableCell>
             <TableCell>
               <RemoveMemberButton
-                bookClubSlug={ bookClubSlug }
-                adminEmail={ adminEmail }
-                adminRole={ adminRole }
-                userEmail={ member.user.email }
-                memberRole={ member.membership.role }
+                bookClubSlug={bookClubSlug}
+                adminEmail={adminEmail}
+                adminRole={adminRole}
+                userEmail={member.user.email}
+                memberRole={member.membership.role}
               />
             </TableCell>
           </TableRow>
-        )) }
+        ))}
       </TableBody>
     </Table>
   );

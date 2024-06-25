@@ -13,10 +13,10 @@ interface ProtectedRouteProps {
 
 /** Wrapper for routes that redirects to login if not authenticated */
 const ProtectedRoute = async ({
-                                bookClubSlug,
-                                needsAdmin = false,
-                                children
-                              }: Readonly<ProtectedRouteProps>) => {
+  bookClubSlug,
+  needsAdmin = false,
+  children
+}: Readonly<ProtectedRouteProps>) => {
   // Get the session, if it exists
   const session = await getServerSession();
 
@@ -37,12 +37,12 @@ const ProtectedRoute = async ({
 
       // If the user isn't a member, redirect to the book club page
       if (!role) redirect('/home');
-      if (needsAdmin && ![ Role.OWNER, Role.ADMIN ].includes(role))
-        redirect(`/book-club/${ bookClubSlug }`);
+      if (needsAdmin && ![Role.OWNER, Role.ADMIN].includes(role))
+        redirect(`/book-club/${bookClubSlug}`);
     }
   }
 
-  return <>{ children }</>;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

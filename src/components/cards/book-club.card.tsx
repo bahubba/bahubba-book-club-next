@@ -17,7 +17,7 @@ import { BookClubProperties } from '@/db/models/nodes';
  */
 const BookClubCard = ({ bookClub }: { bookClub: BookClubProperties }) => {
   // State for the pre-signed image URL
-  const [ url, setURL ] = useState<string>('');
+  const [url, setURL] = useState<string>('');
 
   // On load, get the pre-signed URL for the image
   // TODO - It would be nice to find a more best-practice Next.js way to do this
@@ -30,39 +30,39 @@ const BookClubCard = ({ bookClub }: { bookClub: BookClubProperties }) => {
     if (!bookClub.image || bookClub.image === 'default')
       setURL('/images/books.jpg');
     else getBookClubImage();
-  }, [ bookClub.image ]);
+  }, [bookClub.image]);
 
   return (
     // TODO - Get the image from S3
     <Link
-      href={ `/book-club/${ slugify(bookClub.name, {
+      href={`/book-club/${slugify(bookClub.name, {
         lower: true,
         remove: /[*+~.()'"!:@#$%^&\\/;:{}||`<>?,.-]/g
-      }) }` }
+      })}`}
     >
       <Tooltip
         className="bg-opacity-75 bg-black text-white"
         showArrow
-        content={ bookClub.description }
+        content={bookClub.description}
       >
         <Card className="max-w-[200px]">
           <CardHeader className="pb-0 flex-col items-start">
-            <h1>{ bookClub.name }</h1>
+            <h1>{bookClub.name}</h1>
             <small className="overflow-hidden line-clamp-1">
-              { bookClub.description }
+              {bookClub.description}
             </small>
           </CardHeader>
           <CardBody className="overflow-visible">
             <div className="flex justify-center">
-              { url && (
+              {url && (
                 <Image
                   className="object-cover rounded-xl"
-                  src={ url }
+                  src={url}
                   alt="Books"
-                  height={ 200 }
-                  width={ 200 }
+                  height={200}
+                  width={200}
                 />
-              ) }
+              )}
             </div>
           </CardBody>
         </Card>

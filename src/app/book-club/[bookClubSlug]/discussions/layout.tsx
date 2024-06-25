@@ -17,15 +17,15 @@ interface CreateDiscussionLayoutProps {
  * @param {string} props.params.bookClubSlug - The slug of the book club
  */
 const CreateDiscussionLayout = ({
-                                  children,
-                                  params: { bookClubSlug }
-                                }: Readonly<CreateDiscussionLayoutProps>) => (
+  children,
+  params: { bookClubSlug }
+}: Readonly<CreateDiscussionLayoutProps>) => (
   <ProtectedRoute
-    bookClubSlug={ bookClubSlug }
+    bookClubSlug={bookClubSlug}
     needsAdmin
   >
     <div className="flex h-full justify-center">
-      <div className="flex flex-col h-full w-[75]-vw pb-2">{ children }</div>
+      <div className="flex flex-col h-full w-[75]-vw pb-2">{children}</div>
     </div>
   </ProtectedRoute>
 );

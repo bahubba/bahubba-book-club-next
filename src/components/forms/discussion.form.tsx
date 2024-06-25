@@ -13,19 +13,19 @@ import { handleCreateAdHocDiscussion } from '@/api/form-handlers/discussion-form
  * @param {string} bookClubSlug - The slug of the book club
  */
 export const DiscussionForm = ({
-                                 bookClubSlug
-                               }: Readonly<{ bookClubSlug: string }>) => {
-  const [ formState, formAction ] = useFormState(handleCreateAdHocDiscussion, {
+  bookClubSlug
+}: Readonly<{ bookClubSlug: string }>) => {
+  const [formState, formAction] = useFormState(handleCreateAdHocDiscussion, {
     error: ''
   });
 
   return (
-    <form action={ formAction }>
+    <form action={formAction}>
       <div className="space-y-2">
         <Input
           className="hidden"
           name="slug"
-          value={ bookClubSlug }
+          value={bookClubSlug}
         />
         <Input
           variant="bordered"

@@ -24,12 +24,12 @@ interface ReviewMembershipRequestButtonProps {
  * @param {boolean} props.isRejecting
  */
 const ReviewMembershipRequestButton = ({
-                                         bookClubSlug,
-                                         userEmail,
-                                         isRejecting = false
-                                       }: Readonly<ReviewMembershipRequestButtonProps>) => {
+  bookClubSlug,
+  userEmail,
+  isRejecting = false
+}: Readonly<ReviewMembershipRequestButtonProps>) => {
   // Form state
-  const [ formState, formAction ] = useFormState(handleReviewMembershipRequest, {
+  const [formState, formAction] = useFormState(handleReviewMembershipRequest, {
     error: ''
   });
 
@@ -40,16 +40,16 @@ const ReviewMembershipRequestButton = ({
         isRejecting ? 'Reject membership' : 'Approve membership as Reader'
       }
     >
-      <form action={ formAction }>
+      <form action={formAction}>
         <Input
           className="hidden"
           name="slug"
-          value={ bookClubSlug }
+          value={bookClubSlug}
         />
         <Input
           className="hidden"
           name="userEmail"
-          value={ userEmail }
+          value={userEmail}
         />
         <Input
           className="hidden"
@@ -61,7 +61,7 @@ const ReviewMembershipRequestButton = ({
           }
         />
         <SubmitButton
-          color={ isRejecting ? 'danger' : 'primary' }
+          color={isRejecting ? 'danger' : 'primary'}
           buttonIcon={
             isRejecting ? <RejectIcon /> : <ApproveIcon color="secondary" />
           }

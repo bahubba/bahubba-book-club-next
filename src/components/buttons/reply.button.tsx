@@ -28,31 +28,31 @@ const ReplyButton = (props: Readonly<ReplyComponentProps>) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Key state, used to refresh form modal on successful submission
-  const [ refreshKey, setRefreshKey ] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Callback function for incrementing the refresh key to force reset the form in the modal
   const forceFormReset = useCallback(() => {
     onClose();
-    setRefreshKey(prev => prev + 1);
-  }, [ onClose ]);
+    setRefreshKey(prev => prev + 1)
+  }, [onClose]);
 
   return (
     <>
       <Button
         variant="light"
-        onClick={ onOpen }
+        onClick={onOpen}
       >
         <span className="text-primary-500">Reply</span>
       </Button>
       <ReplyModal
-        key={ refreshKey }
-        { ...props }
-        isOpen={ isOpen }
-        onClose={ onClose }
-        onSuccess={ forceFormReset }
+        key={refreshKey}
+        {...props}
+        isOpen={isOpen}
+        onClose={onClose}
+        onSuccess={forceFormReset}
       />
     </>
-  );
-};
+  )
+}
 
 export default ReplyButton;

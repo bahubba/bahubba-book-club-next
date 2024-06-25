@@ -13,7 +13,7 @@ const BookClubs = async () => {
   const bookClubs = await getBookClubs();
 
   // TODO - add key
-  return <BookClubCardGridLayout bookClubs={ bookClubs } />;
+  return <BookClubCardGridLayout bookClubs={bookClubs} />;
 };
 
 /** The home page for the application, showing a user's clubs, books, and trending info */

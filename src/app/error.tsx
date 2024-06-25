@@ -9,9 +9,9 @@ const Error = ({ error, reset }: {
   reset: () => void
 }) => {
   // If the error is for auth, logout
-  if (props.APP.LOGOUT_ERRORS.includes(error.message)) signOut();
+  if(props.APP.LOGOUT_ERRORS.includes(error.message)) signOut();
 
   return <></>;
-};
+}
 
 export default Error;

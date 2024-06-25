@@ -14,12 +14,12 @@ const UserAvatar = () => {
   ) : (
     <Link href="/profile">
       <User
-        name={ session.data?.user?.name ?? 'Anonymous user' }
-        description={ session.data?.user?.email ?? 'No email' }
-        avatarProps={ {
+        name={session.data?.user?.name ?? 'Anonymous user'}
+        description={session.data?.user?.email ?? 'No email'}
+        avatarProps={{
           src: session.data?.user?.image || undefined,
           alt: session.data?.user?.name || 'Anonymous user avatar'
-        } }
+        }}
       />
     </Link>
   );
