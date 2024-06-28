@@ -5,7 +5,7 @@ import { Input } from '@nextui-org/input';
 import { Textarea } from '@nextui-org/react';
 
 import SubmitButton from '@/components/buttons/submit.button';
-import { handleCreateAdHocDiscussion } from '@/api/form-handlers/discussion-form.handlers';
+import { handleCreateAdHocDiscussion } from '@/api/form-handlers/discussion.form-handlers';
 
 /**
  * Form for creating a new discussion in a book club

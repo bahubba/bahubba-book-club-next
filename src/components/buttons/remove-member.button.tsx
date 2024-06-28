@@ -3,7 +3,7 @@ import { Input } from '@nextui-org/input';
 import { Tooltip } from '@nextui-org/tooltip';
 
 import SubmitButton from './submit.button';
-import { handleRemoveMember } from '@/api/form-handlers/membership-form.handlers';
+import { handleRemoveMember } from '@/api/form-handlers/membership.form-handlers';
 import RejectIcon from '../icons/reject.icon';
 import { Role } from '@/db/models/nodes';
 

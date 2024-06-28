@@ -3,7 +3,7 @@ import { Input } from '@nextui-org/input';
 import { Tooltip } from '@nextui-org/tooltip';
 
 import SubmitButton from './submit.button';
-import { handleReviewMembershipRequest } from '@/api/form-handlers/membership-request-form.handlers';
+import { handleReviewMembershipRequest } from '@/api/form-handlers/membership-request.form-handlers';
 import { MembershipRequestStatus } from '@/db/models/nodes';
 import RejectIcon from '../icons/reject.icon';
 import ApproveIcon from '../icons/approve.icon';

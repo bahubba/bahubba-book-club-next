@@ -193,20 +193,3 @@ export const handleAdvancePicker = async (
   revalidatePath(pageRoute);
   redirect(pageRoute);
 };
-
-/**
- * Handle picking a book
- *
- * @param {ErrorFormState} _ From state from the previous render; Unused
- * @param {FormData} formData The form data, containing the book to be picked
- * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
- */
-export const handlePickBook = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
-  // Get the user and ensure that they're authenticated
-  const { email } = await ensureAuth();
-
-
-}

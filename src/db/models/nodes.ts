@@ -67,7 +67,6 @@ export interface MembershipProperties {
 
 // Book node properties
 export interface BookProperties {
-  id: string,
   googleBooksID: string | null,
   title: string,
   authors: string[],
@@ -88,7 +87,6 @@ export interface MembershipRequestProperties {
 
 // Book pick properties
 export interface PickProperties {
-  id: string;
   pickedOn: Date | string;
   targetCompletion?: Date | string;
   completed?: Date | string;

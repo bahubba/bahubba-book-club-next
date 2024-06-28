@@ -16,7 +16,7 @@ interface BookListItemProps {
  * List item for a book
  *
  * @param {Object} props
- * @param {Object} props.book Details about the book
+ * @param {GoogleAPIBook} props.book Details about the book
  * @param {boolean} props.pickable Whether the book can be picked
  * @param {string} props.bookClubSlug If pickable, the slug of the book club being picked for
  */
