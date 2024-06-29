@@ -45,6 +45,7 @@ const ReplyModal = ({
   });
 
   // Reply text state
+  // FIXME - This does not need to be a state variable, we already have a form
   const [replyText, setReplyText] = useState('');
 
   // Handle text input
