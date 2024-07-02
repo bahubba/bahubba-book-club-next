@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import { Divider } from '@nextui-org/divider';
+import { Spinner } from '@nextui-org/spinner';
 
 import BookClubHeader from '@/components/data-fetchers/book-club-name.data-fetcher';
 import BookSearchForm from '@/components/forms/book-search.form';
 import BookListDataFetcher from '@/components/data-fetchers/book-list.data-fetcher';
-import { Spinner } from '@nextui-org/spinner';
+import { getBookClubName } from '@/api/fetchers/book-club.fetchers';
 
 // Component props
 interface PickBookPageProps {
@@ -16,6 +17,17 @@ interface PickBookPageProps {
     pageNum?: string;
     pageSize?: string;
   };
+}
+
+/**
+ * Async component for loading the book club name before rendering the book list (necessary for picking)
+ *
+ * @param {Object} props Component props
+ * @param {string} props.bookClubSlug 
+ */
+const BookListLoader = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>)=> {
+  // Fetch the book club's name
+  const bookClubName = await getBookClubName(bookClubSlug);
 }
 
 /**
@@ -59,7 +71,7 @@ const PickBookPage = async ({
         <Suspense
           fallback={
             <div className="flex justify-center items-center w-full h-full">
-              <Spinner/>
+              <Spinner />
             </div>
           }
         >

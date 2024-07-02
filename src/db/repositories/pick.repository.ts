@@ -24,8 +24,9 @@ export const addPick = async (
     `
     MATCH (:User { email: $email, isActive: TRUE })-[:HAS_MEMBERSHIP]->(m:Membership { isActive: TRUE })<-[:HAS_CURRENT_PICKER]-(bc:BookClub { slug: $slug, isActive: TRUE })
     WHERE NOT EXISTS { MATCH (bc)-[:HAS_CURRENT_PICK]->() }
-    MATCH (b:Book { id: $bookID, isActive: TRUE })
-    MERGE (m)-[:PICKED]->(p:Pick $pickProperties)<-[:HAS_CURRENT_PICK]-(bc)
+    MATCH (b:Book { googleBooksID: $bookID, isActive: TRUE })
+    CREATE (p:Pick $pickProperties)
+    MERGE (m)-[:PICKED]->(p)<-[:HAS_CURRENT_PICK]-(bc)
     MERGE (bc)-[:HAS_PICK]->(p)
     MERGE (p)-[:SELECTED]->(b)
     RETURN p
@@ -33,6 +34,8 @@ export const addPick = async (
     { email, slug, bookID, pickProperties }
   );
 
+  // Close the session and return
+  session.close();
   return result.records.length > 0;
 }
 

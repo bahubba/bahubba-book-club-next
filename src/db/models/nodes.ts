@@ -67,7 +67,7 @@ export interface MembershipProperties {
 
 // Book node properties
 export interface BookProperties {
-  googleBooksID: string | null,
+  googleBooksID: string,
   title: string,
   authors: string[],
   description?: string,
@@ -75,6 +75,18 @@ export interface BookProperties {
   identifiers?: Array<{identifier?: string; type?: string}>
   isActive: boolean;
 }
+
+// Author node properties
+export interface AuthorProperties {
+  givenName?: string;
+  surname?: string;
+  googleBooksName?: string;
+  isTemp?: boolean;
+  dateOfBirth?: Date | string;
+  dateOfDeath?: Date | string;
+  isActive: boolean;
+}
+export interface PseudonymProperties extends  AuthorProperties {}
 
 // Membership request node properties
 export interface MembershipRequestProperties {

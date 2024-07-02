@@ -6,6 +6,7 @@ import BookListItem from '@/components/lists/list-items/book.list-item';
 import URLQueryPagination from '@/components/pagination/url-query.pagination';
 
 import { searchForBooks } from '@/api/fetchers/book.fetchers';
+import { getBookClubName } from '@/api/fetchers/book-club.fetchers';
 
 // Component props
 interface BookListDataFetcherProps {
@@ -27,14 +28,21 @@ interface BookListDataFetcherProps {
  * @param {boolean} props.pickable Whether a book in the list can be picked
  * @param {string} props.bookClubSlug If pickable, the slug of the book club being picked for
  */
-const BookListDataFetcher = async ({
-  query,
-  pageNum = 1,
-  pageSize = 25,
-  path,
-  pickable = false,
-  bookClubSlug
-}: BookListDataFetcherProps) => {
+const BookListDataFetcher = async (
+  {
+    query,
+    pageNum = 1,
+    pageSize = 25,
+    path,
+    pickable = false,
+    bookClubSlug
+  }: BookListDataFetcherProps
+) => {
+  // If the list should be pickable, fetch the book club's name
+  const bookClubName = pickable && !!bookClubSlug && bookClubSlug.length ?
+    await getBookClubName(bookClubSlug) :
+    undefined;
+
   // Search for books
   const bookResults = await searchForBooks(query, pageNum, pageSize);
 
@@ -51,6 +59,7 @@ const BookListDataFetcher = async ({
                 book={book}
                 pickable={pickable}
                 bookClubSlug={bookClubSlug}
+                bookClubName={bookClubName ?? undefined}
               />
               { idx < bookResults.books.length - 1 && <Divider />}
             </Fragment>
