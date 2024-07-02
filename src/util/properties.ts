@@ -1,5 +1,6 @@
 interface Props {
   APP: { [key: string]: string | string[] };
+  API: { [key: string]: string };
   DB: { [key: string]: string };
   AWS: { [key: string]: string | number };
 }
@@ -12,6 +13,9 @@ const props: Props = {
     RESERVED_DISCUSSION_NAMES: ['', '_', 'create', 'search', 'default'],
     DEFAULT_BOOK_CLUB_DESCRIPTION: 'A book club for reading books',
     LOGOUT_ERRORS: ['Not authenticated', 'No user found']
+  },
+  API: {
+    GOOGLE_API_KEY: process.env.BBCM_GOOGLE_API_KEY || ''
   },
   DB: {
     ATLAS_URI: `mongodb+srv://${process.env.BBCM_ATLAS_USER}:${process.env.BBCM_ATLAS_PW}@${process.env.BBCM_ATLAS_URI}`,

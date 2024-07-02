@@ -7,13 +7,15 @@ import SectionHeaderLayout from '@/components/layout/section-header.layout';
 import RequestMembershipButton from '@/components/buttons/request-membership.button';
 import DiscussionCard from '@/components/cards/discussion.card';
 import LinkButton from '@/components/buttons/link.button';
-import AdminIcon from '@/components/icons/admin.icon';
 import BookClubPickOrderList from '@/components/lists/book-club-pick-order.list';
-import { getBookClubName, getBookClubRole } from '@/api/fetchers/book-club.fetchers';
+import AdminIcon from '@/components/icons/admin.icon';
+import ChatIcon from '@/components/icons/chat.icon';
+import BookClubHeader from '@/components/data-fetchers/book-club-name.data-fetcher';
+
+import { getBookClubRole } from '@/api/fetchers/book-club.fetchers';
 import { getBookClubPickList } from '@/api/fetchers/membership.fetchers';
 import { getAdHocDiscussions } from '@/api/fetchers/discussion.fetchers';
 import { Role } from '@/db/models/nodes';
-import ChatIcon from '@/components/icons/chat.icon';
 
 // Component props
 interface BookClubHomePageProps {
@@ -99,21 +101,6 @@ const BookClubButtons = async ({
 };
 
 /**
- * Async component for displaying the book club name
- *
- * @param {Object} props - The component props
- * @param {string} props.bookClubSlug - The slug of the book club
- */
-const BookClubPageHeader = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
-  // Fetch the book club name
-  const bookClubName = await getBookClubName(bookClubSlug);
-
-  return <>{bookClubName}</>;
-};
-
-/**
  * Book club home page
  *
  * @param props - Page props
@@ -129,7 +116,7 @@ const BookClubHomePage = ({
         title={
           <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
             <Suspense fallback={<></>}>
-              <BookClubPageHeader bookClubSlug={bookClubSlug} />
+              <BookClubHeader bookClubSlug={bookClubSlug} />
             </Suspense>
           </h1>
         }

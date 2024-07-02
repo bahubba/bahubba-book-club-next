@@ -7,7 +7,7 @@ import { ScrollShadow } from '@nextui-org/scroll-shadow';
 
 import BookClubCardGridLayout from '@/components/layout/book-club-card-grid.layout';
 import SubmitButton from '@/components/buttons/submit.button';
-import { handleBookClubSearch } from '@/api/form-handlers/book-club-form.handlers';
+import { handleBookClubSearch } from '@/api/form-handlers/book-club.form-handlers';
 
 /** Form for searching for book clubs */
 const BookClubSearchForm = () => {

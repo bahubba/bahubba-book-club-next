@@ -6,7 +6,7 @@ import { Input } from '@nextui-org/input';
 import { Select, SelectItem } from '@nextui-org/select';
 
 import SubmitButton from '@/components/buttons/submit.button';
-import { handleUpdateMemberRole } from '@/api/form-handlers/membership-form.handlers';
+import { handleUpdateMemberRole } from '@/api/form-handlers/membership.form-handlers';
 import { Role } from '@/db/models/nodes';
 import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
 

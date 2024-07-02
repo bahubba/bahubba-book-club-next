@@ -65,6 +65,29 @@ export interface MembershipProperties {
   departed?: Date | string;
 }
 
+// Book node properties
+export interface BookProperties {
+  googleBooksID: string,
+  title: string,
+  authors: string[],
+  description?: string,
+  thumbnail?: string,
+  identifiers?: Array<{identifier?: string; type?: string}>
+  isActive: boolean;
+}
+
+// Author node properties
+export interface AuthorProperties {
+  givenName?: string;
+  surname?: string;
+  googleBooksName?: string;
+  isTemp?: boolean;
+  dateOfBirth?: Date | string;
+  dateOfDeath?: Date | string;
+  isActive: boolean;
+}
+export interface PseudonymProperties extends  AuthorProperties {}
+
 // Membership request node properties
 export interface MembershipRequestProperties {
   status: MembershipRequestStatus;
@@ -72,6 +95,14 @@ export interface MembershipRequestProperties {
   requestMessage: string;
   reviewed?: Date | string;
   reviewMessage?: string;
+}
+
+// Book pick properties
+export interface PickProperties {
+  pickedOn: Date | string;
+  targetCompletion?: Date | string;
+  completed?: Date | string;
+  isActive: boolean;
 }
 
 // Discussion node properties

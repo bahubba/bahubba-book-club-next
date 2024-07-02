@@ -15,7 +15,8 @@ import {
 import { ErrorFormState, SearchFormState } from '@/api/form-handlers/state-interfaces';
 import { Publicity, Role } from '@/db/models/nodes';
 import props from '@/util/properties';
-import { advancePicker, findBookClubRole } from '@/db/repositories/membership.repository';
+import { findBookClubRole } from '@/db/repositories/membership.repository';
+import { advancePicker } from '@/db/repositories/pick.repository';
 
 /**
  * Handle submitting a new book club

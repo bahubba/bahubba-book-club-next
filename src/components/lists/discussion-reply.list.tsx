@@ -79,7 +79,7 @@ const DiscussionReplyList = async ({
         </ScrollShadow>
         <div className="flex justify-center">
           <URLQueryPagination
-            url={`/book-club/${bookClubSlug}/discussions/${discussionID}`}
+            urlPrefix={`/book-club/${bookClubSlug}/discussions/${discussionID}?`}
             total={Math.ceil(total / pageSize)}
           />
         </div>
