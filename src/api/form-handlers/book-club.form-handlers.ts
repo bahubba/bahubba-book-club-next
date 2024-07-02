@@ -25,10 +25,7 @@ import { advancePicker } from '@/db/repositories/pick.repository';
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
-export const handleCreateBookClub = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleCreateBookClub = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 
@@ -92,10 +89,7 @@ export const handleCreateBookClub = async (
  * @param {FormData} formData The book club form's data, matching the Book Club interface
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleUpdateBookClub = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleUpdateBookClub = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 
@@ -143,10 +137,7 @@ export const handleUpdateBookClub = async (
  * @param {FormData} formData The search form's data, containing the search term
  * @return {Promise<SearchFormState>} The new form state; Used for passing back search results or error messages
  */
-export const handleBookClubSearch = async (
-  _: SearchFormState,
-  formData: FormData
-): Promise<SearchFormState> => {
+export const handleBookClubSearch = async (_: SearchFormState, formData: FormData): Promise<SearchFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 
@@ -167,10 +158,7 @@ export const handleBookClubSearch = async (
  * @param {FormData} formData The form data, containing the book club slug
  * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
-export const handleAdvancePicker = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleAdvancePicker = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 

@@ -16,10 +16,7 @@ import { findBookClubRole } from '@/db/repositories/membership.repository';
  * @param {FormData} formData The form data, containing the book club slug
  * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
-export const handleCreateAdHocDiscussion = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleCreateAdHocDiscussion = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 
@@ -60,10 +57,7 @@ export const handleCreateAdHocDiscussion = async (
  * @param {FormData} formData The form data, containing the book club slug, node ID, and reply text
  * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
-export const handleReplyToDiscussion = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleReplyToDiscussion = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user and ensure that they're authenticated
   const { email } = await ensureAuth();
 

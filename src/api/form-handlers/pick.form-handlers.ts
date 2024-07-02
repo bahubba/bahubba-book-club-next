@@ -15,10 +15,7 @@ import { ErrorFormState } from '@/api/form-handlers/state-interfaces';
  * @param {FormData} formData The form data, containing the book club slug and the ID of book being selected
  * @return {Promise<ErrorFormState>} The new form state; Used for passing back error messages
  */
-export const handlePickBook = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handlePickBook = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Get the user's email and ensure they're authenticated
   const { email } = await ensureAuth();
 

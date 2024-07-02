@@ -16,10 +16,7 @@ import { ErrorFormState } from './state-interfaces';
  * @param {FormData} formData The membership request form's data, matching the MembershipRequest interface
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleSubmitMembershipRequest = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleSubmitMembershipRequest = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email } = await ensureAuth();
 
@@ -48,10 +45,7 @@ export const handleSubmitMembershipRequest = async (
  * @param {FormData} formData Data from the form: slug, userEmail, and status
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleReviewMembershipRequest = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleReviewMembershipRequest = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 

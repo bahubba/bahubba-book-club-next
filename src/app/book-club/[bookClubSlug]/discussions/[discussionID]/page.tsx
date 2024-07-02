@@ -20,20 +20,23 @@ interface BookClubDiscussionPageProps {
 /**
  * Book club discussion page
  *
- * @param {Object} props - Component props
- * @param {Object} props.params - The route parameters
- * @param {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Readonly<BookClubDiscussionPageProps>} props Component props
+ * @param {{ bookClubSlug: string, discussionID: string}} props.params The route parameters
+ * @param {string} props.params.bookClubSlug The slug of the book club
+ * @param {string} props.params.discussionID ID of the discussion
  */
-const BookClubDiscussionPage = async ({
-  params: { bookClubSlug, discussionID },
-  searchParams: {
-    pageNum = '1',
-    pageSize = '10'
-  } = {
-    pageNum: '1',
-    pageSize: '10'
-  }
-}: Readonly<BookClubDiscussionPageProps>) => {
+const BookClubDiscussionPage = async (
+  {
+    params: { bookClubSlug, discussionID },
+    searchParams: {
+      pageNum = '1',
+      pageSize = '10'
+    } = {
+      pageNum: '1',
+      pageSize: '10'
+    }
+  }: Readonly<BookClubDiscussionPageProps>
+) => {
   // Load the discussion
   const discussion = await getDiscussion(bookClubSlug, discussionID);
 

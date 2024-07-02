@@ -20,10 +20,7 @@ import { Role } from '@/db/models/nodes';
  * @param {FormData} formData The form data, containing the club slug and member email
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleAddMember = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleAddMember = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 
@@ -58,10 +55,7 @@ export const handleAddMember = async (
  * @param {ErrorFormState} _ Form state from the previous render
  * @param {FormData} formData The form data, containing the club slug, member email, and new role
  */
-export const handleUpdateMemberRole = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleUpdateMemberRole = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 
@@ -110,10 +104,7 @@ export const handleUpdateMemberRole = async (
  * @param {FormData} formData The form data, containing the club slug and member email
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleRemoveMember = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleRemoveMember = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 
@@ -155,10 +146,7 @@ export const handleRemoveMember = async (
  * @param {FormData} formData The form data, containing the club slug and the new pick order
  * @return {ErrorFormState} The new form state; Used for passing back error messages
  */
-export const handleAdjustPickOrder = async (
-  _: ErrorFormState,
-  formData: FormData
-): Promise<ErrorFormState> => {
+export const handleAdjustPickOrder = async (_: ErrorFormState, formData: FormData): Promise<ErrorFormState> => {
   // Ensure the user is authenticated and pull out their email
   const { email: adminEmail } = await ensureAuth();
 

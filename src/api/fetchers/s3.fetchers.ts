@@ -7,10 +7,13 @@ import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
 import { ensureAuth } from '../auth.api';
 import props from '@/util/properties';
 
-/** Retrieve a pre-signed URL for a given image name */
-export const getPreSignedBookClubImageURL = async (
-  imageName: string
-): Promise<string> => {
+/**
+ * Retrieve a pre-signed URL for a given image name
+ *
+ * @param {string} imageName Name of the image to generate link for
+ * @return {Promise<string>} Pre-signed URL for the image with a relatively quick expiration
+ */
+export const getPreSignedBookClubImageURL = async (imageName: string): Promise<string> => {
   // Ensure that the user is authenticated
   await ensureAuth();
 
@@ -27,7 +30,11 @@ export const getPreSignedBookClubImageURL = async (
   return imageURL;
 };
 
-/** Retrieves a list of stock book club image file names */
+/**
+ * Retrieves a list of stock book club image file names
+ *
+ * @return {Promise<string[]>} List of pre-signed URLs for internal images for book clubs stored in S3
+ */
 export const getStockBookClubImageNames = async (): Promise<string[]> => {
   // Ensure that the user is authenticated
   await ensureAuth();

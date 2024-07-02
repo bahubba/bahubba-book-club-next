@@ -31,9 +31,7 @@ export const getBookClubs = async (): Promise<BookClubProperties[]> => {
  * @param {string} slug The slug of the book club to retrieve
  * @return {Promise<BookClubProperties | null>} The book club with the given slug, or null if it doesn't exist
  */
-export const getBookClub = async (
-  slug: string
-): Promise<BookClubProperties | null> => {
+export const getBookClub = async (slug: string): Promise<BookClubProperties | null> => {
   // Ensure that the user is authenticated
   const { email } = await ensureAuth();
 
@@ -80,9 +78,7 @@ export const getBookClubPublicity = async (
  * @param {string} slug The slug of the book club
  * @return {Promise<UserAndMembership[]>} The members of the book club
  */
-export const getBookClubMembers = async (
-  slug: string
-): Promise<UserAndMembership[]> => {
+export const getBookClubMembers = async (slug: string): Promise<UserAndMembership[]> => {
   // Ensure that the user is authenticated
   const { email } = await ensureAuth();
 

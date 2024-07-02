@@ -27,9 +27,7 @@ export const hasOpenRequest = async (slug: string): Promise<boolean> => {
  * @param {string} slug The slug of the book club
  * @return {Promise<UserAndMembershipRequest[]>} The membership requests
  */
-export const getMembershipRequests = async (
-  slug: string
-): Promise<UserAndMembershipRequest[]> => {
+export const getMembershipRequests = async (slug: string): Promise<UserAndMembershipRequest[]> => {
   // Ensure that the user is authenticated and get their email
   const { email } = await ensureAuth();
 

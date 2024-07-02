@@ -8,10 +8,10 @@ import BookClubBackButton from '@/components/buttons/book-club-back.button';
 /**
  * Async component for loading book club discussion cards
  *
- * @param {Object} props - Component props
- * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {Readonly<{ bookClubSlug: string }>} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
-const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
+const DiscussionCards = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>) => {
   // Load the discussions
   const discussions = await getAdHocDiscussions(bookClubSlug);
 
@@ -33,13 +33,11 @@ const DiscussionCards = async ({ bookClubSlug }: { bookClubSlug: string }) => {
 /**
  * Book club discussions home page
  *
- * @param {Object} props - Component props
- * @param {Object} props.params - The route parameters
- * @param {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Readonly<{ params: { bookClubSlug: string } }>} props Component props
+ * @param {{ bookClubSlug: string }} props.params The route parameters
+ * @param {string} props.params.bookClubSlug The slug of the book club
  */
-const BookClubDiscussionsPage = ({
-  params: { bookClubSlug }
-}: Readonly<{ params: { bookClubSlug: string } }>) => (
+const BookClubDiscussionsPage = ({ params: { bookClubSlug } }: Readonly<{ params: { bookClubSlug: string } }>) => (
   <>
     <div className="flex justify-between items-center pe-2">
       <h1 className="flex-shrink text-2xl font-bold my-2">Discussions</h1>

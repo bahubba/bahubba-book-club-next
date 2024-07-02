@@ -22,8 +22,8 @@ interface PickBookPageProps {
 /**
  * Async component for loading the book club name before rendering the book list (necessary for picking)
  *
- * @param {Object} props Component props
- * @param {string} props.bookClubSlug 
+ * @param {Readonly<{ bookClubSlug: string }>} props Component props
+ * @param {string} props.bookClubSlug
  */
 const BookListLoader = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>)=> {
   // Fetch the book club's name
@@ -33,22 +33,24 @@ const BookListLoader = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string 
 /**
  * Page for picking a book club
  *
- * @param {Object} props Component props
- * @param {Object} props.params URL slugs as params
+ * @param {Readonly<PickBookPageProps>} props Component props
+ * @param {{ bookClubSlug: string }} props.params URL slugs as params
  * @param {string} props.params.bookClubSlug The slug of the book club being picked for
- * @param {Object} props.searchParams URL query params
+ * @param {{ query?: string, pageNum?: string, pageSize?: string }} props.searchParams URL query params
  * @param {string} props.searchParams.query The search query for finding a book
  * @param {string} props.searchParams.pageNum The page number of the search results
  * @param {string} props.searchParams.pageSize The number of results to return per page
  */
-const PickBookPage = async ({
-  params: { bookClubSlug },
-  searchParams: {
-    query = '',
-    pageNum = '1',
-    pageSize = '25'
-  }
-}: PickBookPageProps) => (
+const PickBookPage = async (
+  {
+    params: { bookClubSlug },
+    searchParams: {
+      query = '',
+      pageNum = '1',
+      pageSize = '25'
+    }
+  }: Readonly<PickBookPageProps>
+) => (
   <div className="flex flex-col h-full pb-2">
     <div className="flex-shrink flex-grow-0 flex justify-between items-center">
       <h1 className="ms-2 my-2 text-3xl font-bold">

@@ -1,8 +1,10 @@
+import { ReactNode } from 'react';
+
 import ProtectedRoute from '@/components/nav/protected-route.component';
 
 // Component props
 interface CreateDiscussionLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params: {
     bookClubSlug: string;
   };
@@ -11,15 +13,12 @@ interface CreateDiscussionLayoutProps {
 /**
  * Layout for book club discussion creation
  *
- * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - The children components
- * @param {Object} props.params - The route parameters
- * @param {string} props.params.bookClubSlug - The slug of the book club
+ * @param {Readonly<CreateDiscussionLayoutProps>} props Component props
+ * @param {Object} props.params The route parameters
+ * @param {string} props.params.bookClubSlug The slug of the book club
+ * @param {ReactNode} props.children The children components
  */
-const CreateDiscussionLayout = ({
-  children,
-  params: { bookClubSlug }
-}: Readonly<CreateDiscussionLayoutProps>) => (
+const CreateDiscussionLayout = ({ params: { bookClubSlug }, children }: Readonly<CreateDiscussionLayoutProps>) => (
   <ProtectedRoute
     bookClubSlug={bookClubSlug}
     needsAdmin

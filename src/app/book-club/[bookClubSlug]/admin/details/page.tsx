@@ -14,12 +14,10 @@ interface BookClubAdminDetailsPageProps {
 /**
  * Async component for rendering the admin details form after fetching data
  *
- * @param {Object} props - The component props
+ * @param {Readonly<{ bookClubSlug: string }>} props The component props
  * @param {string} props.bookClubSlug The slug of the book club
  */
-const BookClubDetailsFormWrapper = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+const BookClubDetailsFormWrapper = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>) => {
   const bookClub = await getBookClub(bookClubSlug);
 
   return bookClub ? (
@@ -33,13 +31,11 @@ const BookClubDetailsFormWrapper = async ({
 /**
  * Book club details admin page
  *
- * @param {Object} props - The page props
- * @param {BookClubAdminDetailsPageProps} props.params - The page params
- * @param {string} props.params.bookClubSlug - The book club slug from the URL path
+ * @param {Readonly<BookClubAdminDetailsPageProps>} props The page props
+ * @param {{ bookClubSlug: string }} props.params The page params
+ * @param {string} props.params.bookClubSlug The book club slug from the URL path
  */
-const BookClubAdminDetailsPage = ({
-  params: { bookClubSlug }
-}: Readonly<BookClubAdminDetailsPageProps>) => {
+const BookClubAdminDetailsPage = ({ params: { bookClubSlug } }: Readonly<BookClubAdminDetailsPageProps>) => {
   return (
     <Suspense
       fallback={

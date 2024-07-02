@@ -1,8 +1,10 @@
+import { ReactNode } from 'react';
+
 import ProtectedRoute from '@/components/nav/protected-route.component';
 
 // Component props
 interface BookClubLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
   params: {
     bookClubSlug: string;
   };
@@ -11,15 +13,12 @@ interface BookClubLayoutProps {
 /**
  * Layout for the book club page; Protected route by user's membership in club
  *
- * @param {Object} props Component props
- * @param {React.ReactNode} props.children The children of the layout
- * @param {params} props.params The parameters of the page
+ * @param {Readonly<BookClubLayoutProps>} props Component props
+ * @param {{ bookClubSlug }} props.params The parameters of the page
  * @param {string} props.params.bookClubSlug The slug of the book club
+ * @param {ReactNode} props.children The children of the layout
  */
-const BookClubLayout = ({
-  children,
-  params: { bookClubSlug }
-}: Readonly<BookClubLayoutProps>) => (
+const BookClubLayout = ({ params: { bookClubSlug }, children }: Readonly<BookClubLayoutProps>) => (
   <ProtectedRoute bookClubSlug={bookClubSlug}>{children}</ProtectedRoute>
 );
 

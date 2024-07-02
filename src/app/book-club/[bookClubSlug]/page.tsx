@@ -27,12 +27,10 @@ interface BookClubHomePageProps {
 /**
  * Async component for fetching and displaying ad-hoc discussions
  *
- * @param {Object} props - Component props
- * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {Readonly<{ bookClubSlug: string }>} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
-const AdHocDiscussions = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+const AdHocDiscussions = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the ad-hoc discussions
   const discussions = await getAdHocDiscussions(bookClubSlug);
 
@@ -52,12 +50,10 @@ const AdHocDiscussions = async ({
 /**
  * Async component for fetching and displaying the pick order
  *
- * @param {Object} props - Component props
- * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {Readonly<{ bookClubSlug: string }>} props Component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
-const PickOrderWrapper = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+const PickOrderWrapper = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the pick order and user's role
   const pickOrder = await getBookClubPickList(bookClubSlug);
   const memberRole = await getBookClubRole(bookClubSlug);
@@ -74,12 +70,10 @@ const PickOrderWrapper = async ({
 /**
  * Async component for displaying the book club admin button or the request membership button
  *
- * @param {Object} props - The component props
- * @param {string} props.bookClubSlug - The slug of the book club
+ * @param {Readonly<{ bookClubSlug: string }>} props The component props
+ * @param {string} props.bookClubSlug The slug of the book club
  */
-const BookClubButtons = async ({
-  bookClubSlug
-}: Readonly<{ bookClubSlug: string }>) => {
+const BookClubButtons = async ({ bookClubSlug }: Readonly<{ bookClubSlug: string }>) => {
   // Fetch the user's role
   const role = await getBookClubRole(bookClubSlug);
 
@@ -103,71 +97,67 @@ const BookClubButtons = async ({
 /**
  * Book club home page
  *
- * @param props - Page props
- * @param props.params - Page params
- * @param props.params.bookClubSlug - Slug of the book club name from the URL path
+ * @param {Readonly<BookClubHomePageProps>} props Page props
+ * @param {{ bookClubSlug: string }} props.params Page params
+ * @param {string} props.params.bookClubSlug Slug of the book club name from the URL path
  */
-const BookClubHomePage = ({
-  params: { bookClubSlug }
-}: Readonly<BookClubHomePageProps>) => {
-  return (
-    <div className="flex flex-col h-full pb-2">
-      <SectionHeaderLayout
-        title={
-          <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
-            <Suspense fallback={<></>}>
-              <BookClubHeader bookClubSlug={bookClubSlug} />
-            </Suspense>
-          </h1>
-        }
-      >
-        <Suspense fallback={<></>}>
-          <BookClubButtons bookClubSlug={bookClubSlug} />
-        </Suspense>
-      </SectionHeaderLayout>
-      <div className="flex flex-1 w-full h-1">
-        <PageSectionLayout header="Members">
-          <Suspense
-            fallback={
-              <div className="flex justify-center items-center w-full h-36">
-                <Spinner />
-              </div>
-            }
-          >
-            <PickOrderWrapper bookClubSlug={bookClubSlug} />
+const BookClubHomePage = ({ params: { bookClubSlug } }: Readonly<BookClubHomePageProps>) => (
+  <div className="flex flex-col h-full pb-2">
+    <SectionHeaderLayout
+      title={
+        <h1 className="flex-shrink flex items-center ms-2 my-2 text-3xl font-bold">
+          <Suspense fallback={<></>}>
+            <BookClubHeader bookClubSlug={bookClubSlug} />
           </Suspense>
-        </PageSectionLayout>
-        <PageSectionLayout header="Books">
-          <div>Some long text string that will take up some width</div>
-        </PageSectionLayout>
-        <PageSectionLayout
-          header={
-            <Link href={`/book-club/${bookClubSlug}/discussions`}>
-              Discussions
-            </Link>
-          }
-          sectionHeaderChildren={
-            <LinkButton
-              uri={`/book-club/${bookClubSlug}/discussions/create`}
-              tooltip="Create a discussion"
-            >
-              <ChatIcon />
-            </LinkButton>
+        </h1>
+      }
+    >
+      <Suspense fallback={<></>}>
+        <BookClubButtons bookClubSlug={bookClubSlug} />
+      </Suspense>
+    </SectionHeaderLayout>
+    <div className="flex flex-1 w-full h-1">
+      <PageSectionLayout header="Members">
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center w-full h-36">
+              <Spinner />
+            </div>
           }
         >
-          <Suspense
-            fallback={
-              <div className="flex justify-center items-center w-full h-36">
-                <Spinner />
-              </div>
-            }
+          <PickOrderWrapper bookClubSlug={bookClubSlug} />
+        </Suspense>
+      </PageSectionLayout>
+      <PageSectionLayout header="Books">
+        <div>Some long text string that will take up some width</div>
+      </PageSectionLayout>
+      <PageSectionLayout
+        header={
+          <Link href={`/book-club/${bookClubSlug}/discussions`}>
+            Discussions
+          </Link>
+        }
+        sectionHeaderChildren={
+          <LinkButton
+            uri={`/book-club/${bookClubSlug}/discussions/create`}
+            tooltip="Create a discussion"
           >
-            <AdHocDiscussions bookClubSlug={bookClubSlug} />
-          </Suspense>
-        </PageSectionLayout>
-      </div>
+            <ChatIcon />
+          </LinkButton>
+        }
+      >
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center w-full h-36">
+              <Spinner />
+            </div>
+          }
+        >
+          <AdHocDiscussions bookClubSlug={bookClubSlug} />
+        </Suspense>
+      </PageSectionLayout>
     </div>
-  );
-};
+  </div>
+);
 
 export default BookClubHomePage;

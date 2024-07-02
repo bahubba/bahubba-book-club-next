@@ -9,9 +9,7 @@ import { toJSON } from '@/util/helpers';
  * @param {string} slug The slug of the book club
  * @return {Promise<UserAndMembership[]>} The pick list
  */
-export const getBookClubPickList = async (
-  slug: string
-): Promise<UserAndMembership[]> => {
+export const getBookClubPickList = async (slug: string): Promise<UserAndMembership[]> => {
   // Ensure the user is authenticated and pull out their email
   const { email } = await ensureAuth();
 

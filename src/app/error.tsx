@@ -4,6 +4,12 @@ import { signOut } from 'next-auth/react';
 
 import props from '@/util/properties';
 
+/**
+ * Catch-all error page, just removes any session/auth
+ *
+ * @param error
+ * @param reset
+ */
 const Error = ({ error, reset }: {
   error: Error & { digest?: string }
   reset: () => void

@@ -11,12 +11,10 @@ import { toJSON } from '@/util/helpers';
 /**
  * Get ad-hoc discussions for a book club
  *
- * @param {string} bookClubSlug - The slug of the book club
+ * @param {string} bookClubSlug The slug of the book club
  * @return {Promise<DiscussionPreview[]>}
  */
-export const getAdHocDiscussions = async (
-  bookClubSlug: string
-): Promise<DiscussionPreview[]> => {
+export const getAdHocDiscussions = async (bookClubSlug: string): Promise<DiscussionPreview[]> => {
   // Ensure the user is authenticated and get their email
   const { email } = await ensureAuth();
 
@@ -27,14 +25,11 @@ export const getAdHocDiscussions = async (
 /**
  * Get a discussion
  *
- * @param {string} bookClubSlug - The slug of the book club
- * @param {string} discussionID - The slug of the discussion
+ * @param {string} bookClubSlug The slug of the book club
+ * @param {string} discussionID The slug of the discussion
  * @return {Promise<DiscussionProperties>}
  */
-export const getDiscussion = async (
-  bookClubSlug: string,
-  discussionID: string
-): Promise<DiscussionProperties> => {
+export const getDiscussion = async (bookClubSlug: string, discussionID: string): Promise<DiscussionProperties> => {
   // Ensure the user is authenticated and get their email
   const { email } = await ensureAuth();
 
@@ -70,10 +65,7 @@ export const getDiscussionReplies = async (
  * @param {string} discussionID The ID of the discussion
  * @return {Promise<number>} The total number of replies
  */
-export const getDiscussionReplyCount = async (
-  bookClubSlug: string,
-  discussionID: string
-): Promise<number> => {
+export const getDiscussionReplyCount = async (bookClubSlug: string, discussionID: string): Promise<number> => {
   // Ensure the user is authenticated and get their email
   const { email } = await ensureAuth();
 
